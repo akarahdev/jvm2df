@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "dev.akarah"
-version = "1.0-SNAPSHOT"
+version = "unspecified"
 
 repositories {
     mavenCentral()
