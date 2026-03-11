@@ -15,7 +15,7 @@ application {
 }
 
 tasks.run {
-    args(project.rootDir.toString() + "/example-plot/build/libs/example-plot-1.0-SNAPSHOT.jar")
+    args(project.rootDir.toString() + "/example-plot/build/libs/example-plot-1.0-SNAPSHOT-all.jar")
 }
 
 repositories {

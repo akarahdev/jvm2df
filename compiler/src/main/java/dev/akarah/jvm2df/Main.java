@@ -1,6 +1,7 @@
 package dev.akarah.jvm2df;
 
 import dev.akarah.jvm2df.bytecode.JarToClasses;
+import dev.akarah.jvm2df.bytecode.MethodFlowAnalysis;
 
 import java.nio.file.Path;
 
@@ -22,6 +23,7 @@ public class Main {
                 System.out.println(methodElements.methodName());
                 methodElements.code().ifPresent(code -> {
                     System.out.println(code.toDebugString());
+                    System.out.println(new MethodFlowAnalysis(code).analyze());
                 });
             });
         });
