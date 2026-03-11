@@ -17,6 +17,10 @@ public class JarToClasses {
             var entry = jarStream.getNextJarEntry();
             while(entry != null) {
                 var classBytes = jarStream.readAllBytes();
+                if(classBytes.length == 0) {
+                    entry = jarStream.getNextJarEntry();
+                    continue;
+                }
                 var cf = ClassFile.of();
                 classFiles.add(cf.parse(classBytes));
                 entry = jarStream.getNextJarEntry();

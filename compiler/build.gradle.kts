@@ -7,7 +7,7 @@ group = "dev.akarah"
 version = "unspecified"
 
 tasks.run {
-    dependsOn(":example-plot:jar")
+    dependsOn(":example-plot:shadowJar")
 }
 
 application {

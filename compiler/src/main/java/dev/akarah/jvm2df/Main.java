@@ -15,5 +15,15 @@ public class Main {
         System.out.println("Compiling " + path);
         var classes = JarToClasses.convert(path);
         System.out.println(classes);
+
+        classes.forEach(classElements -> {
+            System.out.println(classElements.thisClass().name());
+            classElements.methods().forEach(methodElements -> {
+                System.out.println(methodElements.methodName());
+                methodElements.code().ifPresent(code -> {
+                    System.out.println(code.toDebugString());
+                });
+            });
+        });
     }
 }

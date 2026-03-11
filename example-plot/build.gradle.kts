@@ -13,3 +13,12 @@ repositories {
 dependencies {
     implementation(project(":stdlib"))
 }
+
+tasks.jar {
+    from(
+        configurations.runtimeClasspath
+            .get()
+            .filter { it.name.endsWith("jar") }
+            .map { zipTree(it) }
+    )
+}
