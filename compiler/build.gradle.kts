@@ -6,6 +6,8 @@ plugins {
 group = "dev.akarah"
 version = "unspecified"
 
+
+
 tasks.run {
     dependsOn(":example-plot:shadowJar")
 }
@@ -20,12 +22,14 @@ tasks.run {
 
 repositories {
     mavenCentral()
+    maven("https://libraries.minecraft.net")
 }
 
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("com.mojang:datafixerupper:9.0.19")
 }
 
 tasks.test {

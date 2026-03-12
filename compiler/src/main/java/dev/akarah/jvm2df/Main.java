@@ -2,8 +2,14 @@ package dev.akarah.jvm2df;
 
 import dev.akarah.jvm2df.bytecode.JarToClasses;
 import dev.akarah.jvm2df.bytecode.MethodFlowAnalysis;
+import dev.akarah.jvm2df.codetemplate.CodeTemplateData;
+import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
+import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.codetemplate.items.Args;
+import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class Main {
     static void main(String[] args) {
@@ -27,5 +33,14 @@ public class Main {
                 });
             });
         });
+
+        var code = new CodeLine(List.of(
+                ActionBlock.playerEvent("Join"),
+                ActionBlock.playerAction("SendMessage", new Args(List.of(
+                        new Args.Argument(LiteralItem.text("Hi!"), 0)
+                )))
+        ));
+
+        System.out.println(new CodeTemplateData(code));
     }
 }

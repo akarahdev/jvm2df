@@ -6,7 +6,6 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.ClassModel;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.jar.JarInputStream;
 
