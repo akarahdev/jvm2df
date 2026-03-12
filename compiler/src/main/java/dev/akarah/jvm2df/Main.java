@@ -23,24 +23,6 @@ public class Main {
         var classes = JarToClasses.convert(path);
         System.out.println(classes);
 
-        classes.forEach(classElements -> {
-            System.out.println(classElements.thisClass().name());
-            classElements.methods().forEach(methodElements -> {
-                System.out.println(methodElements.methodName());
-                methodElements.code().ifPresent(code -> {
-                    System.out.println(code.toDebugString());
-                    System.out.println(new MethodFlowAnalysis(code).analyze());
-                });
-            });
-        });
-
-        var code = new CodeLine(List.of(
-                ActionBlock.playerEvent("Join"),
-                ActionBlock.playerAction("SendMessage", new Args(List.of(
-                        new Args.Argument(LiteralItem.text("Hi!"), 0)
-                )))
-        ));
-
-        System.out.println(new CodeTemplateData(code));
+//      System.out.println(new MethodFlowAnalysis(code).analyze());
     }
 }

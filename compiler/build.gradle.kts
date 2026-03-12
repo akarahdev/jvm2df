@@ -30,6 +30,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.mojang:datafixerupper:9.0.19")
+    implementation("org.java-websocket:Java-WebSocket:1.6.0")
 }
 
 tasks.test {
