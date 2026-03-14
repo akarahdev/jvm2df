@@ -9,6 +9,7 @@ import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 
+import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -39,10 +40,25 @@ public record LineVarLocals(CodeBlockTransformer transformer) implements LocalMe
     @Override
     @SuppressWarnings("unchecked")
     public List<VarItem<?>> functionHeadParams(MethodMeta methodMeta) {
-        return (List<VarItem<?>>) (Object) IntStream.range(0, methodMeta.methodTypeDesc().parameterCount() + (methodMeta.isStatic() ? 0 : 1))
-                .mapToObj(this::referenceLocal)
-                .map(x -> new ParameterItem(x.name(), "any", false, false))
-                .toList();
+        var params = new ArrayList<ParameterItem>();
+        int idx = 0;
+        if(!methodMeta.isStatic()) {
+            idx += 1;
+            var localVar = this.referenceLocal(0);
+            params.add(new ParameterItem(localVar.name(), "any", false, false));
+        }
+        for(var parameter : methodMeta.methodTypeDesc().parameterList()) {
+            var localVar = this.referenceLocal(idx);
+            params.add(new ParameterItem(localVar.name(), "any", false, false));
+            idx += 1;
+            if(parameter.descriptorString().equals("D") || parameter.descriptorString().equals("L")) {
+                idx += 1;
+            }
+        }
+        if(!methodMeta.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
+            params.addFirst(new ParameterItem("return", "var", false, false));
+        }
+        return (List<VarItem<?>>) (Object) params;
     }
 
     @Override

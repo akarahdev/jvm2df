@@ -8,7 +8,9 @@ import dev.akarah.jvm2df.tree.cfr.NaiveFlowTransformer;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
+import dev.akarah.jvm2df.util.Beep;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.reflect.AccessFlag;
 import java.net.URISyntaxException;
@@ -46,14 +48,22 @@ public class Main {
                     );
                     System.out.println(base.context());
                     System.out.println(codeModel.toDebugString());
-                    var out = base
-                            .map(BytecodeTranslator::split)
-                            .inspect((v, c) -> System.out.println(v))
-                            .map(NaiveFlowTransformer::new)
-                            .map(NaiveFlowTransformer::convert)
-                            .map(CodeBlockTransformer::new)
-                            .map(CodeBlockTransformer::transform);
-                    codeLines.addAll(out.value());
+                    try {
+                        var out = base
+                                .map(BytecodeTranslator::split)
+                                .inspect((v, c) -> System.out.println(v))
+                                .map(NaiveFlowTransformer::new)
+                                .map(NaiveFlowTransformer::convert)
+                                .map(CodeBlockTransformer::new)
+                                .map(CodeBlockTransformer::transform);
+                        codeLines.addAll(out.value());
+                    } catch (Exception e) {
+                        try {
+                            Beep.tone(330, 100, 0.5);
+                        } catch (LineUnavailableException _) {
+                            // ignore it, sound isn't necessary
+                        }
+                    }
                 });
             });
         });

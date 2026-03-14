@@ -6,6 +6,6 @@ public class PlayerEvents extends PlayerEventHandler {
     public void Join() {
         var a1 = new ComplexNumber(10, 20);
         var a2 = new ComplexNumber(30, 40);
-        a1.add(a2).debugPrint();
+        a1.multiply(a2).conjugate().debugPrint();
     }
 }

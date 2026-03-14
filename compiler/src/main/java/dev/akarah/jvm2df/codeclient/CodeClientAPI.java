@@ -2,10 +2,12 @@ package dev.akarah.jvm2df.codeclient;
 
 import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.util.Beep;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -43,6 +45,11 @@ public class CodeClientAPI extends WebSocketClient {
             }
             case "place done" -> {
                 this.close();
+                try {
+                    Beep.tone(440, 100, 0.5);
+                } catch (LineUnavailableException _) {
+                    // ignore it, sound isn't necessary
+                }
             }
             case "basic", "large", "massive", "mega" -> {
 
