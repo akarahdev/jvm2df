@@ -3,6 +3,8 @@ package dev.akarah.jvm2df.codetemplate.items;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public record Args(List<Argument> arguments) {
@@ -13,5 +15,22 @@ public record Args(List<Argument> arguments) {
         ).apply(instance, Argument::new));
     }
 
-    public static Codec<Args> CODEC = Argument.CODEC.listOf().xmap(Args::new, Args::arguments);
+    public static Args byVarItems(List<VarItem<?>> varItems) {
+        var list = new ArrayList<Argument>();
+        int idx = 0;
+        for(var item : varItems) {
+            list.add(new Argument(
+                    item,
+                    idx
+            ));
+            idx += 1;
+        }
+        return new Args(list);
+    }
+
+    public static Args byVarItems(VarItem<?>... varItems) {
+        return byVarItems(Arrays.asList(varItems));
+    }
+
+    public static Codec<Args> CODEC = Argument.CODEC.listOf().xmap(Args::new, Args::arguments).fieldOf("items").codec();
 }

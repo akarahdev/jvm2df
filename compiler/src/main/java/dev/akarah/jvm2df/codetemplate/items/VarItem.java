@@ -10,7 +10,10 @@ public interface VarItem<T extends VarItem<T>> {
     public static Map<String, Codec<?>> VAR_ITEMS = Map.ofEntries(
             Map.entry("num", LiteralItem.CODEC),
             Map.entry("txt", LiteralItem.CODEC),
-            Map.entry("comp", LiteralItem.CODEC)
+            Map.entry("comp", LiteralItem.CODEC),
+            Map.entry("var", VariableItem.CODEC),
+            Map.entry("bl_tag", BlockTagItem.CODEC),
+            Map.entry("pn_el", ParameterItem.CODEC)
     );
 
     @SuppressWarnings("unchecked")

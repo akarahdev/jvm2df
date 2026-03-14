@@ -2,6 +2,7 @@ package dev.akarah.jvm2df.tree.cfr;
 
 import dev.akarah.jvm2df.tree.cfg.BasicBlock;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
+import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ public class NaiveFlowTransformer implements ControlFlowTransformer {
         for(var block : basicBlocks) {
             mainLoop.statements().add(new CodeTree.ExecuteFlow(
                     new ReconstructedFlow.If(
-                            new CodeTree.IsEqual(
+                            new CodeTree.Compare(
+                                    ComparisonType.EQUAL,
                                     new CodeTree.LoadLocal(LABEL_VARIABLE),
                                     new CodeTree.Constant(block.offset())
                             ),

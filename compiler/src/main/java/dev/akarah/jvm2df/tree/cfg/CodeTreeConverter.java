@@ -1,6 +1,8 @@
 package dev.akarah.jvm2df.tree.cfg;
 
+import dev.akarah.jvm2df.tree.instructions.BinOpType;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
+import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.lang.classfile.*;
@@ -93,25 +95,25 @@ public class CodeTreeConverter {
     private void operator(OperatorInstruction instruction, int offset) {
         switch (instruction.opcode()) {
             case DADD, FADD, IADD, LADD -> {
-                this.stack.add(new CodeTree.Add(stack.removeLast(), stack.removeLast()));
+                this.stack.add(new CodeTree.BinOp(BinOpType.ADD, stack.removeLast(), stack.removeLast()));
             }
             case DSUB, FSUB, ISUB, LSUB -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.Sub(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.SUB, lhs, rhs));
             }
             case DMUL, FMUL, IMUL, LMUL -> {
-                this.stack.add(new CodeTree.Mul(stack.removeLast(), stack.removeLast()));
+                this.stack.add(new CodeTree.BinOp(BinOpType.MUL, stack.removeLast(), stack.removeLast()));
             }
             case DDIV, FDIV, IDIV, LDIV -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.Div(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.DIV, lhs, rhs));
             }
             case DREM, FREM, IREM, LREM -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.Mod(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.MOD, lhs, rhs));
             }
             case DNEG, FNEG, INEG, LNEG -> {
                 this.stack.add(new CodeTree.Negate(stack.removeLast()));
@@ -119,20 +121,20 @@ public class CodeTreeConverter {
             case ISHL, LSHL -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.ShiftLeft(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.SHL, lhs, rhs));
             }
             case ISHR, LSHR -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.ShiftRight(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.SHR, lhs, rhs));
             }
-            case IAND, LAND -> this.stack.add(new CodeTree.And(stack.removeLast(), stack.removeLast()));
-            case IXOR, LXOR -> this.stack.add(new CodeTree.Xor(stack.removeLast(), stack.removeLast()));
-            case IOR, LOR -> this.stack.add(new CodeTree.Or(stack.removeLast(), stack.removeLast()));
+            case IAND, LAND -> this.stack.add(new CodeTree.BinOp(BinOpType.AND, stack.removeLast(), stack.removeLast()));
+            case IXOR, LXOR -> this.stack.add(new CodeTree.BinOp(BinOpType.XOR, stack.removeLast(), stack.removeLast()));
+            case IOR, LOR -> this.stack.add(new CodeTree.BinOp(BinOpType.OR, stack.removeLast(), stack.removeLast()));
             case DCMPG, DCMPL, FCMPG, FCMPL -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.CompareNumbers(lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.COMPARE_DOUBLES, lhs, rhs));
             }
             case ARRAYLENGTH -> {
                 this.stack.add(new CodeTree.ArrayLength(this.stack.removeLast()));
@@ -184,12 +186,18 @@ public class CodeTreeConverter {
 
         switch (instruction.opcode()) {
             case GOTO, GOTO_W -> stack.add(new Terminator.Jump(this.labelToOffset(instruction.target())));
-            case IFEQ, IF_ACMPEQ, IF_ICMPEQ, IFNULL -> stack.add(new CodeTree.IsEqual(this.stack.removeLast(), this.stack.removeLast()));
-            case IFNE, IF_ACMPNE, IF_ICMPNE, IFNONNULL -> stack.add(new CodeTree.IsNotEqual(this.stack.removeLast(), this.stack.removeLast()));
-            case IFGE, IF_ICMPGE -> stack.add(new CodeTree.IsGE(this.stack.removeLast(), this.stack.removeLast()));
-            case IFGT, IF_ICMPGT -> stack.add(new CodeTree.IsGT(this.stack.removeLast(), this.stack.removeLast()));
-            case IFLE, IF_ICMPLE -> stack.add(new CodeTree.IsLE(this.stack.removeLast(), this.stack.removeLast()));
-            case IFLT, IF_ICMPLT -> stack.add(new CodeTree.IsLT(this.stack.removeLast(), this.stack.removeLast()));
+            case IFEQ, IF_ACMPEQ, IF_ICMPEQ, IFNULL -> stack.add(new CodeTree.Compare(
+                    ComparisonType.EQUAL, this.stack.removeLast(), this.stack.removeLast()));
+            case IFNE, IF_ACMPNE, IF_ICMPNE, IFNONNULL -> stack.add(new CodeTree.Compare(
+                    ComparisonType.NOT_EQUAL, this.stack.removeLast(), this.stack.removeLast()));
+            case IFGE, IF_ICMPGE -> stack.add(new CodeTree.Compare(
+                    ComparisonType.GREATER_THAN_OR_EQ, this.stack.removeLast(), this.stack.removeLast()));
+            case IFGT, IF_ICMPGT -> stack.add(new CodeTree.Compare(
+                    ComparisonType.GREATER_THAN, this.stack.removeLast(), this.stack.removeLast()));
+            case IFLE, IF_ICMPLE -> stack.add(new CodeTree.Compare(
+                    ComparisonType.LESS_THAN_OR_EQ, this.stack.removeLast(), this.stack.removeLast()));
+            case IFLT, IF_ICMPLT -> stack.add(new CodeTree.Compare(
+                    ComparisonType.LESS_THAN, this.stack.removeLast(), this.stack.removeLast()));
         }
         if(instruction.opcode().toString().contains("IF")) {
             this.stack.add(
