@@ -11,7 +11,10 @@ import java.util.function.Function;
 public class BoxedPrimitiveHandler implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if(invoke.descriptor().startsWith("java/lang/Integer#valueOf")) {
+        if(invoke.descriptor().startsWith("java/lang/Integer#valueOf")
+        || invoke.descriptor().startsWith("java/lang/Long#valueOf")
+        || invoke.descriptor().startsWith("java/lang/Double#valueOf")
+        || invoke.descriptor().startsWith("java/lang/Float#valueOf")) {
             return Optional.of(
                     transformer -> transformer.convertCodeTree(invoke.args().getFirst())
             );

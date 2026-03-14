@@ -21,6 +21,12 @@ public interface CodeTree {
     record ArrayStore(CodeTree list, CodeTree index, CodeTree value) implements CodeTree {}
     record ArrayLength(CodeTree list) implements CodeTree {}
 
+    record ObjectNew(String clazz) implements CodeTree {}
+    record ObjectGetField(CodeTree obj, String field) implements CodeTree {}
+    record ObjectSetField(CodeTree obj, String field, CodeTree value) implements CodeTree {}
+    record ObjectGetStatic(String clazz, String field) implements CodeTree {}
+    record ObjectSetStatic(String clazz, String field, CodeTree value) implements CodeTree {}
+
     record Compare(ComparisonType comparison, CodeTree lhs, CodeTree rhs) implements CodeTree {}
 
     record ExecuteFlow(ReconstructedFlow flow) implements CodeTree {}

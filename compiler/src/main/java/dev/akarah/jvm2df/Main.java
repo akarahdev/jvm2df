@@ -45,8 +45,9 @@ public class Main {
                             methodMeta
                     );
                     System.out.println(base.context());
-                    var out = base.map(BytecodeTranslator::split)
-                            .inspect((v, c) -> System.out.println(v))
+                    System.out.println(codeModel.toDebugString());
+                    var out = base
+                            .map(BytecodeTranslator::split)
                             .map(NaiveFlowTransformer::new)
                             .map(NaiveFlowTransformer::convert)
                             .map(CodeBlockTransformer::new)

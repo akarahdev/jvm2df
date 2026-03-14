@@ -60,6 +60,17 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
+    public void setStaticField(String clazz, String field, VarItem<?> value) {
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "=",
+                Args.byVarItems(
+                        new VariableItem("static." + clazz + "." + field, "unsaved"),
+                        value
+                )
+        ));
+    }
+
+    @Override
     public VarItem<?> readField(VarItem<?> allocation, VarItem<?> field) {
         if(allocation instanceof VariableItem allocationVar) {
             if(field instanceof LiteralItem fieldLiteral) {
@@ -72,6 +83,11 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
         } else {
             throw new RuntimeException("Allocations must be variables");
         }
+    }
+
+    @Override
+    public VarItem<?> readStaticField(String clazz, String field) {
+        return new VariableItem("static." + clazz + "." + field, "unsaved");
     }
 
     @Override

@@ -231,6 +231,34 @@ public class CodeBlockTransformer {
                     this.convertCodeTree(arrayLength.list()),
                     LiteralItem.string("length")
             );
+            case CodeTree.ObjectNew objectNew -> {
+                var alloc = this.globals.allocate();
+                this.globals.setField(
+                        alloc,
+                        LiteralItem.string("class"),
+                        LiteralItem.string(objectNew.clazz())
+                );
+                yield alloc;
+            }
+            case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value) -> {
+                this.globals.setStaticField(clazz, field, this.convertCodeTree(value));
+                yield LiteralItem.number("0");
+            }
+            case CodeTree.ObjectGetStatic(String clazz, String field) ->
+                    this.globals.readStaticField(clazz, field);
+            case CodeTree.ObjectSetField objStore -> {
+                var array = this.convertCodeTree(objStore.obj());
+                this.globals.setField(
+                        array,
+                        LiteralItem.string(objStore.field()),
+                        this.convertCodeTree(objStore.value())
+                );
+                yield array;
+            }
+            case CodeTree.ObjectGetField objIndex -> this.globals.readField(
+                    this.convertCodeTree(objIndex.obj()),
+                    LiteralItem.string(objIndex.field())
+            );
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }

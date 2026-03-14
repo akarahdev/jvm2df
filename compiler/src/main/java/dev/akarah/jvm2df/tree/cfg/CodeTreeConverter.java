@@ -86,10 +86,41 @@ public class CodeTreeConverter {
             case InvokeInstruction instruction -> this.invoke(instruction, offset);
             case BranchInstruction instruction -> this.branch(instruction, offset);
             case OperatorInstruction instruction -> this.operator(instruction, offset);
+            case NewObjectInstruction instruction -> {
+                this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
+            }
+            case FieldInstruction instruction -> this.field(instruction);
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
         };
+    }
+
+    private void field(FieldInstruction instruction) {
+        switch (instruction.opcode()) {
+            case GETSTATIC -> this.stack.add(new CodeTree.ObjectGetStatic(
+                    instruction.owner().asInternalName(),
+                    instruction.field().name().stringValue()
+            ));
+            case PUTSTATIC -> this.stack.add(new CodeTree.ObjectSetStatic(
+                    instruction.owner().asInternalName(),
+                    instruction.field().name().stringValue(),
+                    this.stack.removeLast()
+            ));
+            case GETFIELD -> this.stack.add(new CodeTree.ObjectGetField(
+                    this.stack.removeLast(),
+                    instruction.field().name().stringValue()
+            ));
+            case PUTFIELD -> {
+                var value = this.stack.removeLast();
+                var obj = this.stack.removeLast();
+                this.stack.add(new CodeTree.ObjectSetField(
+                        obj,
+                        instruction.field().name().stringValue(),
+                        value
+                ));
+            }
+        }
     }
 
     private void operator(OperatorInstruction instruction, int offset) {

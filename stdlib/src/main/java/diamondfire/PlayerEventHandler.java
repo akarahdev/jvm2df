@@ -1,11 +1,11 @@
 package diamondfire;
 
 public abstract class PlayerEventHandler {
-    public void Join() {}
-    public void Leave() {}
-    public void LeftClick() {}
-    public void RightClick() {}
-    public void Sneak() {}
-    public void PlaceBlock() {}
-    public void BreakBlock() {}
+    public native void Join();
+    public native void Leave();
+    public native void LeftClick();
+    public native void RightClick();
+    public native void Sneak();
+    public native void PlaceBlock();
+    public native void BreakBlock();
 }
