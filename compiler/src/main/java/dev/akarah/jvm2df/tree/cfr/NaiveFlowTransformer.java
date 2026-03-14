@@ -10,9 +10,14 @@ import java.util.Optional;
 
 public class NaiveFlowTransformer implements ControlFlowTransformer {
     public static final int LABEL_VARIABLE = Integer.MAX_VALUE;
+    List<BasicBlock> basicBlocks;
+
+    public NaiveFlowTransformer(List<BasicBlock> basicBlocks) {
+        this.basicBlocks = basicBlocks;
+    }
 
     @Override
-    public FlowBlock convert(List<BasicBlock> basicBlocks) {
+    public FlowBlock convert() {
         var mainLoop = new FlowBlock(new ArrayList<>());
 
         for(var block : basicBlocks) {

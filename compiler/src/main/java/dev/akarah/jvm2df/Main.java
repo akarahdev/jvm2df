@@ -3,6 +3,8 @@ package dev.akarah.jvm2df;
 import dev.akarah.jvm2df.bytecode.JarToClasses;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
 import dev.akarah.jvm2df.tree.cfr.NaiveFlowTransformer;
+import dev.akarah.jvm2df.tree.instructions.MethodMeta;
+import dev.akarah.jvm2df.tree.instructions.WithContext;
 
 import java.nio.file.Path;
 
@@ -21,13 +23,21 @@ public class Main {
         classes.forEach(classElements -> {
             classElements.methods().forEach(methodElements -> {
                 methodElements.code().ifPresent(codeModel -> {
-                    var splitter = new BytecodeTranslator(codeModel);
-                    System.out.println(classElements.thisClass().name() + "#" + methodElements.methodName());
-                    var blocks = splitter.split();
-                    // System.out.println(blocks);
+                    var methodMeta = new MethodMeta(
+                            classElements.thisClass().asInternalName(),
+                            methodElements.methodName().stringValue(),
+                            methodElements.methodTypeSymbol()
+                    );
 
-                    var transformed = new NaiveFlowTransformer().convert(blocks);
-                    System.out.println(transformed);
+
+                    var base = new WithContext<>(
+                            new BytecodeTranslator(codeModel),
+                            methodMeta
+                    );
+                    var out = base.map(BytecodeTranslator::split)
+                            .map(NaiveFlowTransformer::new)
+                            .map(NaiveFlowTransformer::convert);
+                    System.out.println(out.value());
                 });
             });
         });

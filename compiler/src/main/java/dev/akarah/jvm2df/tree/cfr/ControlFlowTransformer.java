@@ -6,5 +6,5 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ControlFlowTransformer {
-    FlowBlock convert(List<BasicBlock> basicBlocks);
+    FlowBlock convert();
 }
