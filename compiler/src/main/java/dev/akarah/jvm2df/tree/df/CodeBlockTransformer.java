@@ -18,6 +18,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("unchecked")
@@ -113,38 +114,27 @@ public class CodeBlockTransformer {
                 ));
                 yield returnVariable;
             }
-            case CodeTree.Compare compare -> {
-                var op = switch (compare.comparison()) {
-                    case EQUAL -> "=";
-                    case NOT_EQUAL -> "!=";
-                    case GREATER_THAN -> ">";
-                    case LESS_THAN -> "<";
-                    case GREATER_THAN_OR_EQ -> ">=";
-                    case LESS_THAN_OR_EQ -> "<=";
-                };
-                var comparisonResult = new VariableItem("compare_result." + compare.hashCode(), "line");
-                this.codeBlocks.add(ActionBlock.setVar(
-                        "=",
-                        Args.byVarItems(
-                                comparisonResult,
-                                LiteralItem.number("0")
-                        )
-                ));
-                this.codeBlocks.add(ActionBlock.ifVar(op, Args.byVarItems(
-                        this.convertCodeTree(compare.lhs()),
-                        this.convertCodeTree(compare.rhs())
-                )));
-                this.codeBlocks.add(Bracket.openNormal());
-                this.codeBlocks.add(ActionBlock.setVar(
-                        "=",
-                        Args.byVarItems(
-                                comparisonResult,
-                                LiteralItem.number("1")
-                        )
-                ));
-                this.codeBlocks.add(Bracket.closeNormal());
-                yield comparisonResult;
-            }
+            case CodeTree.Compare compare -> convertCompare(
+                    compare,
+                    comparisonResult -> {
+                        this.codeBlocks.add(ActionBlock.setVar(
+                                "=",
+                                Args.byVarItems(
+                                        comparisonResult,
+                                        LiteralItem.number("1")
+                                )
+                        ));
+                    },
+                    comparisonResult -> {
+                        this.codeBlocks.add(ActionBlock.setVar(
+                                "=",
+                                Args.byVarItems(
+                                        comparisonResult,
+                                        LiteralItem.number("0")
+                                )
+                        ));
+                    }
+            );
             case CodeTree.BinOp add -> {
                 var variable = new VariableItem("add." + add.hashCode(), "line");
                 this.codeBlocks.add(ActionBlock.setVar(
@@ -171,24 +161,66 @@ public class CodeBlockTransformer {
         };
     }
 
+    private VarItem<?> convertCompare(CodeTree.Compare compare, Consumer<VarItem<?>> ifTrue, Consumer<VarItem<?>> ifFalse) {
+        var op = switch (compare.comparison()) {
+            case EQUAL -> "=";
+            case NOT_EQUAL -> "!=";
+            case GREATER_THAN -> ">";
+            case LESS_THAN -> "<";
+            case GREATER_THAN_OR_EQ -> ">=";
+            case LESS_THAN_OR_EQ -> "<=";
+        };
+        var comparisonResult = new VariableItem("compare_result." + compare.hashCode(), "line");
+        this.codeBlocks.add(ActionBlock.ifVar(op, Args.byVarItems(
+                this.convertCodeTree(compare.lhs()),
+                this.convertCodeTree(compare.rhs())
+        )));
+        this.codeBlocks.add(Bracket.openNormal());
+        ifTrue.accept(comparisonResult);
+        this.codeBlocks.add(Bracket.closeNormal());
+        if(ifFalse != null) {
+            this.codeBlocks.add(ActionBlock.else_());
+            this.codeBlocks.add(Bracket.openNormal());
+            ifFalse.accept(comparisonResult);
+            this.codeBlocks.add(Bracket.closeNormal());
+        }
+        return comparisonResult;
+    }
+
     private VarItem<?> convertFlowOperation(ReconstructedFlow flow) {
         return switch (flow) {
             case ReconstructedFlow.If iff -> {
-                var result = this.convertCodeTree(iff.condition());
-                this.codeBlocks.add(ActionBlock.ifVar(
-                        "=",
-                        Args.byVarItems(result, LiteralItem.number("1"))
-                ));
-                this.codeBlocks.add(Bracket.openNormal());
-                this.convertFlowBlock(iff.ifTrue());
-                this.codeBlocks.add(Bracket.closeNormal());
+                if(iff.condition() instanceof CodeTree.Compare compare) {
+                    iff.ifFalse().ifPresentOrElse(
+                            onFalse -> this.convertCompare(
+                                    compare,
+                                    _ -> { this.convertFlowBlock(iff.ifTrue()); },
+                                    _ -> { this.convertFlowBlock(onFalse); }
+                            ),
+                            () -> this.convertCompare(
+                                    compare,
+                                    _ -> { this.convertFlowBlock(iff.ifTrue()); },
+                                    null
+                            )
+                    );
 
-                iff.ifFalse().ifPresent(falseBlock -> {
-                    this.codeBlocks.add(ActionBlock.else_());
+                } else {
+                    var result = this.convertCodeTree(iff.condition());
+                    this.codeBlocks.add(ActionBlock.ifVar(
+                            "=",
+                            Args.byVarItems(result, LiteralItem.number("1"))
+                    ));
                     this.codeBlocks.add(Bracket.openNormal());
-                    this.convertFlowBlock(falseBlock);
+                    this.convertFlowBlock(iff.ifTrue());
                     this.codeBlocks.add(Bracket.closeNormal());
-                });
+
+                    iff.ifFalse().ifPresent(falseBlock -> {
+                        this.codeBlocks.add(ActionBlock.else_());
+                        this.codeBlocks.add(Bracket.openNormal());
+                        this.convertFlowBlock(falseBlock);
+                        this.codeBlocks.add(Bracket.closeNormal());
+                    });
+                }
                 yield LiteralItem.number("0");
             }
             case ReconstructedFlow.LoopForever loopForever -> {
