@@ -45,9 +45,8 @@ public class Main {
                             .map(NaiveFlowTransformer::convert)
                             .map(CodeBlockTransformer::new)
                             .map(CodeBlockTransformer::transform);
-                    codeLines.add(out.value());
+                    codeLines.addAll(out.value());
                     System.out.println(out.value());
-                    System.out.println(out.value().codeString());
                 });
             });
         });

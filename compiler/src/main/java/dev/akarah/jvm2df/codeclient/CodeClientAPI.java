@@ -29,6 +29,11 @@ public class CodeClientAPI extends WebSocketClient {
         switch (message) {
             case "auth" -> {
                 this.send("clear");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 this.send("spawn");
                 this.send("place");
                 for(var line : this.functions) {
