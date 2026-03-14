@@ -45,6 +45,7 @@ public class CodeTreeConverter {
             }
         };
     }
+
     private void operator(OperatorInstruction instruction, int offset) {
         switch (instruction.opcode()) {
             case DADD, FADD, IADD, LADD -> {
@@ -54,6 +55,40 @@ public class CodeTreeConverter {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
                 this.stack.add(new CodeTree.Sub(lhs, rhs));
+            }
+            case DMUL, FMUL, IMUL, LMUL -> {
+                this.stack.add(new CodeTree.Mul(stack.removeLast(), stack.removeLast()));
+            }
+            case DDIV, FDIV, IDIV, LDIV -> {
+                var rhs = stack.removeLast();
+                var lhs = stack.removeLast();
+                this.stack.add(new CodeTree.Div(lhs, rhs));
+            }
+            case DREM, FREM, IREM, LREM -> {
+                var rhs = stack.removeLast();
+                var lhs = stack.removeLast();
+                this.stack.add(new CodeTree.Mod(lhs, rhs));
+            }
+            case DNEG, FNEG, INEG, LNEG -> {
+                this.stack.add(new CodeTree.Negate(stack.removeLast()));
+            }
+            case ISHL, LSHL -> {
+                var rhs = stack.removeLast();
+                var lhs = stack.removeLast();
+                this.stack.add(new CodeTree.ShiftLeft(lhs, rhs));
+            }
+            case ISHR, LSHR -> {
+                var rhs = stack.removeLast();
+                var lhs = stack.removeLast();
+                this.stack.add(new CodeTree.ShiftRight(lhs, rhs));
+            }
+            case IAND, LAND -> this.stack.add(new CodeTree.And(stack.removeLast(), stack.removeLast()));
+            case IXOR, LXOR -> this.stack.add(new CodeTree.Xor(stack.removeLast(), stack.removeLast()));
+            case IOR, LOR -> this.stack.add(new CodeTree.Or(stack.removeLast(), stack.removeLast()));
+            case DCMPG, DCMPL, FCMPG, FCMPL -> {
+                var rhs = stack.removeLast();
+                var lhs = stack.removeLast();
+                this.stack.add(new CodeTree.CompareNumbers(lhs, rhs));
             }
         }
     }
