@@ -1,8 +1,4 @@
-package dev.akarah.jvm2df.cfg;
-
-import java.lang.classfile.CodeElement;
-import java.lang.classfile.Opcode;
-import java.util.List;
+package dev.akarah.jvm2df.tree.instructions;
 
 public interface Terminator extends CodeTree {
     record Jump(int target) implements Terminator {}

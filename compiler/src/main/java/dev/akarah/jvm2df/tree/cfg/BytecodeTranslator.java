@@ -1,8 +1,8 @@
-package dev.akarah.jvm2df.cfg;
+package dev.akarah.jvm2df.tree.cfg;
 
+import dev.akarah.jvm2df.tree.instructions.Terminator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nullable;
 import java.lang.classfile.*;
 import java.lang.classfile.attribute.CodeAttribute;
 import java.lang.classfile.instruction.*;

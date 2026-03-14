@@ -1,4 +1,6 @@
-package dev.akarah.jvm2df.cfg;
+package dev.akarah.jvm2df.tree.instructions;
+
+import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 
 import java.lang.classfile.CodeElement;
 import java.lang.constant.ConstantDesc;
@@ -36,4 +38,6 @@ public interface CodeTree {
     record IsLE(CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record IsLT(CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record Unknown(CodeElement codeElement) implements CodeTree {}
+
+    record ExecuteFlow(ReconstructedFlow flow) implements CodeTree {}
 }

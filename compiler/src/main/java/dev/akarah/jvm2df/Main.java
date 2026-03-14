@@ -1,8 +1,8 @@
 package dev.akarah.jvm2df;
 
-import com.google.gson.Gson;
 import dev.akarah.jvm2df.bytecode.JarToClasses;
-import dev.akarah.jvm2df.cfg.BytecodeTranslator;
+import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
+import dev.akarah.jvm2df.tree.cfr.NaiveFlowTransformer;
 
 import java.nio.file.Path;
 
@@ -24,7 +24,10 @@ public class Main {
                     var splitter = new BytecodeTranslator(codeModel);
                     System.out.println(classElements.thisClass().name() + "#" + methodElements.methodName());
                     var blocks = splitter.split();
-                    System.out.println(blocks);
+                    // System.out.println(blocks);
+
+                    var transformed = new NaiveFlowTransformer().convert(blocks);
+                    System.out.println(transformed);
                 });
             });
         });
