@@ -4,6 +4,7 @@ import java.lang.classfile.*;
 import java.lang.classfile.instruction.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -38,8 +39,48 @@ public class CodeTreeConverter {
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
             }
+            case NewPrimitiveArrayInstruction instruction -> {
+                this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
+            }
+            case NewReferenceArrayInstruction instruction -> {
+                this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
+            }
+            case ArrayStoreInstruction instruction -> {
+                var value = this.stack.removeLast();
+                var index = this.stack.removeLast();
+                var array = this.stack.removeLast();
+                this.stack.add(new CodeTree.ArrayStore(array, index, value));
+            }
+            case ArrayLoadInstruction instruction -> {
+                var index = this.stack.removeLast();
+                var array = this.stack.removeLast();
+                this.stack.add(new CodeTree.ArrayIndex(array, index));
+            }
+            case StackInstruction instruction -> {
+                var num = 1000000 - 1 + new Random().nextInt(Integer.MAX_VALUE - 1000000);
+                switch (instruction.opcode()) {
+                    case POP -> {
+                        this.stack.removeLast();
+                    }
+                    case POP2 -> {
+                        this.stack.removeLast();
+                        this.stack.removeLast();
+                    }
+                    case DUP -> {
+                        this.stack.add(new CodeTree.StoreLocal(num, this.stack.removeLast()));
+                        this.stack.add(new CodeTree.LoadLocal(num));
+                    }
+                    case DUP2 -> {
+                        this.stack.add(new CodeTree.StoreLocal(num, this.stack.removeLast()));
+                        this.stack.add(new CodeTree.LoadLocal(num));
+                        this.stack.add(new CodeTree.LoadLocal(num));
+                    }
+                    default -> throw new RuntimeException("i'm doing this later this SUCKS");
+                }
+            }
             case InvokeInstruction instruction -> this.invoke(instruction, offset);
             case BranchInstruction instruction -> this.branch(instruction, offset);
+            case OperatorInstruction instruction -> this.operator(instruction, offset);
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
@@ -89,6 +130,9 @@ public class CodeTreeConverter {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
                 this.stack.add(new CodeTree.CompareNumbers(lhs, rhs));
+            }
+            case ARRAYLENGTH -> {
+                this.stack.add(new CodeTree.ArrayLength(this.stack.removeLast()));
             }
         }
     }

@@ -24,6 +24,11 @@ public interface CodeTree {
     record Xor(CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record CompareNumbers(CodeTree lhs, CodeTree rhs) implements CodeTree {}
 
+    record ArrayNew(CodeTree size) implements CodeTree {}
+    record ArrayIndex(CodeTree list, CodeTree index) implements CodeTree {}
+    record ArrayStore(CodeTree list, CodeTree index, CodeTree value) implements CodeTree {}
+    record ArrayLength(CodeTree list) implements CodeTree {}
+
     record IsEqual(CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record IsNotEqual(CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record IsGE(CodeTree lhs, CodeTree rhs) implements CodeTree {}
