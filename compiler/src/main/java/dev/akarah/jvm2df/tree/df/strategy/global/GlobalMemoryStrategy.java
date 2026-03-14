@@ -1,7 +1,6 @@
-package dev.akarah.jvm2df.tree.df.strategy;
+package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 
 public interface GlobalMemoryStrategy {
     VarItem<?> allocate();

@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df.tree.df.strategy;
+package dev.akarah.jvm2df.tree.df.strategy.local;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.items.Args;
@@ -12,7 +12,6 @@ import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public record LineVarLocals(CodeBlockTransformer transformer) implements LocalMemoryStrategy {
     @Override

@@ -9,10 +9,10 @@ import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class BlockTagHandler implements InvokeHandler {
+public class VarItemGenHandler implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if(invoke.descriptor().startsWith("diamondfire/internal/BlockTagGen#tag")) {
+        if(invoke.descriptor().startsWith("diamondfire/internal/VarItemGen#tag")) {
             return Optional.of(transformer -> {
                 var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
                 var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
@@ -21,7 +21,7 @@ public class BlockTagHandler implements InvokeHandler {
                 return new BlockTagItem(option, tag, action, block);
             });
         }
-        if(invoke.descriptor().startsWith("diamondfire/internal/BlockTagGen#lineVar")) {
+        if(invoke.descriptor().startsWith("diamondfire/internal/VarItemGen#lineVar")) {
             return Optional.of(transformer -> {
                 return new VariableItem("ret." + new Object().hashCode(), "line");
             });

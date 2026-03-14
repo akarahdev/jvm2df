@@ -1,13 +1,13 @@
 package java.lang;
 
-import diamondfire.internal.BlockTagGen;
+import diamondfire.internal.VarItemGen;
 import diamondfire.internal.CodeBlocks;
 
 public class String {
     public String concat(String other) {
         return CodeBlocks.setVar(
                 "+",
-                BlockTagGen.lineVar(),
+                VarItemGen.lineVar(),
                 this,
                 other
         );
@@ -16,7 +16,7 @@ public class String {
     public int length() {
         return CodeBlocks.setVar(
                 "StringLength",
-                BlockTagGen.lineVar(),
+                VarItemGen.lineVar(),
                 this
         );
     }
@@ -24,7 +24,7 @@ public class String {
     public char charAt(int index) {
         return CodeBlocks.setVar(
                 "TrimString",
-                BlockTagGen.lineVar(),
+                VarItemGen.lineVar(),
                 this,
                 index - 1,
                 index - 1

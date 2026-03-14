@@ -1,6 +1,6 @@
 package diamondfire;
 
-import diamondfire.internal.BlockTagGen;
+import diamondfire.internal.VarItemGen;
 import diamondfire.internal.CodeBlocks;
 
 public class Control {
@@ -8,11 +8,11 @@ public class Control {
         CodeBlocks.control(
                 "PrintDebug",
                 argument,
-                BlockTagGen.tag("Permission", "Developer", "PrintDebug", "control"),
-                BlockTagGen.tag("Text Value Merging", "No Spaces", "PrintDebug", "control"),
-                BlockTagGen.tag("Highlighting", "None", "PrintDebug", "control"),
-                BlockTagGen.tag("Sound", "Default", "PrintDebug", "control"),
-                BlockTagGen.tag("Message Style", "Debug", "PrintDebug", "control")
+                VarItemGen.tag("Permission", "Developer", "PrintDebug", "control"),
+                VarItemGen.tag("Text Value Merging", "No Spaces", "PrintDebug", "control"),
+                VarItemGen.tag("Highlighting", "None", "PrintDebug", "control"),
+                VarItemGen.tag("Sound", "Default", "PrintDebug", "control"),
+                VarItemGen.tag("Message Style", "Debug", "PrintDebug", "control")
         );
     }
 
@@ -20,7 +20,7 @@ public class Control {
         CodeBlocks.control(
                 "Wait",
                 ticks,
-                BlockTagGen.tag("Time Unit", "Ticks", "Wait", "control")
+                VarItemGen.tag("Time Unit", "Ticks", "Wait", "control")
         );
     }
 }

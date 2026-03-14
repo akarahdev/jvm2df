@@ -1,5 +1,5 @@
 import diamondfire.PlayerAction;
-import diamondfire.PlayerEventHandler;
+import diamondfire.event.PlayerEventHandler;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override

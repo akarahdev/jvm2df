@@ -1,4 +1,4 @@
-package diamondfire;
+package diamondfire.event;
 
 public abstract class PlayerEventHandler {
     public native void Join();

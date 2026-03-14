@@ -8,10 +8,10 @@ import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
-import dev.akarah.jvm2df.tree.df.strategy.BasicHeapStrategy;
-import dev.akarah.jvm2df.tree.df.strategy.GlobalMemoryStrategy;
-import dev.akarah.jvm2df.tree.df.strategy.LineVarLocals;
-import dev.akarah.jvm2df.tree.df.strategy.LocalMemoryStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.global.BasicHeapStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
+import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
@@ -63,21 +63,21 @@ public class CodeBlockTransformer {
 
         this.pushFrame();
         switch (methodMeta.superClassName()) {
-            case "diamondfire/PlayerEventHandler" -> {
+            case "diamondfire/event/PlayerEventHandler" -> {
                 if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
                 this.appendCodeBlock(ActionBlock.playerEvent(methodMeta.methodName()));
             }
-            case "diamondfire/EntityEventHandler" -> {
+            case "diamondfire/event/EntityEventHandler" -> {
                 if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
                 this.appendCodeBlock(ActionBlock.entityEvent(methodMeta.methodName()));
             }
-            case "diamondfire/GameEventHandler" -> {
+            case "diamondfire/event/GameEventHandler" -> {
                 if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
                     this.popFrame();
                     return List.of();

@@ -1,9 +1,8 @@
-package dev.akarah.jvm2df.tree.df.strategy;
+package dev.akarah.jvm2df.tree.df.strategy.local;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
-import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 
 import java.util.List;

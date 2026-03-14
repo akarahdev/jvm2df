@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df.tree.df.strategy;
+package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.items.Args;
@@ -6,9 +6,7 @@ import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
-
-import java.util.List;
-import java.util.UUID;
+import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 public class BasicHeapStrategy implements GlobalMemoryStrategy {
     CodeBlockTransformer transformer;
