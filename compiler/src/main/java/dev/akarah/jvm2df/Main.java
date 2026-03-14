@@ -1,15 +1,10 @@
 package dev.akarah.jvm2df;
 
+import com.google.gson.Gson;
 import dev.akarah.jvm2df.bytecode.JarToClasses;
-import dev.akarah.jvm2df.bytecode.MethodFlowAnalysis;
-import dev.akarah.jvm2df.codetemplate.CodeTemplateData;
-import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
-import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
-import dev.akarah.jvm2df.codetemplate.items.Args;
-import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
+import dev.akarah.jvm2df.cfg.BytecodeTranslator;
 
 import java.nio.file.Path;
-import java.util.List;
 
 public class Main {
     static void main(String[] args) {
@@ -23,6 +18,15 @@ public class Main {
         var classes = JarToClasses.convert(path);
         System.out.println(classes);
 
-//      System.out.println(new MethodFlowAnalysis(code).analyze());
+        classes.forEach(classElements -> {
+            classElements.methods().forEach(methodElements -> {
+                methodElements.code().ifPresent(codeModel -> {
+                    var splitter = new BytecodeTranslator(codeModel);
+                    System.out.println(classElements.thisClass().name() + "#" + methodElements.methodName());
+                    var blocks = splitter.split();
+                    System.out.println(blocks);
+                });
+            });
+        });
     }
 }
