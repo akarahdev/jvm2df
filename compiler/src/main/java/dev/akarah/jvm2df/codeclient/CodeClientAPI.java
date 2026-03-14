@@ -30,13 +30,13 @@ public class CodeClientAPI extends WebSocketClient {
     public void onMessage(String message) {
         switch (message) {
             case "auth" -> {
+                this.send("mode code");
                 this.send("clear");
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception _) {
+                    // ignored bruh
                 }
-                this.send("spawn");
                 this.send("place");
                 for(var line : this.functions) {
                     this.send("place " + line.codeString());
