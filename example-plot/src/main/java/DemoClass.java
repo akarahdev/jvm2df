@@ -1,14 +1,18 @@
+import diamondfire.Control;
+import diamondfire.internal.BlockTagGen;
+import diamondfire.internal.CodeBlocks;
+
 public class DemoClass {
     public static int sumTheArrays() {
         int[] a = new int[]{1, 2, 3};
         int[] b = new int[]{4, 5, 6};
         int[] added = addArrays(a, b);
 
-        int sum = 0;
         for(int i = 0; i < added.length; i++) {
-            sum += added[i];
+            Control.debug(added[i]);
         }
-        return sum;
+
+        return 0;
     }
 
     public static int[] addArrays(int[] a, int[] b) {
