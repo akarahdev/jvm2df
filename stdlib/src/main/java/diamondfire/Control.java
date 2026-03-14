@@ -4,7 +4,7 @@ import diamondfire.internal.BlockTagGen;
 import diamondfire.internal.CodeBlocks;
 
 public class Control {
-    public static void debug(double argument) {
+    public static void debug(Object argument) {
         CodeBlocks.control(
                 "PrintDebug",
                 argument,

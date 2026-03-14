@@ -1,7 +1,7 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
-import com.mojang.datafixers.types.Func;
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
+import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.BlockTagItem;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
@@ -12,13 +12,13 @@ import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class ControlHandler implements InvokeHandler {
+public record DFCodeBlocksHandler(String functionName, BiFunction<String, Args, CodeBlock<?>> mapper) implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if(invoke.descriptor().startsWith("diamondfire/internal/CodeBlocks#control")) {
+        if(invoke.descriptor().startsWith("diamondfire/internal/CodeBlocks#" + functionName)) {
             var codeArguments = new ArrayList<>(invoke.args());
             var action = codeArguments.removeFirst();
             if(!(action instanceof CodeTree.Constant(var constantDesc))) {
@@ -51,12 +51,16 @@ public class ControlHandler implements InvokeHandler {
                     ));
                 }
 
-                transformer.appendCodeBlock(ActionBlock.control(
+                transformer.appendCodeBlock(this.mapper.apply(
                         constantDesc.toString(),
                         new Args(arguments)
                 ));
 
-                return LiteralItem.number("0");
+                if(norms.isEmpty()) {
+                    return LiteralItem.number("0");
+                } else {
+                    return norms.getFirst();
+                }
             });
         }
         return Optional.empty();

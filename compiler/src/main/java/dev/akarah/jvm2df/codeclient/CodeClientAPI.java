@@ -22,7 +22,7 @@ public class CodeClientAPI extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakeData) {
-        this.send("scopes default inventory movement read_plot write_code clear_plot");
+        this.send("scopes write_code clear_plot");
         this.send("auth");
     }
 

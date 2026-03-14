@@ -96,6 +96,9 @@ public class CodeTreeConverter {
                 this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
             }
             case FieldInstruction instruction -> this.field(instruction);
+            case TypeCheckInstruction instruction -> {
+                // TODO: typecheck :3
+            }
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }

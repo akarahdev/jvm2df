@@ -63,6 +63,7 @@ public class Main {
                         } catch (LineUnavailableException _) {
                             // ignore it, sound isn't necessary
                         }
+                        throw new RuntimeException(e);
                     }
                 });
             });

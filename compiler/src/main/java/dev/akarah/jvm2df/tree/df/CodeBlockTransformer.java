@@ -7,9 +7,6 @@ import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
-import dev.akarah.jvm2df.tree.df.handler.BlockTagHandler;
-import dev.akarah.jvm2df.tree.df.handler.BoxedPrimitiveHandler;
-import dev.akarah.jvm2df.tree.df.handler.ControlHandler;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
 import dev.akarah.jvm2df.tree.df.strategy.BasicHeapStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.GlobalMemoryStrategy;
@@ -19,8 +16,6 @@ import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
-import java.awt.*;
-import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
