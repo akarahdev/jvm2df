@@ -8,7 +8,8 @@ public record MethodMeta(
         String className,
         String methodName,
         MethodTypeDesc methodTypeDesc,
-        boolean isStatic
+        boolean isStatic,
+        String superClassName
 ) {
     @Override
     public @NotNull String toString() {

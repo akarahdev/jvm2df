@@ -33,7 +33,6 @@ public class CodeBlockTransformer {
     List<List<CodeBlock<?>>> codeLineStack;
     List<CodeLine> confirmedCodeLines = new ArrayList<>();
 
-
     public CodeBlockTransformer(FlowBlock block, MethodMeta methodMeta) {
         this.block = block;
         this.methodMeta = methodMeta;
@@ -71,10 +70,35 @@ public class CodeBlockTransformer {
             params.addFirst(new ParameterItem("return", "var", false, false));
         }
         this.pushFrame();
-        this.appendCodeBlock(ActionBlock.function(
-                methodMeta.toString(),
-                params
-        ));
+        switch (methodMeta.superClassName()) {
+            case "diamondfire/PlayerEventHandler" -> {
+                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                    this.popFrame();
+                    return List.of();
+                }
+                this.appendCodeBlock(ActionBlock.playerEvent(methodMeta.methodName()));
+            }
+            case "diamondfire/EntityEventHandler" -> {
+                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                    this.popFrame();
+                    return List.of();
+                }
+                this.appendCodeBlock(ActionBlock.entityEvent(methodMeta.methodName()));
+            }
+            case "diamondfire/GameEventHandler" -> {
+                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                    this.popFrame();
+                    return List.of();
+                }
+                this.appendCodeBlock(ActionBlock.gameEvent(methodMeta.methodName()));
+            }
+            default -> {
+                this.appendCodeBlock(ActionBlock.function(
+                        methodMeta.toString(),
+                        params
+                ));
+            }
+        }
 
         this.convertFlowBlock(this.block);
         this.popFrame();

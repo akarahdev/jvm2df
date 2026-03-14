@@ -9,6 +9,7 @@ import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
 
+import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.reflect.AccessFlag;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -34,7 +35,8 @@ public class Main {
                             classElements.thisClass().asInternalName(),
                             methodElements.methodName().stringValue(),
                             methodElements.methodTypeSymbol(),
-                            methodElements.flags().has(AccessFlag.STATIC)
+                            methodElements.flags().has(AccessFlag.STATIC),
+                            classElements.superclass().map(ClassEntry::asInternalName).orElse("java/lang/Object")
                     );
 
 

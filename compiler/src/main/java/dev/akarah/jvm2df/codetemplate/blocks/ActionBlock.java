@@ -51,6 +51,30 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock entityEvent(String event) {
+        return new ActionBlock(
+                "game_event",
+                Optional.empty(),
+                Optional.of(event),
+                Optional.empty(),
+                Optional.of("LS-CANCEL"),
+                Optional.empty(),
+                Optional.empty()
+        );
+    }
+
+    public static ActionBlock gameEvent(String event) {
+        return new ActionBlock(
+                "game_event",
+                Optional.empty(),
+                Optional.of(event),
+                Optional.empty(),
+                Optional.of("LS-CANCEL"),
+                Optional.empty(),
+                Optional.empty()
+        );
+    }
+
     public static ActionBlock function(String data, List<VarItem<?>> params) {
         return new ActionBlock(
                 "func",
