@@ -1,5 +1,6 @@
 package dev.akarah.jvm2df.tree.instructions;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -19,5 +20,10 @@ public record WithContext<T, C>(
                 mapper.apply(value, context),
                 context
         );
+    }
+
+    public WithContext<T, C> inspect(BiConsumer<T, C> consumer) {
+        consumer.accept(this.value, this.context);
+        return this;
     }
 }

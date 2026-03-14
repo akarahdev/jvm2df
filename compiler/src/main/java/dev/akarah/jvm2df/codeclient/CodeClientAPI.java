@@ -41,6 +41,9 @@ public class CodeClientAPI extends WebSocketClient {
                 }
                 this.send("place go");
             }
+            case "done" -> {
+                this.close();
+            }
             case "basic", "large", "massive", "mega" -> {
 
             }

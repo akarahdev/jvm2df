@@ -7,6 +7,7 @@ import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
+import dev.akarah.jvm2df.tree.df.strategy.BasicHeapStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.LineVarLocals;
 import dev.akarah.jvm2df.tree.df.strategy.LocalMemoryStrategy;
@@ -14,13 +15,12 @@ import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
+import java.awt.*;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 
-@SuppressWarnings("unchecked")
 public class CodeBlockTransformer {
     LocalMemoryStrategy locals;
     GlobalMemoryStrategy globals;
@@ -35,7 +35,7 @@ public class CodeBlockTransformer {
         this.codeLineStack = new ArrayList<>(new ArrayList<>());
         this.withStrategies(
                 new LineVarLocals(this),
-                null
+                new BasicHeapStrategy(this, this.locals)
         );
     }
 
@@ -169,6 +169,32 @@ public class CodeBlockTransformer {
                 ));
                 yield this.locals.referenceLocal(inc.idx());
             }
+            case CodeTree.ArrayNew arrayNew -> {
+                var alloc = this.globals.allocate();
+                this.globals.setField(
+                        alloc,
+                        LiteralItem.string("length"),
+                        this.convertCodeTree(arrayNew.size())
+                );
+                yield alloc;
+            }
+            case CodeTree.ArrayStore arrayStore -> {
+                var array = this.convertCodeTree(arrayStore.list());
+                this.globals.setField(
+                        array,
+                        this.convertCodeTree(arrayStore.index()),
+                        this.convertCodeTree(arrayStore.value())
+                );
+                yield array;
+            }
+            case CodeTree.ArrayIndex arrayIndex -> this.globals.readField(
+                    this.convertCodeTree(arrayIndex.list()),
+                    this.convertCodeTree(arrayIndex.index())
+            );
+            case CodeTree.ArrayLength arrayLength -> this.globals.readField(
+                    this.convertCodeTree(arrayLength.list()),
+                    LiteralItem.string("length")
+            );
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }

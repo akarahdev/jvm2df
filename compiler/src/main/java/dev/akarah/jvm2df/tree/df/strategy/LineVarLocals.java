@@ -9,6 +9,7 @@ import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -38,7 +39,7 @@ public record LineVarLocals(CodeBlockTransformer transformer) implements LocalMe
     @Override
     @SuppressWarnings("unchecked")
     public List<VarItem<?>> functionHeadParams(MethodMeta methodMeta) {
-        return (List<VarItem<?>>) (Object) IntStream.range(0, methodMeta.methodTypeDesc().parameterCount())
+        return (List<VarItem<?>>) (Object) IntStream.range(0, methodMeta.methodTypeDesc().parameterCount() + (methodMeta.isStatic() ? 0 : 1))
                 .mapToObj(this::referenceLocal)
                 .map(x -> new ParameterItem(x.name(), "any", false, false))
                 .toList();

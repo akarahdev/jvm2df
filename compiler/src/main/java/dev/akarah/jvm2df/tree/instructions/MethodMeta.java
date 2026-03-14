@@ -7,7 +7,8 @@ import java.lang.constant.MethodTypeDesc;
 public record MethodMeta(
         String className,
         String methodName,
-        MethodTypeDesc methodTypeDesc
+        MethodTypeDesc methodTypeDesc,
+        boolean isStatic
 ) {
     @Override
     public @NotNull String toString() {

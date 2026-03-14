@@ -9,6 +9,7 @@ import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
 
+import java.lang.reflect.AccessFlag;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,7 +33,8 @@ public class Main {
                     var methodMeta = new MethodMeta(
                             classElements.thisClass().asInternalName(),
                             methodElements.methodName().stringValue(),
-                            methodElements.methodTypeSymbol()
+                            methodElements.methodTypeSymbol(),
+                            methodElements.flags().has(AccessFlag.STATIC)
                     );
 
 
@@ -40,13 +42,14 @@ public class Main {
                             new BytecodeTranslator(codeModel),
                             methodMeta
                     );
+                    System.out.println(base.context());
                     var out = base.map(BytecodeTranslator::split)
+                            .inspect((v, c) -> System.out.println(v))
                             .map(NaiveFlowTransformer::new)
                             .map(NaiveFlowTransformer::convert)
                             .map(CodeBlockTransformer::new)
                             .map(CodeBlockTransformer::transform);
                     codeLines.addAll(out.value());
-                    System.out.println(out.value());
                 });
             });
         });
