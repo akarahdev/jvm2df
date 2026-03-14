@@ -14,12 +14,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 public class CodeTreeConverter {
+    List<CodeTree> statements;
     List<CodeTree> stack;
     Function<Label, Integer> labelConverter;
 
 
-    public CodeTreeConverter(List<CodeTree> stack, Function<Label, Integer> labelConverter) {
-        this.stack = stack;
+    public CodeTreeConverter(List<CodeTree> statements, Function<Label, Integer> labelConverter) {
+        this.statements = statements;
+        this.stack = new ArrayList<>();
         this.labelConverter = labelConverter;
     }
 
@@ -30,16 +32,16 @@ public class CodeTreeConverter {
             }
             case ReturnInstruction instruction -> {
                 if(instruction.typeKind().equals(TypeKind.VOID)) {
-                    this.stack.add(new Terminator.ReturnVoid());
+                    this.statements.add(new Terminator.ReturnVoid());
                 } else {
-                    this.stack.add(new Terminator.ReturnValue(this.stack.removeLast()));
+                    this.statements.add(new Terminator.ReturnValue(this.stack.removeLast()));
                 }
             }
             case IncrementInstruction instruction -> {
-                this.stack.add(new CodeTree.IncrementLocal(instruction.slot(), new CodeTree.Constant(instruction.constant())));
+                this.statements.add(new CodeTree.IncrementLocal(instruction.slot(), new CodeTree.Constant(instruction.constant())));
             }
             case StoreInstruction instruction -> {
-                this.stack.add(new CodeTree.StoreLocal(instruction.slot(), this.stack.removeLast()));
+                this.statements.add(new CodeTree.StoreLocal(instruction.slot(), this.stack.removeLast()));
             }
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
@@ -54,7 +56,7 @@ public class CodeTreeConverter {
                 var value = this.stack.removeLast();
                 var index = this.stack.removeLast();
                 var array = this.stack.removeLast();
-                this.stack.add(new CodeTree.ArrayStore(array, index, value));
+                this.statements.add(new CodeTree.ArrayStore(array, index, value));
             }
             case ArrayLoadInstruction instruction -> {
                 var index = this.stack.removeLast();
@@ -72,11 +74,15 @@ public class CodeTreeConverter {
                         this.stack.removeLast();
                     }
                     case DUP -> {
-                        this.stack.add(new CodeTree.StoreLocal(num, this.stack.removeLast()));
+                        var value = this.stack.removeLast();
+                        this.statements.add(new CodeTree.StoreLocal(num, value));
+                        this.stack.add(new CodeTree.LoadLocal(num));
                         this.stack.add(new CodeTree.LoadLocal(num));
                     }
                     case DUP2 -> {
-                        this.stack.add(new CodeTree.StoreLocal(num, this.stack.removeLast()));
+                        var value = this.stack.removeLast();
+                        this.statements.add(new CodeTree.StoreLocal(num, value));
+                        this.stack.add(new CodeTree.LoadLocal(num));
                         this.stack.add(new CodeTree.LoadLocal(num));
                         this.stack.add(new CodeTree.LoadLocal(num));
                     }
@@ -102,7 +108,7 @@ public class CodeTreeConverter {
                     instruction.owner().asInternalName(),
                     instruction.field().name().stringValue()
             ));
-            case PUTSTATIC -> this.stack.add(new CodeTree.ObjectSetStatic(
+            case PUTSTATIC -> this.statements.add(new CodeTree.ObjectSetStatic(
                     instruction.owner().asInternalName(),
                     instruction.field().name().stringValue(),
                     this.stack.removeLast()
@@ -114,7 +120,7 @@ public class CodeTreeConverter {
             case PUTFIELD -> {
                 var value = this.stack.removeLast();
                 var obj = this.stack.removeLast();
-                this.stack.add(new CodeTree.ObjectSetField(
+                this.statements.add(new CodeTree.ObjectSetField(
                         obj,
                         instruction.field().name().stringValue(),
                         value
@@ -182,13 +188,18 @@ public class CodeTreeConverter {
             params.add(this.stack.removeLast());
         }
         params = params.reversed();
-        stack.add(new CodeTree.Invoke(
+        var invoke = new CodeTree.Invoke(
                 instruction.owner().asInternalName()
-                    + "#"
-                    + instruction.name()
-                    + instruction.typeSymbol().descriptorString(),
+                        + "#"
+                        + instruction.name()
+                        + instruction.typeSymbol().descriptorString(),
                 params
-        ));
+        );
+        if (TypeKind.from(instruction.typeSymbol().returnType()) == TypeKind.VOID) {
+            this.statements.add(invoke);
+        } else {
+            this.stack.add(invoke);
+        }
     }
 
 
@@ -216,7 +227,7 @@ public class CodeTreeConverter {
         }
 
         switch (instruction.opcode()) {
-            case GOTO, GOTO_W -> stack.add(new Terminator.Jump(this.labelToOffset(instruction.target())));
+            case GOTO, GOTO_W -> statements.add(new Terminator.Jump(this.labelToOffset(instruction.target())));
             case IFEQ, IF_ACMPEQ, IF_ICMPEQ, IFNULL -> stack.add(new CodeTree.Compare(
                     ComparisonType.EQUAL, this.stack.removeLast(), this.stack.removeLast()));
             case IFNE, IF_ACMPNE, IF_ICMPNE, IFNONNULL -> stack.add(new CodeTree.Compare(
@@ -231,7 +242,7 @@ public class CodeTreeConverter {
                     ComparisonType.LESS_THAN, this.stack.removeLast(), this.stack.removeLast()));
         }
         if(instruction.opcode().toString().contains("IF")) {
-            this.stack.add(
+            this.statements.add(
                     new Terminator.BranchIf(
                             stack.removeLast(),
                             this.labelToOffset(instruction.target()),
