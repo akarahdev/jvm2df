@@ -84,8 +84,9 @@ public class CodeClientAPI extends WebSocketClient {
     private void foldFunctions(int maxSize, int folds) {
         for(int foldCount = 0; foldCount < folds; foldCount++) {
             boolean folded = false;
-            for(int currPointer = 0; currPointer < this.functions.size(); currPointer++) {
-                for(int chkPointer = 0; chkPointer < this.functions.size(); chkPointer++) {
+            int startLine = 0;
+            for(int currPointer = startLine; currPointer < this.functions.size(); currPointer++) {
+                for(int chkPointer = startLine; chkPointer < this.functions.size(); chkPointer++) {
                     if(chkPointer == currPointer) {
                         continue;
                     }
@@ -95,10 +96,9 @@ public class CodeClientAPI extends WebSocketClient {
                         var obj = this.functions.remove(chkPointer);
                         this.functions.get(currPointer).codeBlocks().addAll(obj.codeBlocks());
                         folded = true;
-                    }
-
-                    if(folded)
+                        startLine += 1;
                         break;
+                    }
                 }
                 if(folded)
                     break;
