@@ -31,6 +31,11 @@ public class CodeBlocks {
 
     public static native <T> T setVar(
             String action,
+            Object a
+    );
+
+    public static native <T> T setVar(
+            String action,
             Object a,
             Object b
     );
@@ -48,5 +53,14 @@ public class CodeBlocks {
             Object b,
             Object c,
             Object d
+    );
+
+    public static native <T> T selectObject(
+            String action
+    );
+
+    public static native <T> T selectObject(
+            String action,
+            Object a
     );
 }

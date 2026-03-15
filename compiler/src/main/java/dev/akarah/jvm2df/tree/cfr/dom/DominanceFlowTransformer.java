@@ -5,6 +5,7 @@ import dev.akarah.jvm2df.tree.cfr.ControlFlowTransformer;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
+import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.util.*;
@@ -150,6 +151,23 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         return reconstruct(basicBlocks.getFirst(), null);
     }
 
+    private CodeTree negate(CodeTree condition) {
+        if (condition instanceof CodeTree.Compare(
+                ComparisonType comparison, CodeTree lhs, CodeTree rhs
+        )) {
+            var negated = switch (comparison) {
+                case EQUAL -> ComparisonType.NOT_EQUAL;
+                case NOT_EQUAL -> ComparisonType.EQUAL;
+                case GREATER_THAN -> ComparisonType.LESS_THAN_OR_EQ;
+                case LESS_THAN -> ComparisonType.GREATER_THAN_OR_EQ;
+                case GREATER_THAN_OR_EQ -> ComparisonType.LESS_THAN;
+                case LESS_THAN_OR_EQ -> ComparisonType.GREATER_THAN;
+            };
+            return new CodeTree.Compare(negated, lhs, rhs);
+        }
+        return new CodeTree.Negate(condition);
+    }
+
     private FlowBlock reconstruct(BasicBlock block, BasicBlock stopAt) {
         if (block == null || block == stopAt || visitedBlocks.contains(block)) {
             return new FlowBlock(new ArrayList<>());
@@ -158,6 +176,28 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         if (isLoopHeader(block) && !loopHeaders.contains(block)) {
             loopHeaders.add(block);
             BasicBlock exit = findLoopExit(block);
+
+            // Detect while-like loop header
+            if (block.statements().size() == 1 && block.terminator() instanceof Terminator.BranchIf(
+                    CodeTree condition, int aTrue, int aFalse
+            )) {
+                var ifTrue = blocksByOffset.get(aTrue);
+                var ifFalse = blocksByOffset.get(aFalse);
+
+                if (ifTrue == exit || ifFalse == exit) {
+                    var whileCondition = (ifTrue == exit) ? negate(condition) : condition;
+                    var bodyStart = (ifTrue == exit) ? ifFalse : ifTrue;
+
+                    FlowBlock body = reconstruct(bodyStart, block);
+
+                    List<CodeTree> statements = new ArrayList<>();
+                    statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.While(whileCondition, body)));
+                    if (exit != null && exit != stopAt) {
+                        statements.addAll(reconstruct(exit, stopAt).statements());
+                    }
+                    return new FlowBlock(statements);
+                }
+            }
 
             FlowBlock body = reconstructLoopBody(block, exit);
 
@@ -219,6 +259,10 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
             var target = blocksByOffset.get(target1);
             if (target != null && target != header && target != exit) {
                 statements.addAll(reconstruct(target, exit).statements());
+            } else if (target == header) {
+                statements.add(new Terminator.Continue());
+            } else if (target == exit) {
+                statements.add(new Terminator.Break());
             }
         } else if (term instanceof Terminator.BranchIf(CodeTree operand, int aTrue, int aFalse)) {
             var ifTrue = blocksByOffset.get(aTrue);
@@ -229,8 +273,8 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
 
             statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.If(
                     operand,
-                    (ifTrue == header) ? new FlowBlock(new ArrayList<>()) : reconstruct(ifTrue, merge == null ? exit : merge),
-                    Optional.of((ifFalse == header) ? new FlowBlock(new ArrayList<>()) : reconstruct(ifFalse, merge == null ? exit : merge))
+                    (ifTrue == header) ? new FlowBlock(List.of(new Terminator.Continue())) : (ifTrue == exit ? new FlowBlock(List.of(new Terminator.Break())) : reconstruct(ifTrue, merge == null ? exit : merge)),
+                    Optional.of((ifFalse == header) ? new FlowBlock(List.of(new Terminator.Continue())) : (ifFalse == exit ? new FlowBlock(List.of(new Terminator.Break())) : reconstruct(ifFalse, merge == null ? exit : merge)))
             )));
 
             if (merge != null && merge != exit) {

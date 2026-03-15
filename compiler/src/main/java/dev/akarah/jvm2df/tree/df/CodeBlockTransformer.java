@@ -15,6 +15,7 @@ import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
+import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.lang.classfile.ClassModel;
@@ -138,6 +139,14 @@ public class CodeBlockTransformer {
             }
             case Terminator.ReturnValue ret -> {
                 this.locals.setResultAndReturn(this.convertCodeTree(ret.code()));
+                yield LiteralItem.number("0");
+            }
+            case Terminator.Break _ -> {
+                this.appendCodeBlock(ActionBlock.control("StopRepeat", Args.byVarItems()));
+                yield LiteralItem.number("0");
+            }
+            case Terminator.Continue _ -> {
+                this.appendCodeBlock(ActionBlock.control("Skip", Args.byVarItems()));
                 yield LiteralItem.number("0");
             }
             case CodeTree.Invoke invoke -> this.convertInvoke(invoke);
@@ -319,6 +328,35 @@ public class CodeBlockTransformer {
                 this.appendCodeBlock(ActionBlock.repeat("Forever", Args.byVarItems()));
                 this.appendCodeBlock(Bracket.openRepeat());
                 this.convertFlowBlock(loopForever.block());
+                this.appendCodeBlock(Bracket.closeRepeat());
+                yield LiteralItem.number("0");
+            }
+            case ReconstructedFlow.While while_ -> {
+                if (while_.condition() instanceof CodeTree.Compare(
+                        ComparisonType comparison, CodeTree lhs, CodeTree rhs
+                )) {
+                    var op = switch (comparison) {
+                        case EQUAL -> "=";
+                        case NOT_EQUAL -> "!=";
+                        case GREATER_THAN -> ">";
+                        case LESS_THAN -> "<";
+                        case GREATER_THAN_OR_EQ -> ">=";
+                        case LESS_THAN_OR_EQ -> "<=";
+                    };
+                    this.appendCodeBlock(ActionBlock.repeat("While", op, Args.byVarItems(
+                            this.convertCodeTree(lhs),
+                            this.convertCodeTree(rhs)
+                    )));
+                } else {
+                    var result = this.convertCodeTree(while_.condition());
+                    this.appendCodeBlock(ActionBlock.repeat(
+                            "While",
+                            "=",
+                            Args.byVarItems(result, LiteralItem.number("1"))
+                    ));
+                }
+                this.appendCodeBlock(Bracket.openRepeat());
+                this.convertFlowBlock(while_.block());
                 this.appendCodeBlock(Bracket.closeRepeat());
                 yield LiteralItem.number("0");
             }

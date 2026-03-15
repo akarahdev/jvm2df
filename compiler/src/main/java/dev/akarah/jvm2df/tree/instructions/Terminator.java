@@ -15,4 +15,10 @@ public sealed interface Terminator extends CodeTree {
 
     record Unreachable() implements Terminator {
     }
+
+    record Break() implements Terminator {
+    }
+
+    record Continue() implements Terminator {
+    }
 }

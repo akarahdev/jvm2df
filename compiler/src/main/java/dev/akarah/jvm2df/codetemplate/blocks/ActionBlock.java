@@ -175,6 +175,30 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock repeat(String action, String subAction, Args args) {
+        return new ActionBlock(
+                "repeat",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.of(subAction),
+                Optional.of(""),
+                Optional.of(""),
+                Optional.of(args)
+        );
+    }
+
+    public static ActionBlock selectObject(String action, Args args) {
+        return new ActionBlock(
+                "select_obj",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.of(""),
+                Optional.of(""),
+                Optional.of(""),
+                Optional.of(args)
+        );
+    }
+
     public ActionBlock storeTagInSlot(int slot, String tag, String option) {
         this.args.ifPresent(args -> {
             args.arguments().add(new Args.Argument(
