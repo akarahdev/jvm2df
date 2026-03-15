@@ -19,7 +19,7 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> allocate() {
-        var allocationNameVar = new VariableItem("allocation", "line");
+        var allocationNameVar = new VariableItem("tmp.allocation", "line");
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "=",
                 Args.byVarItems(

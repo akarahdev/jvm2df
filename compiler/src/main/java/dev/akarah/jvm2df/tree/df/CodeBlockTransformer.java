@@ -144,7 +144,7 @@ public class CodeBlockTransformer {
                 for(var subp : invoke.args()) {
                     params.add(this.convertCodeTree(subp));
                 }
-                var returnVariable = new VariableItem("ret_result." + invoke.hashCode(), "line");
+                var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
                 if(!invoke.descriptor().endsWith("V")) {
                     params.addFirst(returnVariable);
                 }
@@ -176,7 +176,7 @@ public class CodeBlockTransformer {
                     }
             );
             case CodeTree.BinOp add -> {
-                var variable = new VariableItem("add." + add.hashCode(), "line");
+                var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
                 var op = switch (add.type()) {
                     case ADD -> "+";
                     case SUB -> "-";
@@ -319,7 +319,7 @@ public class CodeBlockTransformer {
                     LiteralItem.string(objIndex.field())
             );
             case CodeTree.Negate negate -> {
-                var tmp = new VariableItem("neg." + negate.hashCode(), "line");
+                var tmp = new VariableItem("tmp.neg." + negate.hashCode(), "line");
                 this.appendCodeBlock(ActionBlock.setVar(
                         "x",
                         Args.byVarItems(
@@ -343,7 +343,7 @@ public class CodeBlockTransformer {
             case GREATER_THAN_OR_EQ -> ">=";
             case LESS_THAN_OR_EQ -> "<=";
         };
-        var comparisonResult = new VariableItem("compare_result." + compare.hashCode(), "line");
+        var comparisonResult = new VariableItem("tmp.compare_result." + compare.hashCode(), "line");
         this.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
                 this.convertCodeTree(compare.lhs()),
                 this.convertCodeTree(compare.rhs())

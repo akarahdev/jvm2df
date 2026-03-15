@@ -21,7 +21,7 @@ public class VarItemGenHandler implements InvokeHandler {
         }
         if(invoke.descriptor().startsWith("diamondfire/internal/VarItemGen#lineVar")) {
             return Optional.of(transformer -> {
-                return new VariableItem("ret." + new Object().hashCode(), "line");
+                return new VariableItem("tmp.std." + new Object().hashCode(), "line");
             });
         }
         return Optional.empty();
