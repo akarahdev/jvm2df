@@ -2,6 +2,7 @@ package dev.akarah.jvm2df.frontend;
 
 import dev.akarah.jvm2df.bytecode.JarToClasses;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfg.BasicBlock;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
 import dev.akarah.jvm2df.tree.cfr.ControlFlowTransformer;
@@ -15,6 +16,7 @@ import dev.akarah.jvm2df.util.Beep;
 import javax.sound.sampled.LineUnavailableException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -51,17 +53,25 @@ public class Pipeline {
         var classes = JarToClasses.convert(this.jarPath);
 
         final var codeLines = new ArrayList<CodeLine>();
+
+        var graph = new CompilationGraph();
+        classes.forEach(graph::register);
         classes.forEach(classElements -> {
             classElements.methods().forEach(methodElements -> {
                 methodElements.code().ifPresent(codeModel -> {
                     try {
-                        var basicBlocks = this.bytecodeTranslator.split(codeModel);
+                        System.out.println(classElements.thisClass().asInternalName() + "#" + methodElements.methodName() + methodElements.methodTypeSymbol().descriptorString());
+                        System.out.println(codeModel.toDebugString());
+                        var basicBlocks = this.bytecodeTranslator.split(codeModel, graph);
+                        System.out.println(basicBlocks);
                         var flowBlock = this.flowTransformer.convert(basicBlocks);
+                        System.out.println(flowBlock);
                         var newLines = this.codeBlockTransformer.transform(
                                 flowBlock,
                                 methodElements,
                                 this.localMemoryStrategy,
-                                this.globalMemoryStrategy
+                                this.globalMemoryStrategy,
+                                graph
                         );
                         codeLines.addAll(newLines);
                     } catch (Exception e) {

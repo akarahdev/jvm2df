@@ -3,7 +3,9 @@ package dev.akarah.jvm2df.tree.instructions;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 
 import java.lang.classfile.CodeElement;
+import java.lang.classfile.constantpool.MemberRefEntry;
 import java.lang.constant.ConstantDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
 public interface CodeTree {
@@ -11,7 +13,11 @@ public interface CodeTree {
     record StoreLocal(int idx, CodeTree value) implements CodeTree {}
     record IncrementLocal(int idx, CodeTree value) implements CodeTree {}
     record LoadLocal(int idx) implements CodeTree {}
-    record Invoke(String descriptor, List<CodeTree> args) implements CodeTree {}
+    record Invoke(MemberRefEntry descriptor, List<CodeTree> args, InvokeStyle style) implements CodeTree {
+        public MethodTypeDesc methodTypeDesc() {
+            return MethodTypeDesc.ofDescriptor(this.descriptor().type().stringValue());
+        }
+    }
 
     record BinOp(BinOpType type, CodeTree lhs, CodeTree rhs) implements CodeTree {}
     record Negate(CodeTree lhs) implements CodeTree {}

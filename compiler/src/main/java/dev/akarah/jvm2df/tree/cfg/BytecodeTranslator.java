@@ -1,5 +1,7 @@
 package dev.akarah.jvm2df.tree.cfg;
 
+import dev.akarah.jvm2df.tree.CompilationGraph;
+import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -13,11 +15,13 @@ public class BytecodeTranslator {
     List<CodeElement> instructions;
     Set<Integer> splitTargets;
     CodeTreeConverter converter;
+    CompilationGraph graph;
 
-    public List<BasicBlock> split(CodeModel codeModel) {
+    public List<BasicBlock> split(CodeModel codeModel, CompilationGraph graph) {
         this.instructions = codeModel.elementList();
         this.splitTargets = new HashSet<>();
         this.codeModel = codeModel;
+        this.graph = graph;
         this.findTargets();
         return constructBlocks();
     }
@@ -29,7 +33,8 @@ public class BytecodeTranslator {
                 offset,
                 new ArrayList<>()
         );
-        this.converter = new CodeTreeConverter(block.statements(), this::labelToOffset);
+        this.converter = new CodeTreeConverter(block.statements(), this::labelToOffset, graph);
+
         for(var elem : this.instructions) {
             if(elem instanceof Label label) {
                 var targetOffset = labelToOffset(label);
@@ -66,7 +71,8 @@ public class BytecodeTranslator {
                 targetOffset,
                 new ArrayList<>()
         );
-        this.converter = new CodeTreeConverter(block.statements(), this::labelToOffset);
+        this.converter = new CodeTreeConverter(block.statements(), this::labelToOffset, this.graph);
+
         return block;
     }
 

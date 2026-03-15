@@ -5,6 +5,7 @@ import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.*;
+import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
@@ -15,7 +16,10 @@ import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
+import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
+import java.lang.classfile.constantpool.ClassEntry;
+import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,6 +31,7 @@ public class CodeBlockTransformer {
     FlowBlock block;
     List<List<CodeBlock<?>>> codeLineStack;
     List<CodeLine> confirmedCodeLines;
+    CompilationGraph graph;
 
     public void appendCodeBlock(CodeBlock<?> codeBlock) {
         this.codeLineStack.getLast().add(codeBlock);
@@ -41,7 +46,7 @@ public class CodeBlockTransformer {
         this.codeLineStack.add(new ArrayList<>());
     }
 
-    public List<CodeLine> transform(FlowBlock block, MethodModel methodModel, LocalMemoryStrategy locals, GlobalMemoryStrategy globals) {
+    public List<CodeLine> transform(FlowBlock block, MethodModel methodModel, LocalMemoryStrategy locals, GlobalMemoryStrategy globals, CompilationGraph graph) {
         this.block = block;
         this.methodModel = methodModel;
         this.codeLineStack = new ArrayList<>(new ArrayList<>());
@@ -50,12 +55,18 @@ public class CodeBlockTransformer {
         this.globals = globals;
         this.locals.setup(this);
         this.globals.setup(this, locals);
-
+        this.graph = graph;
         this.codeLineStack = new ArrayList<>();
+
         var params = new ArrayList<>(this.locals.functionHeadParams(this.methodModel));
 
         this.pushFrame();
-        switch (methodModel.parent().orElseThrow().superclass().orElseThrow().asInternalName()) {
+        var parentalName = methodModel.parent()
+                .flatMap(ClassModel::superclass)
+                .map(ClassEntry::asInternalName)
+                .orElse("java/lang/Object");
+
+        switch (parentalName) {
             case "diamondfire/event/PlayerEventHandler" -> {
                 if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
@@ -315,85 +326,83 @@ public class CodeBlockTransformer {
     }
 
     private VarItem<?> convertBinOp(CodeTree.BinOp add) {
-        {
-            var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
-            var op = switch (add.type()) {
-                case ADD -> "+";
-                case SUB -> "-";
-                case MUL -> "x";
-                case DIV -> "/";
-                case MOD -> "%";
-                case SHR, SHL, XOR, AND, OR -> "Bitwise";
-                case COMPARE_DOUBLES -> "CompareDoubles";
-            };
-            switch (op) {
-                case "CompareDoubles" -> {
-                    var lhsVarItem = this.convertCodeTree(add.lhs());
-                    var rhsVarItem = this.convertCodeTree(add.rhs());
+        var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
+        var op = switch (add.type()) {
+            case ADD -> "+";
+            case SUB -> "-";
+            case MUL -> "x";
+            case DIV -> "/";
+            case MOD -> "%";
+            case SHR, SHL, XOR, AND, OR -> "Bitwise";
+            case COMPARE_DOUBLES -> "CompareDoubles";
+        };
+        switch (op) {
+            case "CompareDoubles" -> {
+                var lhsVarItem = this.convertCodeTree(add.lhs());
+                var rhsVarItem = this.convertCodeTree(add.rhs());
 
-                    var lhsVarString = "";
-                    if(lhsVarItem instanceof LiteralItem literalItem) {
-                        lhsVarString = literalItem.value();
-                    }
-                    if(lhsVarItem instanceof VariableItem variableItem) {
-                        lhsVarString = "%var(" + variableItem.name() + ")";
-                    }
-
-                    var rhsVarString = "";
-                    if(rhsVarItem instanceof LiteralItem literalItem) {
-                        rhsVarString = literalItem.value();
-                    }
-                    if(rhsVarItem instanceof VariableItem variableItem) {
-                        rhsVarString = "%var(" + variableItem.name() + ")";
-                    }
-
-                    this.appendCodeBlock(ActionBlock.setVar(
-                            "ClampNumber",
-                            Args.byVarItems(
-                                    variable,
-                                    LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
-                                    LiteralItem.number("-1"),
-                                    LiteralItem.number("1")
-                            )
-                    ));
-
+                var lhsVarString = "";
+                if(lhsVarItem instanceof LiteralItem literalItem) {
+                    lhsVarString = literalItem.value();
                 }
-                case "Bitwise" -> {
-                    var bitwiseTag = switch (add.type()) {
-                        case SHR -> ">>";
-                        case SHL -> "<<";
-                        case XOR -> "^";
-                        case AND -> "&";
-                        case OR -> "|";
-                        default -> throw new IllegalStateException("How?");
-                    };
-                    this.appendCodeBlock(
-                            ActionBlock.setVar(
-                                            op,
-                                            Args.byVarItems(
-                                                    variable,
-                                                    this.convertCodeTree(add.lhs()),
-                                                    this.convertCodeTree(add.rhs())
-                                            )
-                                    )
-                                    .storeTagInSlot(26, "Operator", bitwiseTag)
-                                    .storeTagInSlot(25, "Precision", "Default")
-                    );
+                if(lhsVarItem instanceof VariableItem variableItem) {
+                    lhsVarString = "%var(" + variableItem.name() + ")";
                 }
-                default -> {
-                    this.appendCodeBlock(ActionBlock.setVar(
-                            op,
-                            Args.byVarItems(
-                                    variable,
-                                    this.convertCodeTree(add.lhs()),
-                                    this.convertCodeTree(add.rhs())
-                            )
-                    ));
+
+                var rhsVarString = "";
+                if(rhsVarItem instanceof LiteralItem literalItem) {
+                    rhsVarString = literalItem.value();
                 }
+                if(rhsVarItem instanceof VariableItem variableItem) {
+                    rhsVarString = "%var(" + variableItem.name() + ")";
+                }
+
+                this.appendCodeBlock(ActionBlock.setVar(
+                        "ClampNumber",
+                        Args.byVarItems(
+                                variable,
+                                LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
+                                LiteralItem.number("-1"),
+                                LiteralItem.number("1")
+                        )
+                ));
+
             }
-
-            return variable;
+            case "Bitwise" -> {
+                var bitwiseTag = switch (add.type()) {
+                    case SHR -> ">>";
+                    case SHL -> "<<";
+                    case XOR -> "^";
+                    case AND -> "&";
+                    case OR -> "|";
+                    default -> throw new IllegalStateException("How?");
+                };
+                this.appendCodeBlock(
+                        ActionBlock.setVar(
+                                        op,
+                                        Args.byVarItems(
+                                                variable,
+                                                this.convertCodeTree(add.lhs()),
+                                                this.convertCodeTree(add.rhs())
+                                        )
+                                )
+                                .storeTagInSlot(26, "Operator", bitwiseTag)
+                                .storeTagInSlot(25, "Precision", "Default")
+                );
+            }
+            default -> {
+                this.appendCodeBlock(ActionBlock.setVar(
+                        op,
+                        Args.byVarItems(
+                                variable,
+                                this.convertCodeTree(add.lhs()),
+                                this.convertCodeTree(add.rhs())
+                        )
+                ));
+            }
         }
+
+        return variable;
     }
 
     private VarItem<?> convertInvoke(CodeTree.Invoke invoke) {
@@ -409,13 +418,34 @@ public class CodeBlockTransformer {
             params.add(this.convertCodeTree(subp));
         }
         var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
-        if(!invoke.descriptor().endsWith("V")) {
+        if(!invoke.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
             params.addFirst(returnVariable);
         }
-        this.appendCodeBlock(ActionBlock.callFunction(
-                invoke.descriptor(),
-                this.locals.functionCallParams(params)
-        ));
+        var outline = new CompilationGraph.MethodOutline(
+                invoke.descriptor().name().stringValue(),
+                invoke.methodTypeDesc()
+        );
+        switch (invoke.style()) {
+            case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
+                this.appendCodeBlock(ActionBlock.callFunction(
+                        this.graph.generateFunctionCallName(
+                                invoke.descriptor().owner(),
+                                outline
+                        ),
+                        this.locals.functionCallParams(params)
+                ));
+            }
+            case VIRTUAL_INTERFACE, VIRTUAL_OVERRIDABLE -> {
+                if(params.getFirst() instanceof VariableItem dispatchParameter) {
+                    this.appendCodeBlock(ActionBlock.callFunction(
+                            "%var(%var(" + dispatchParameter.name() + ").method." + outline + ")" ,
+                            this.locals.functionCallParams(params)
+                    ));
+                } else {
+                    throw new RuntimeException("unreachable");
+                }
+            }
+        }
         return returnVariable;
     }
 }

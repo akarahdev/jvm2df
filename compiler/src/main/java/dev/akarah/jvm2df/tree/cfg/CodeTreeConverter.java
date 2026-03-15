@@ -1,9 +1,7 @@
 package dev.akarah.jvm2df.tree.cfg;
 
-import dev.akarah.jvm2df.tree.instructions.BinOpType;
-import dev.akarah.jvm2df.tree.instructions.CodeTree;
-import dev.akarah.jvm2df.tree.instructions.ComparisonType;
-import dev.akarah.jvm2df.tree.instructions.Terminator;
+import dev.akarah.jvm2df.tree.CompilationGraph;
+import dev.akarah.jvm2df.tree.instructions.*;
 
 import java.lang.classfile.*;
 import java.lang.classfile.instruction.*;
@@ -17,12 +15,14 @@ public class CodeTreeConverter {
     List<CodeTree> statements;
     List<CodeTree> stack;
     Function<Label, Integer> labelConverter;
+    CompilationGraph graph;
 
 
-    public CodeTreeConverter(List<CodeTree> statements, Function<Label, Integer> labelConverter) {
+    public CodeTreeConverter(List<CodeTree> statements, Function<Label, Integer> labelConverter, CompilationGraph graph) {
         this.statements = statements;
         this.stack = new ArrayList<>();
         this.labelConverter = labelConverter;
+        this.graph = graph;
     }
 
     public void convert(CodeElement codeElement, int offset) {
@@ -92,9 +92,7 @@ public class CodeTreeConverter {
             case InvokeInstruction instruction -> this.invoke(instruction, offset);
             case BranchInstruction instruction -> this.branch(instruction, offset);
             case OperatorInstruction instruction -> this.operator(instruction, offset);
-            case NewObjectInstruction instruction -> {
-                this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
-            }
+            case NewObjectInstruction instruction -> this.newObj(instruction);
             case FieldInstruction instruction -> this.field(instruction);
             case TypeCheckInstruction instruction -> {
                 // TODO: typecheck :3
@@ -103,6 +101,25 @@ public class CodeTreeConverter {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
         };
+    }
+
+    private void newObj(NewObjectInstruction instruction) {
+        this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
+        for(var outline : this.graph.allSuperMethodsFor(this.graph.classByEntry(instruction.className()))) {
+            var methodModel = this.graph.lookupMethodInSuper(
+                    instruction.className(),
+                    outline.name(),
+                    outline.typeDesc()
+            );
+            this.stack.add(new CodeTree.ObjectSetField(
+                    this.stack.removeLast(),
+                    "method." + outline.name() + outline.typeDesc().descriptorString(),
+                    new CodeTree.Constant(this.graph.generateFunctionCallName(
+                            methodModel.parent().orElseThrow().thisClass(),
+                            outline
+                    ))
+            ));
+        }
     }
 
     private void field(FieldInstruction instruction) {
@@ -192,11 +209,14 @@ public class CodeTreeConverter {
         }
         params = params.reversed();
         var invoke = new CodeTree.Invoke(
-                instruction.owner().asInternalName()
-                        + "#"
-                        + instruction.name()
-                        + instruction.typeSymbol().descriptorString(),
-                params
+                instruction.method(),
+                params,
+                switch (instruction.opcode()) {
+                    case INVOKESTATIC -> InvokeStyle.STATIC;
+                    case INVOKESPECIAL -> InvokeStyle.VIRTUAL_EXACT;
+                    case INVOKEVIRTUAL, INVOKEINTERFACE -> InvokeStyle.VIRTUAL_OVERRIDABLE;
+                    default -> InvokeStyle.DYNAMIC_CALL_SITE;
+                }
         );
         if (TypeKind.from(instruction.typeSymbol().returnType()) == TypeKind.VOID) {
             this.statements.add(invoke);

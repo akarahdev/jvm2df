@@ -15,7 +15,10 @@ public class BoxedPrimitiveHandler implements InvokeHandler {
             "java/lang/Long",
             "java/lang/Double",
             "java/lang/Float",
-            "java/lang/Character"
+            "java/lang/Character",
+            "java/lang/Boolean",
+            "java/lang/Short",
+            "java/lang/Byte"
     );
 
     public static Set<String> METHOD_NAMES = Set.of(
@@ -24,14 +27,18 @@ public class BoxedPrimitiveHandler implements InvokeHandler {
             "longValue",
             "floatValue",
             "doubleValue",
-            "charValue"
+            "charValue",
+            "byteValue",
+            "shortValue",
+            "booleanValue"
     );
 
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         for(var className : CLASS_NAMES) {
             for(var methodName : METHOD_NAMES) {
-                if(invoke.descriptor().startsWith(className + "#" + methodName)) {
+                if(invoke.descriptor().owner().asInternalName().equals(className)
+                && invoke.descriptor().name().equalsString(methodName)) {
                     return Optional.of(
                             transformer -> transformer.convertCodeTree(invoke.args().getFirst())
                     );
