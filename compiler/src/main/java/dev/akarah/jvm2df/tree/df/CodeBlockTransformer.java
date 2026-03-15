@@ -9,9 +9,7 @@ import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
-import dev.akarah.jvm2df.tree.df.strategy.global.BasicHeapStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
-import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
@@ -131,7 +129,7 @@ public class CodeBlockTransformer {
             }
             case CodeTree.LoadLocal(int idx) -> this.locals.referenceLocal(idx);
             case CodeTree.ExecuteFlow(ReconstructedFlow flow) -> this.convertFlowOperation(flow);
-            case Terminator.ReturnVoid ret -> {
+            case Terminator.ReturnVoid _ -> {
                 this.locals.setResultAndReturn(LiteralItem.number("0"));
                 yield LiteralItem.number("0");
             }

@@ -2,7 +2,6 @@ package dev.akarah.jvm2df.codetemplate.items;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.akarah.jvm2df.codetemplate.Fail;
 
 public record BlockTagItem(String option, String tag, String action, String block) implements VarItem<BlockTagItem> {
     public static Codec<BlockTagItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(

@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public interface VarItem<T extends VarItem<T>> {
     public static Map<String, Codec<?>> VAR_ITEMS = Map.ofEntries(

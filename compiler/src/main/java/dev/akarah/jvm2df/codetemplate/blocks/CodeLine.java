@@ -2,11 +2,8 @@ package dev.akarah.jvm2df.codetemplate.blocks;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;

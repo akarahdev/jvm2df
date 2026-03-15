@@ -1,5 +1,15 @@
 plugins {
     id("java")
+    id("com.diffplug.spotless") version "6.25.0"
+}
+
+spotless {
+    java {
+        eclipse().configFile(file("config/spotless/eclipse-formatter.xml"))
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
 
 group = "dev.akarah"

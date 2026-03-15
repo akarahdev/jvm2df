@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public interface CodeBlock<T extends CodeBlock<T>> {
     public static Map<String, MapCodec<?>> CODE_BLOCKS = Map.ofEntries(

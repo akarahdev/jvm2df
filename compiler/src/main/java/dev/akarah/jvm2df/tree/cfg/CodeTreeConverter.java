@@ -50,19 +50,19 @@ public class CodeTreeConverter {
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
             }
-            case NewPrimitiveArrayInstruction instruction -> {
+            case NewPrimitiveArrayInstruction _ -> {
                 this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
             }
-            case NewReferenceArrayInstruction instruction -> {
+            case NewReferenceArrayInstruction _ -> {
                 this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
             }
-            case ArrayStoreInstruction instruction -> {
+            case ArrayStoreInstruction _ -> {
                 var value = this.stack.removeLast();
                 var index = this.stack.removeLast();
                 var array = this.stack.removeLast();
                 this.statements.add(new CodeTree.ArrayStore(array, index, value));
             }
-            case ArrayLoadInstruction instruction -> {
+            case ArrayLoadInstruction _ -> {
                 var index = this.stack.removeLast();
                 var array = this.stack.removeLast();
                 this.stack.add(new CodeTree.ArrayIndex(array, index));
@@ -98,7 +98,7 @@ public class CodeTreeConverter {
             case OperatorInstruction instruction -> this.operator(instruction, offset);
             case NewObjectInstruction instruction -> this.newObj(instruction);
             case FieldInstruction instruction -> this.field(instruction);
-            case TypeCheckInstruction instruction -> {
+            case TypeCheckInstruction _ -> {
                 // TODO: typecheck :3
             }
             default -> {
@@ -150,6 +150,7 @@ public class CodeTreeConverter {
                         value
                 ));
             }
+            default -> {}
         }
     }
 
@@ -200,12 +201,13 @@ public class CodeTreeConverter {
             case ARRAYLENGTH -> {
                 this.stack.add(new CodeTree.ArrayLength(this.stack.removeLast()));
             }
+            default -> {}
         }
     }
 
     private void invoke(InvokeInstruction instruction, int offset) {
         List<CodeTree> params = new ArrayList<>();
-        for(var parameter : instruction.typeSymbol().parameterList()) {
+        for(var _ : instruction.typeSymbol().parameterList()) {
             params.add(this.stack.removeLast());
         }
         if(instruction.opcode() != Opcode.INVOKESTATIC) {
@@ -267,6 +269,7 @@ public class CodeTreeConverter {
                     ComparisonType.LESS_THAN_OR_EQ, this.stack.removeLast(), this.stack.removeLast()));
             case IFLT, IF_ICMPLT -> stack.add(new CodeTree.Compare(
                     ComparisonType.LESS_THAN, this.stack.removeLast(), this.stack.removeLast()));
+            default -> {}
         }
         if(instruction.opcode().toString().contains("IF")) {
             this.statements.add(

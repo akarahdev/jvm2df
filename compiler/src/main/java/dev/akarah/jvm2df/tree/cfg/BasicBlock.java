@@ -1,13 +1,10 @@
 package dev.akarah.jvm2df.tree.cfg;
 
-import com.google.common.collect.Lists;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
-import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
