@@ -6,7 +6,6 @@ import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
-import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
 import dev.akarah.jvm2df.util.Beep;
 
@@ -33,18 +32,9 @@ public class Main {
         classes.forEach(classElements -> {
             classElements.methods().forEach(methodElements -> {
                 methodElements.code().ifPresent(codeModel -> {
-                    var methodMeta = new MethodMeta(
-                            classElements.thisClass().asInternalName(),
-                            methodElements.methodName().stringValue(),
-                            methodElements.methodTypeSymbol(),
-                            methodElements.flags().has(AccessFlag.STATIC),
-                            classElements.superclass().map(ClassEntry::asInternalName).orElse("java/lang/Object")
-                    );
-
-
                     var base = new WithContext<>(
                             new BytecodeTranslator(codeModel),
-                            methodMeta
+                            methodElements
                     );
                     System.out.println(base.context());
                     System.out.println(codeModel.toDebugString());

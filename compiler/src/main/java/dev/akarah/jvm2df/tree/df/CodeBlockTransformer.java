@@ -13,9 +13,9 @@ import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
-import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
+import java.lang.classfile.MethodModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,14 +23,14 @@ import java.util.function.Consumer;
 public class CodeBlockTransformer {
     LocalMemoryStrategy locals;
     GlobalMemoryStrategy globals;
+    MethodModel methodModel;
     FlowBlock block;
-    MethodMeta methodMeta;
     List<List<CodeBlock<?>>> codeLineStack;
     List<CodeLine> confirmedCodeLines = new ArrayList<>();
 
-    public CodeBlockTransformer(FlowBlock block, MethodMeta methodMeta) {
+    public CodeBlockTransformer(FlowBlock block, MethodModel methodModel) {
         this.block = block;
-        this.methodMeta = methodMeta;
+        this.methodModel = methodModel;
         this.codeLineStack = new ArrayList<>(new ArrayList<>());
         this.withStrategies(
                 new LineVarLocals(this),
@@ -59,34 +59,37 @@ public class CodeBlockTransformer {
 
     public List<CodeLine> transform() {
         this.codeLineStack = new ArrayList<>();
-        var params = new ArrayList<>(this.locals.functionHeadParams(this.methodMeta));
+        var params = new ArrayList<>(this.locals.functionHeadParams(this.methodModel));
 
         this.pushFrame();
-        switch (methodMeta.superClassName()) {
+        switch (methodModel.parent().orElseThrow().superclass().orElseThrow().asInternalName()) {
             case "diamondfire/event/PlayerEventHandler" -> {
-                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
-                this.appendCodeBlock(ActionBlock.playerEvent(methodMeta.methodName()));
+                this.appendCodeBlock(ActionBlock.playerEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/EntityEventHandler" -> {
-                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
-                this.appendCodeBlock(ActionBlock.entityEvent(methodMeta.methodName()));
+                this.appendCodeBlock(ActionBlock.entityEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/GameEventHandler" -> {
-                if(methodMeta.methodName().equals("<init>") || methodMeta.methodName().equals("<clinit>")) {
+                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
-                this.appendCodeBlock(ActionBlock.gameEvent(methodMeta.methodName()));
+                this.appendCodeBlock(ActionBlock.gameEvent(methodModel.methodName().stringValue()));
             }
             default -> {
                 this.appendCodeBlock(ActionBlock.function(
-                        methodMeta.toString(),
+                        methodModel.parent().orElseThrow().thisClass().asInternalName()
+                                + "#"
+                                + methodModel.methodName().stringValue()
+                                + methodModel.methodTypeSymbol().descriptorString(),
                         params
                 ));
             }
