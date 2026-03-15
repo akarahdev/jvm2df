@@ -26,17 +26,7 @@ public class CodeBlockTransformer {
     MethodModel methodModel;
     FlowBlock block;
     List<List<CodeBlock<?>>> codeLineStack;
-    List<CodeLine> confirmedCodeLines = new ArrayList<>();
-
-    public CodeBlockTransformer(FlowBlock block, MethodModel methodModel) {
-        this.block = block;
-        this.methodModel = methodModel;
-        this.codeLineStack = new ArrayList<>(new ArrayList<>());
-        this.withStrategies(
-                new LineVarLocals(this),
-                new BasicHeapStrategy(this, this.locals)
-        );
-    }
+    List<CodeLine> confirmedCodeLines;
 
     public void appendCodeBlock(CodeBlock<?> codeBlock) {
         this.codeLineStack.getLast().add(codeBlock);
@@ -51,13 +41,16 @@ public class CodeBlockTransformer {
         this.codeLineStack.add(new ArrayList<>());
     }
 
-    public CodeBlockTransformer withStrategies(LocalMemoryStrategy locals, GlobalMemoryStrategy globals) {
+    public List<CodeLine> transform(FlowBlock block, MethodModel methodModel, LocalMemoryStrategy locals, GlobalMemoryStrategy globals) {
+        this.block = block;
+        this.methodModel = methodModel;
+        this.codeLineStack = new ArrayList<>(new ArrayList<>());
+        this.confirmedCodeLines = new ArrayList<>();
         this.locals = locals;
         this.globals = globals;
-        return this;
-    }
+        this.locals.setup(this);
+        this.globals.setup(this, locals);
 
-    public List<CodeLine> transform() {
         this.codeLineStack = new ArrayList<>();
         var params = new ArrayList<>(this.locals.functionHeadParams(this.methodModel));
 

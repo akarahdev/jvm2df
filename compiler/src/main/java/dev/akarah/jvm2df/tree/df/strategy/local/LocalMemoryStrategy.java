@@ -3,11 +3,13 @@ package dev.akarah.jvm2df.tree.df.strategy.local;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
+import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 
 import java.lang.classfile.MethodModel;
 import java.util.List;
 
 public interface LocalMemoryStrategy {
+    void setup(CodeBlockTransformer transformer);
     VariableItem referenceLocal(int index);
     void setResultAndReturn(VarItem<?> result);
     void compileSubroutineHint(ReconstructedFlow.SubroutineSafeHint hint);

@@ -21,7 +21,7 @@ will likely see far worse performance and exponentially higher code-block space 
  */
 
 public class DominanceFlowTransformer implements ControlFlowTransformer {
-    private final List<BasicBlock> basicBlocks;
+    private List<BasicBlock> basicBlocks;
     private final Map<Integer, BasicBlock> blocksByOffset = new HashMap<>();
     private final Map<BasicBlock, Set<BasicBlock>> successors = new HashMap<>();
     private final Map<BasicBlock, Set<BasicBlock>> predecessors = new HashMap<>();
@@ -29,15 +29,6 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
     private final Map<BasicBlock, List<BasicBlock>> dominanceTree = new HashMap<>();
     private final Set<BasicBlock> visitedBlocks = new HashSet<>();
     private final Set<BasicBlock> loopHeaders = new HashSet<>();
-
-    public DominanceFlowTransformer(List<BasicBlock> basicBlocks) {
-        this.basicBlocks = basicBlocks;
-        for (var block : basicBlocks) {
-            blocksByOffset.put(block.offset(), block);
-        }
-        buildCfg();
-        computeDominators();
-    }
 
     private void buildCfg() {
         for (var block : basicBlocks) {
@@ -145,7 +136,14 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
     }
 
     @Override
-    public FlowBlock convert() {
+    public FlowBlock convert(List<BasicBlock> basicBlocks) {
+        this.basicBlocks = basicBlocks;
+        for (var block : basicBlocks) {
+            blocksByOffset.put(block.offset(), block);
+        }
+        buildCfg();
+        computeDominators();
+
         if (basicBlocks.isEmpty()) return new FlowBlock(new ArrayList<>());
         visitedBlocks.clear();
         loopHeaders.clear();

@@ -12,7 +12,8 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
     CodeBlockTransformer transformer;
     LocalMemoryStrategy localMemoryStrategy;
 
-    public BasicHeapStrategy(CodeBlockTransformer transformer, LocalMemoryStrategy locals) {
+    @Override
+    public void setup(CodeBlockTransformer transformer, LocalMemoryStrategy locals) {
         this.transformer = transformer;
         this.localMemoryStrategy = locals;
     }

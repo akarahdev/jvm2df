@@ -14,7 +14,14 @@ import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 
-public record LineVarLocals(CodeBlockTransformer transformer) implements LocalMemoryStrategy {
+public class LineVarLocals implements LocalMemoryStrategy {
+    CodeBlockTransformer transformer;
+
+    @Override
+    public void setup(CodeBlockTransformer transformer) {
+        this.transformer = transformer;
+    }
+
     @Override
     public VariableItem referenceLocal(int index) {
         return new VariableItem("local." + index, "line");
@@ -34,7 +41,7 @@ public record LineVarLocals(CodeBlockTransformer transformer) implements LocalMe
 
     @Override
     public void compileSubroutineHint(ReconstructedFlow.SubroutineSafeHint hint) {
-        this.transformer().convertFlowBlock(hint.block());
+        this.transformer.convertFlowBlock(hint.block());
     }
 
     @Override

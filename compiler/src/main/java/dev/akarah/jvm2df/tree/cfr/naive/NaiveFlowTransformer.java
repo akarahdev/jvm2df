@@ -4,6 +4,7 @@ import dev.akarah.jvm2df.tree.cfg.BasicBlock;
 import dev.akarah.jvm2df.tree.cfr.ControlFlowTransformer;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
+import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
@@ -14,14 +15,9 @@ import java.util.Optional;
 
 public class NaiveFlowTransformer implements ControlFlowTransformer {
     public static final int LABEL_VARIABLE = Integer.MAX_VALUE;
-    List<BasicBlock> basicBlocks;
-
-    public NaiveFlowTransformer(List<BasicBlock> basicBlocks) {
-        this.basicBlocks = basicBlocks;
-    }
 
     @Override
-    public FlowBlock convert() {
+    public FlowBlock convert(List<BasicBlock> basicBlocks) {
         var mainLoop = new FlowBlock(new ArrayList<>());
 
         for(var block : basicBlocks) {

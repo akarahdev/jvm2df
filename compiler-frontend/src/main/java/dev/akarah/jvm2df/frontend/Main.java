@@ -6,6 +6,8 @@ import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.strategy.global.BasicHeapStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
 import dev.akarah.jvm2df.util.Beep;
 
@@ -22,41 +24,12 @@ public class Main {
         }
 
         var path = Path.of(args[0]).toAbsolutePath();
-        System.out.println("Compiling " + path);
-        var classes = JarToClasses.convert(path);
-        System.out.println(classes);
-
-        final var codeLines = new ArrayList<CodeLine>();
-        classes.forEach(classElements -> {
-            classElements.methods().forEach(methodElements -> {
-                methodElements.code().ifPresent(codeModel -> {
-                    var base = new WithContext<>(
-                            new BytecodeTranslator(codeModel),
-                            methodElements
-                    );
-                    System.out.println(base.context());
-                    System.out.println(codeModel.toDebugString());
-                    try {
-                        var out = base
-                                .map(BytecodeTranslator::split)
-                                .inspect((v, c) -> System.out.println(v))
-                                .map(DominanceFlowTransformer::new)
-                                .map(DominanceFlowTransformer::convert)
-                                .map(CodeBlockTransformer::new)
-                                .map(CodeBlockTransformer::transform);
-                        codeLines.addAll(out.value());
-                    } catch (Exception e) {
-                        try {
-                            Beep.tone(330, 100, 0.5);
-                        } catch (LineUnavailableException _) {
-                            // ignore it, sound isn't necessary
-                        }
-                        throw new RuntimeException(e);
-                    }
-                });
-            });
-        });
-
+        var pipeline = new Pipeline()
+                .setJarPath(path)
+                .setFlowTransformer(new DominanceFlowTransformer())
+                .setLocalMemoryStrategy(new LineVarLocals())
+                .setGlobalMemoryStrategy(new BasicHeapStrategy());
+        var codeLines = pipeline.execute();
         try {
             System.out.println("=== CC STARTS BELOW");
             var cc = new CodeClientAPI(codeLines);

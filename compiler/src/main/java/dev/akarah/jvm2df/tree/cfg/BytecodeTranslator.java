@@ -14,13 +14,10 @@ public class BytecodeTranslator {
     Set<Integer> splitTargets;
     CodeTreeConverter converter;
 
-    public BytecodeTranslator(CodeModel codeModel) {
+    public List<BasicBlock> split(CodeModel codeModel) {
         this.instructions = codeModel.elementList();
         this.splitTargets = new HashSet<>();
         this.codeModel = codeModel;
-    }
-
-    public List<BasicBlock> split() {
         this.findTargets();
         return constructBlocks();
     }
