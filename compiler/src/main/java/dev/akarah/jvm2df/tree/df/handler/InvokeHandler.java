@@ -11,9 +11,9 @@ import java.util.function.Function;
 
 public interface InvokeHandler {
     List<InvokeHandler> INVOKE_HANDLERS = List.of(
-            new DFCodeBlocksHandler("control", ActionBlock::control),
-            new DFCodeBlocksHandler("playerAction", ActionBlock::playerAction),
-            new DFCodeBlocksHandler("setVar", ActionBlock::setVar),
+            new DFCodeBlocksHandler("control", "control", ActionBlock::control),
+            new DFCodeBlocksHandler("playerAction", "player_action", ActionBlock::playerAction),
+            new DFCodeBlocksHandler("setVar", "set_var", ActionBlock::setVar),
             new VarItemGenHandler(),
             new BoxedPrimitiveHandler()
     );

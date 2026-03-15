@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public record DFCodeBlocksHandler(String functionName, BiFunction<String, Args, CodeBlock<?>> mapper) implements InvokeHandler {
+public record DFCodeBlocksHandler(String functionName, String codeBlock, BiFunction<String, Args, CodeBlock<?>> mapper) implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         if(invoke.descriptor().startsWith("diamondfire/internal/CodeBlocks#" + functionName)) {
@@ -30,7 +30,12 @@ public record DFCodeBlocksHandler(String functionName, BiFunction<String, Args, 
                 for(var arg : codeArguments) {
                     var compiledArg = transformer.convertCodeTree(arg);
                     if(compiledArg instanceof BlockTagItem blockTagItem) {
-                        tags.add(blockTagItem);
+                        tags.add(new BlockTagItem(
+                                blockTagItem.option(),
+                                blockTagItem.tag(),
+                                constantDesc.toString(),
+                                codeBlock
+                        ));
                     } else {
                         norms.add(compiledArg);
                     }

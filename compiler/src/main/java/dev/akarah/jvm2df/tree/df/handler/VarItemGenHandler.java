@@ -16,9 +16,7 @@ public class VarItemGenHandler implements InvokeHandler {
             return Optional.of(transformer -> {
                 var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
                 var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
-                var action = ((CodeTree.Constant) invoke.args().get(2)).constantDesc().toString();
-                var block = ((CodeTree.Constant) invoke.args().get(3)).constantDesc().toString();
-                return new BlockTagItem(option, tag, action, block);
+                return new BlockTagItem(option, tag, "?", "?");
             });
         }
         if(invoke.descriptor().startsWith("diamondfire/internal/VarItemGen#lineVar")) {

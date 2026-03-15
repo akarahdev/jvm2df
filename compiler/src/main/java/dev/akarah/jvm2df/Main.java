@@ -4,7 +4,7 @@ import dev.akarah.jvm2df.bytecode.JarToClasses;
 import dev.akarah.jvm2df.codeclient.CodeClientAPI;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
-import dev.akarah.jvm2df.tree.cfr.NaiveFlowTransformer;
+import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.MethodMeta;
 import dev.akarah.jvm2df.tree.instructions.WithContext;
@@ -52,8 +52,8 @@ public class Main {
                         var out = base
                                 .map(BytecodeTranslator::split)
                                 .inspect((v, c) -> System.out.println(v))
-                                .map(NaiveFlowTransformer::new)
-                                .map(NaiveFlowTransformer::convert)
+                                .map(DominanceFlowTransformer::new)
+                                .map(DominanceFlowTransformer::convert)
                                 .map(CodeBlockTransformer::new)
                                 .map(CodeBlockTransformer::transform);
                         codeLines.addAll(out.value());
@@ -70,6 +70,7 @@ public class Main {
         });
 
         try {
+            System.out.println("=== CC STARTS BELOW");
             var cc = new CodeClientAPI(codeLines);
             cc.run();
         } catch (URISyntaxException e) {

@@ -24,8 +24,17 @@ public final class ComplexNumber {
         return new ComplexNumber(this.real, -this.imag);
     }
 
-    public void debugPrint() {
-        Control.debug(this.real);
-        Control.debug(this.imag);
+    public String toString() {
+        if(this.imag >= 0) {
+            return Double.toString(this.real)
+                    .concat("+")
+                    .concat(Double.toString(this.imag))
+                    .concat("i");
+        } else {
+            return Double.toString(this.real)
+                    .concat("-")
+                    .concat(Double.toString(-this.imag))
+                    .concat("i");
+        }
     }
 }

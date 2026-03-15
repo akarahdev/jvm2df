@@ -1,6 +1,9 @@
-package dev.akarah.jvm2df.tree.cfr;
+package dev.akarah.jvm2df.tree.cfr.naive;
 
 import dev.akarah.jvm2df.tree.cfg.BasicBlock;
+import dev.akarah.jvm2df.tree.cfr.ControlFlowTransformer;
+import dev.akarah.jvm2df.tree.cfr.FlowBlock;
+import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;

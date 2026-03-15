@@ -8,11 +8,11 @@ public class Control {
         CodeBlocks.control(
                 "PrintDebug",
                 argument,
-                VarItemGen.tag("Permission", "Developer", "PrintDebug", "control"),
-                VarItemGen.tag("Text Value Merging", "No Spaces", "PrintDebug", "control"),
-                VarItemGen.tag("Highlighting", "None", "PrintDebug", "control"),
-                VarItemGen.tag("Sound", "Default", "PrintDebug", "control"),
-                VarItemGen.tag("Message Style", "Debug", "PrintDebug", "control")
+                VarItemGen.tag("Permission", "Developer"),
+                VarItemGen.tag("Text Value Merging", "No Spaces"),
+                VarItemGen.tag("Highlighting", "None"),
+                VarItemGen.tag("Sound", "Default"),
+                VarItemGen.tag("Message Style", "Debug")
         );
     }
 
@@ -20,7 +20,7 @@ public class Control {
         CodeBlocks.control(
                 "Wait",
                 ticks,
-                VarItemGen.tag("Time Unit", "Ticks", "Wait", "control")
+                VarItemGen.tag("Time Unit", "Ticks")
         );
     }
 }

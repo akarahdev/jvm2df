@@ -210,6 +210,7 @@ public class CodeBlockTransformer {
                         this.appendCodeBlock(ActionBlock.setVar(
                                 "ClampNumber",
                                 Args.byVarItems(
+                                        variable,
                                         LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
                                         LiteralItem.number("-1"),
                                         LiteralItem.number("1")
