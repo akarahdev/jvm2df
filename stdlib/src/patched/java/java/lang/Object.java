@@ -1,11 +1,8 @@
 package java.lang;
 
-import diamondfire.internal.ShimException;
-
 public class Object {
     public boolean equals(Object other) {
-        // todo: fix compilation of stack across labels
-        return false;
+        return this == other;
     }
 
     public String toString() {

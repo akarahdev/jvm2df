@@ -6,10 +6,7 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.MethodTypeDesc;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CompilationGraph {
     Map<String, ClassModel> classDescs = new HashMap<>();
@@ -31,17 +28,13 @@ public class CompilationGraph {
         );
     }
 
-    public List<MethodOutline> allSuperMethodsFor(ClassModel model) {
-        var list = new ArrayList<MethodOutline>();
+    public Set<MethodOutline> allSuperMethodsFor(ClassModel model) {
+        var list = new HashSet<MethodOutline>();
         var entry = model.thisClass();
         do {
+            model = this.classByEntry(entry);
+            System.out.println("trying " + entry);
             for(var method : model.methods()) {
-                for(var alreadyInList : list) {
-                    if(alreadyInList.name().equals(method.methodName().stringValue())
-                    && alreadyInList.typeDesc().equals(method.methodTypeSymbol())) {
-                        continue;
-                    }
-                }
                 list.add(new MethodOutline(
                         method.methodName().stringValue(),
                         method.methodTypeSymbol()
@@ -72,6 +65,7 @@ public class CompilationGraph {
         m = lookupMethodExact(baseClass, methodName, typeDesc);
         while(m == null && baseClass != null) {
             baseClass = classByEntry(baseClass).superclass().orElse(null);
+            m = lookupMethodExact(baseClass, methodName, typeDesc);
         }
         return m;
     }

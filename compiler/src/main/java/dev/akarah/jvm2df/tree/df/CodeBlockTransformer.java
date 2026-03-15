@@ -436,7 +436,11 @@ public class CodeBlockTransformer {
                 ));
             }
             case VIRTUAL_INTERFACE, VIRTUAL_OVERRIDABLE -> {
-                if(params.getFirst() instanceof VariableItem dispatchParameter) {
+                int searchIdx = 1;
+                if(outline.typeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
+                    searchIdx = 0;
+                }
+                if(params.get(searchIdx) instanceof VariableItem dispatchParameter) {
                     this.appendCodeBlock(ActionBlock.callFunction(
                             "%var(%var(" + dispatchParameter.name() + ").method." + outline + ")" ,
                             this.locals.functionCallParams(params)

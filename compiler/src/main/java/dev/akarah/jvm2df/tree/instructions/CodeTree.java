@@ -8,6 +8,13 @@ import java.lang.constant.ConstantDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
+/**
+ * A tree-based code representation based on JVM bytecode.
+ * This is a more abstract representation over JVM bytecode, making
+ * virtual operations explicitly virtual, and static operations simpler.
+ * This can be thought of as a hybrid of DiamondFire code blocks and
+ * JVM bytecode.
+ */
 public interface CodeTree {
     record Constant(ConstantDesc constantDesc) implements CodeTree {}
     record StoreLocal(int idx, CodeTree value) implements CodeTree {}

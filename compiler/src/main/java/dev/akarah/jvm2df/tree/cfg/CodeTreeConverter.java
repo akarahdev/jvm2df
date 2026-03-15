@@ -11,6 +11,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Converts a series of JVM instructons in a Basic Block into
+ * a {@link CodeTree}.
+ */
 public class CodeTreeConverter {
     List<CodeTree> statements;
     List<CodeTree> stack;
