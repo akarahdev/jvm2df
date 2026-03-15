@@ -5,10 +5,13 @@ import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
-public class BasicHeapStrategy implements GlobalMemoryStrategy {
+import java.util.List;
+
+public class GameVarHeapStrategy implements GlobalMemoryStrategy {
     CodeBlockTransformer transformer;
     LocalMemoryStrategy localMemoryStrategy;
 
@@ -87,6 +90,14 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
     @Override
     public VarItem<?> readStaticField(String clazz, String field) {
         return new VariableItem("static." + clazz + "." + field, "unsaved");
+    }
+
+    @Override
+    public void invokeVirtual(VariableItem callerItem, CompilationGraph.MethodOutline methodOutline, List<VarItem<?>> parameters) {
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                "%var(%var(" + callerItem.name() + ").method." + methodOutline + ")",
+                parameters
+        ));
     }
 
     @Override

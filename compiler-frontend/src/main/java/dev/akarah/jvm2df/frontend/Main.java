@@ -2,7 +2,7 @@ package dev.akarah.jvm2df.frontend;
 
 import dev.akarah.jvm2df.codeclient.CodeClientAPI;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
-import dev.akarah.jvm2df.tree.df.strategy.global.BasicHeapStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.global.DictHeapStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
 
 import java.net.URISyntaxException;
@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 public class Main {
     static void main(String[] args) {
-        if(args.length < 1) {
+        if (args.length < 1) {
             System.out.println("Error: Provide a jar file to compile.");
             return;
         }
@@ -20,7 +20,7 @@ public class Main {
                 .setJarPath(path)
                 .setFlowTransformer(new DominanceFlowTransformer())
                 .setLocalMemoryStrategy(new LineVarLocals())
-                .setGlobalMemoryStrategy(new BasicHeapStrategy());
+                .setGlobalMemoryStrategy(new DictHeapStrategy());
         var codeLines = pipeline.execute();
         try {
             System.out.println("=== CC STARTS BELOW");

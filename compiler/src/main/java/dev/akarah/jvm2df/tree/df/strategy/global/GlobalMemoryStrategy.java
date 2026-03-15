@@ -1,8 +1,12 @@
 package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
+import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
+
+import java.util.List;
 
 public interface GlobalMemoryStrategy {
     void setup(CodeBlockTransformer transformer, LocalMemoryStrategy locals);
@@ -16,6 +20,12 @@ public interface GlobalMemoryStrategy {
     VarItem<?> readField(VarItem<?> allocation, VarItem<?> field);
 
     VarItem<?> readStaticField(String clazz, String field);
+
+    void invokeVirtual(
+            VariableItem callerItem,
+            CompilationGraph.MethodOutline methodOutline,
+            List<VarItem<?>> parameters
+    );
 
     void reference(VarItem<?> allocation);
 

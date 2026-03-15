@@ -484,10 +484,11 @@ public class CodeBlockTransformer {
                     searchIdx = 0;
                 }
                 if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
-                    this.appendCodeBlock(ActionBlock.callFunction(
-                            "%var(%var(" + dispatchParameter.name() + ").method." + outline + ")",
+                    this.globals.invokeVirtual(
+                            dispatchParameter,
+                            outline,
                             this.locals.functionCallParams(params)
-                    ));
+                    );
                 } else {
                     throw new RuntimeException("unreachable");
                 }
