@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df;
+package dev.akarah.jvm2df.frontend;
 
 import dev.akarah.jvm2df.bytecode.JarToClasses;
 import dev.akarah.jvm2df.codeclient.CodeClientAPI;
@@ -10,8 +10,6 @@ import dev.akarah.jvm2df.tree.instructions.WithContext;
 import dev.akarah.jvm2df.util.Beep;
 
 import javax.sound.sampled.LineUnavailableException;
-import java.lang.classfile.constantpool.ClassEntry;
-import java.lang.reflect.AccessFlag;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
