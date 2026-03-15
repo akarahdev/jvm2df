@@ -17,7 +17,7 @@ public record FlowBlock(
     public @NotNull String toString() {
         var sb = new StringBuilder();
         sb.append("block").append("{\n");
-        for(var stmt : statements) {
+        for (var stmt : statements) {
             sb.append(stmt.toString()).append("\n");
         }
         sb.append("}");

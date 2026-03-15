@@ -19,7 +19,7 @@ public class NaiveFlowTransformer implements ControlFlowTransformer {
     public FlowBlock convert(List<BasicBlock> basicBlocks) {
         var mainLoop = new FlowBlock(new ArrayList<>());
 
-        for(var block : basicBlocks) {
+        for (var block : basicBlocks) {
             mainLoop.statements().add(new CodeTree.ExecuteFlow(
                     new ReconstructedFlow.If(
                             new CodeTree.Compare(
@@ -42,20 +42,18 @@ public class NaiveFlowTransformer implements ControlFlowTransformer {
 
     private CodeTree instructionMapper(Terminator terminator) {
         return switch (terminator) {
-            case Terminator.Jump(int target) ->
-                    new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(target));
-            case Terminator.BranchIf(CodeTree condition, int ifTrue, int ifFalse) ->
-                    new CodeTree.ExecuteFlow(
-                            new ReconstructedFlow.If(
-                                    condition,
-                                    FlowBlock.by(
-                                            new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifTrue))
-                                    ),
-                                    Optional.of(FlowBlock.by(
-                                            new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifFalse))
-                                    ))
-                            )
-                    );
+            case Terminator.Jump(int target) -> new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(target));
+            case Terminator.BranchIf(CodeTree condition, int ifTrue, int ifFalse) -> new CodeTree.ExecuteFlow(
+                    new ReconstructedFlow.If(
+                            condition,
+                            FlowBlock.by(
+                                    new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifTrue))
+                            ),
+                            Optional.of(FlowBlock.by(
+                                    new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifFalse))
+                            ))
+                    )
+            );
             case Terminator.ReturnValue value -> value;
             case Terminator.ReturnVoid value -> value;
             default -> throw new IllegalStateException("Unexpected value: " + terminator);

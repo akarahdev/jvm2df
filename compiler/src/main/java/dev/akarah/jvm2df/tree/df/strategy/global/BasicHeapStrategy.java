@@ -33,8 +33,8 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public void setField(VarItem<?> allocation, VarItem<?> field, VarItem<?> value) {
-        if(allocation instanceof VariableItem allocationVar) {
-            if(field instanceof LiteralItem fieldLiteral) {
+        if (allocation instanceof VariableItem allocationVar) {
+            if (field instanceof LiteralItem fieldLiteral) {
                 this.transformer.appendCodeBlock(ActionBlock.setVar(
                         "=",
                         Args.byVarItems(
@@ -42,7 +42,7 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
                                 value
                         )
                 ));
-            } else if(field instanceof VariableItem fieldVar) {
+            } else if (field instanceof VariableItem fieldVar) {
                 this.transformer.appendCodeBlock(ActionBlock.setVar(
                         "=",
                         Args.byVarItems(
@@ -71,10 +71,10 @@ public class BasicHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> readField(VarItem<?> allocation, VarItem<?> field) {
-        if(allocation instanceof VariableItem allocationVar) {
-            if(field instanceof LiteralItem fieldLiteral) {
+        if (allocation instanceof VariableItem allocationVar) {
+            if (field instanceof LiteralItem fieldLiteral) {
                 return new VariableItem("%var(" + allocationVar.name() + ")." + fieldLiteral.value(), "unsaved");
-            } else if(field instanceof VariableItem fieldVar) {
+            } else if (field instanceof VariableItem fieldVar) {
                 return new VariableItem("%var(" + allocationVar.name() + ").%var(" + fieldVar.name() + ")", "unsaved");
             } else {
                 throw new RuntimeException("Fields must be literals or variables");

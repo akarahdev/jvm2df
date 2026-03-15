@@ -7,7 +7,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.classfile.*;
 import java.lang.classfile.attribute.CodeAttribute;
-import java.lang.classfile.instruction.*;
+import java.lang.classfile.instruction.BranchInstruction;
+import java.lang.classfile.instruction.LookupSwitchInstruction;
+import java.lang.classfile.instruction.ReturnInstruction;
+import java.lang.classfile.instruction.TableSwitchInstruction;
 import java.util.*;
 
 /**
@@ -37,7 +40,8 @@ public class BytecodeTranslator {
     private boolean canFallThrough(Instruction instruction) {
         Opcode op = instruction.opcode();
         return switch (op) {
-            case GOTO, GOTO_W, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, RETURN, ATHROW, LOOKUPSWITCH, TABLESWITCH -> false;
+            case GOTO, GOTO_W, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, RETURN, ATHROW, LOOKUPSWITCH, TABLESWITCH ->
+                    false;
             default -> true;
         };
     }
@@ -58,8 +62,8 @@ public class BytecodeTranslator {
 
         var labelStackSizes = new HashMap<Integer, Integer>();
 
-        for(var elem : this.instructions) {
-            if(elem instanceof Label label) {
+        for (var elem : this.instructions) {
+            if (elem instanceof Label label) {
                 var targetOffset = labelToOffset(label);
                 if (splitTargets.contains(targetOffset)) {
                     if (!block.statements().isEmpty() || list.isEmpty() || block.offset() != targetOffset) {
@@ -67,7 +71,7 @@ public class BytecodeTranslator {
                     }
                 }
             }
-            if(elem instanceof Instruction instruction) {
+            if (elem instanceof Instruction instruction) {
                 this.converter.convert(elem, offset);
                 switch (elem) {
                     case BranchInstruction branch -> {
@@ -87,7 +91,8 @@ public class BytecodeTranslator {
                             labelStackSizes.put(labelToOffset(entry.target()), size);
                         }
                     }
-                    default -> {}
+                    default -> {
+                    }
                 }
 
                 offset += instruction.sizeInBytes();
@@ -95,7 +100,7 @@ public class BytecodeTranslator {
                 if (canFallThrough(instruction)) {
                     labelStackSizes.put(offset, this.converter.stack.size());
                 }
-                if(splitTargets.contains(offset)) {
+                if (splitTargets.contains(offset)) {
                     block = updateBasicBlock(list, offset, block, offset, labelStackSizes);
                 }
             }
@@ -103,7 +108,7 @@ public class BytecodeTranslator {
         if (!block.statements().isEmpty() || list.isEmpty()) {
             list.add(block);
         }
-        if(list.getFirst().statements().isEmpty()) {
+        if (list.getFirst().statements().isEmpty()) {
             list.removeFirst();
         }
         return list;
@@ -136,7 +141,7 @@ public class BytecodeTranslator {
         }
 
         list.add(block);
-        if(!block.statements().isEmpty() && !(block.statements().getLast() instanceof Terminator)) {
+        if (!block.statements().isEmpty() && !(block.statements().getLast() instanceof Terminator)) {
             block.statements().add(new Terminator.Jump(offset));
 
             labelStackSizes.put(offset, this.converter.stack.size());
@@ -166,12 +171,12 @@ public class BytecodeTranslator {
     private void findTargets() {
         this.splitTargets.clear();
         int offset = 0;
-        for(var element : this.instructions) {
-            if(element instanceof Label label) {
+        for (var element : this.instructions) {
+            if (element instanceof Label label) {
                 this.splitTargets.add(labelToOffset(label));
             }
-            if(element instanceof Instruction instruction) {
-                if(element instanceof ReturnInstruction
+            if (element instanceof Instruction instruction) {
+                if (element instanceof ReturnInstruction
                         || element instanceof BranchInstruction) {
                     this.splitTargets.add(offset + instruction.sizeInBytes());
                     if (element instanceof BranchInstruction branch) {

@@ -6,7 +6,10 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.MethodTypeDesc;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CompilationGraph {
     Map<String, ClassModel> classDescs = new HashMap<>();
@@ -34,17 +37,17 @@ public class CompilationGraph {
         do {
             model = this.classByEntry(entry);
             System.out.println("trying " + entry);
-            for(var method : model.methods()) {
+            for (var method : model.methods()) {
                 list.add(new MethodOutline(
                         method.methodName().stringValue(),
                         method.methodTypeSymbol()
                 ));
             }
-            if(this.classByEntry(entry) == null) {
+            if (this.classByEntry(entry) == null) {
                 throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
             }
             entry = this.classByEntry(entry).superclass().orElse(null);
-        } while(entry != null);
+        } while (entry != null);
         return list;
     }
 
@@ -63,7 +66,7 @@ public class CompilationGraph {
     public MethodModel lookupMethodInSuper(ClassEntry baseClass, String methodName, MethodTypeDesc typeDesc) {
         MethodModel m;
         m = lookupMethodExact(baseClass, methodName, typeDesc);
-        while(m == null && baseClass != null) {
+        while (m == null && baseClass != null) {
             baseClass = classByEntry(baseClass).superclass().orElse(null);
             m = lookupMethodExact(baseClass, methodName, typeDesc);
         }

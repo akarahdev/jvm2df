@@ -55,7 +55,7 @@ public class CodeClientAPI extends WebSocketClient {
                 };
                 this.foldFunctions(size, this.functions.size());
                 this.send("place");
-                for(var line : this.functions) {
+                for (var line : this.functions) {
                     this.send("place " + line.codeString());
                 }
                 this.send("place go");
@@ -80,17 +80,17 @@ public class CodeClientAPI extends WebSocketClient {
     }
 
     private void foldFunctions(int maxSize, int folds) {
-        for(int foldCount = 0; foldCount < folds; foldCount++) {
+        for (int foldCount = 0; foldCount < folds; foldCount++) {
             boolean folded = false;
             int startLine = 0;
-            for(int currPointer = startLine; currPointer < this.functions.size(); currPointer++) {
-                for(int chkPointer = startLine; chkPointer < this.functions.size(); chkPointer++) {
-                    if(chkPointer == currPointer) {
+            for (int currPointer = startLine; currPointer < this.functions.size(); currPointer++) {
+                for (int chkPointer = startLine; chkPointer < this.functions.size(); chkPointer++) {
+                    if (chkPointer == currPointer) {
                         continue;
                     }
                     var ls = this.functions.get(currPointer).codeBlocks().size();
                     var rs = this.functions.get(chkPointer).codeBlocks().size();
-                    if(ls + rs < maxSize) {
+                    if (ls + rs < maxSize) {
                         var obj = this.functions.remove(chkPointer);
                         this.functions.get(currPointer).codeBlocks().addAll(obj.codeBlocks());
                         folded = true;
@@ -98,7 +98,7 @@ public class CodeClientAPI extends WebSocketClient {
                         break;
                     }
                 }
-                if(folded)
+                if (folded)
                     break;
             }
         }

@@ -14,7 +14,7 @@ public record BasicBlock(
         List<CodeTree> statements
 ) {
     public CodeTree terminator() {
-        if(statements.isEmpty()) {
+        if (statements.isEmpty()) {
             return new Terminator.Unreachable();
         }
         return statements.getLast();
@@ -22,7 +22,7 @@ public record BasicBlock(
 
     public FlowBlock mapToFlow(Function<Terminator, CodeTree> mapper) {
         var statements = new ArrayList<CodeTree>(this.statements);
-        if(statements.getLast() instanceof Terminator) {
+        if (statements.getLast() instanceof Terminator) {
             statements.add(mapper.apply((Terminator) statements.removeLast()));
         }
         return new FlowBlock(statements);
@@ -32,7 +32,7 @@ public record BasicBlock(
     public @NotNull String toString() {
         var sb = new StringBuilder();
         sb.append("bb@").append(offset).append("{\n");
-        for(var stmt : statements) {
+        for (var stmt : statements) {
             sb.append("  ").append(stmt.toString()).append("\n");
         }
         sb.append("}");

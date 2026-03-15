@@ -18,7 +18,7 @@ public record Args(List<Argument> arguments) {
     public static Args byVarItems(List<VarItem<?>> varItems) {
         var list = new ArrayList<Argument>();
         int idx = 0;
-        for(var item : varItems) {
+        for (var item : varItems) {
             list.add(new Argument(
                     item,
                     idx

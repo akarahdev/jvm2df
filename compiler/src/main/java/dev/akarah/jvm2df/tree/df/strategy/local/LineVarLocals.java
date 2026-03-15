@@ -49,20 +49,20 @@ public class LineVarLocals implements LocalMemoryStrategy {
     public List<VarItem<?>> functionHeadParams(MethodModel methodMeta) {
         var params = new ArrayList<ParameterItem>();
         int idx = 0;
-        if(!methodMeta.flags().has(AccessFlag.STATIC)) {
+        if (!methodMeta.flags().has(AccessFlag.STATIC)) {
             idx += 1;
             var localVar = this.referenceLocal(0);
             params.add(new ParameterItem(localVar.name(), "any", false, false));
         }
-        for(var parameter : methodMeta.methodTypeSymbol().parameterList()) {
+        for (var parameter : methodMeta.methodTypeSymbol().parameterList()) {
             var localVar = this.referenceLocal(idx);
             params.add(new ParameterItem(localVar.name(), "any", false, false));
             idx += 1;
-            if(parameter.descriptorString().equals("D") || parameter.descriptorString().equals("L")) {
+            if (parameter.descriptorString().equals("D") || parameter.descriptorString().equals("L")) {
                 idx += 1;
             }
         }
-        if(!methodMeta.methodTypeSymbol().returnType().equals(ClassDesc.ofDescriptor("V"))) {
+        if (!methodMeta.methodTypeSymbol().returnType().equals(ClassDesc.ofDescriptor("V"))) {
             params.addFirst(new ParameterItem("return", "var", false, false));
         }
         return (List<VarItem<?>>) (Object) params;

@@ -2,8 +2,12 @@ package dev.akarah.jvm2df.tree.cfg;
 
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.instructions.*;
+import dev.akarah.jvm2df.tree.instructions.Terminator;
 
-import java.lang.classfile.*;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.Label;
+import java.lang.classfile.Opcode;
+import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +39,7 @@ public class CodeTreeConverter {
                 this.stack.add(new CodeTree.Constant(constantInstruction.constantValue()));
             }
             case ReturnInstruction instruction -> {
-                if(instruction.typeKind().equals(TypeKind.VOID)) {
+                if (instruction.typeKind().equals(TypeKind.VOID)) {
                     this.statements.add(new Terminator.ReturnVoid());
                 } else {
                     this.statements.add(new Terminator.ReturnValue(this.stack.removeLast()));
@@ -104,12 +108,12 @@ public class CodeTreeConverter {
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
-        };
+        }
     }
 
     private void newObj(NewObjectInstruction instruction) {
         this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
-        for(var outline : this.graph.allSuperMethodsFor(this.graph.classByEntry(instruction.className()))) {
+        for (var outline : this.graph.allSuperMethodsFor(this.graph.classByEntry(instruction.className()))) {
             var methodModel = this.graph.lookupMethodInSuper(
                     instruction.className(),
                     outline.name(),
@@ -150,7 +154,8 @@ public class CodeTreeConverter {
                         value
                 ));
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -190,8 +195,10 @@ public class CodeTreeConverter {
                 var lhs = stack.removeLast();
                 this.stack.add(new CodeTree.BinOp(BinOpType.SHR, lhs, rhs));
             }
-            case IAND, LAND -> this.stack.add(new CodeTree.BinOp(BinOpType.AND, stack.removeLast(), stack.removeLast()));
-            case IXOR, LXOR -> this.stack.add(new CodeTree.BinOp(BinOpType.XOR, stack.removeLast(), stack.removeLast()));
+            case IAND, LAND ->
+                    this.stack.add(new CodeTree.BinOp(BinOpType.AND, stack.removeLast(), stack.removeLast()));
+            case IXOR, LXOR ->
+                    this.stack.add(new CodeTree.BinOp(BinOpType.XOR, stack.removeLast(), stack.removeLast()));
             case IOR, LOR -> this.stack.add(new CodeTree.BinOp(BinOpType.OR, stack.removeLast(), stack.removeLast()));
             case DCMPG, DCMPL, FCMPG, FCMPL -> {
                 var rhs = stack.removeLast();
@@ -201,16 +208,17 @@ public class CodeTreeConverter {
             case ARRAYLENGTH -> {
                 this.stack.add(new CodeTree.ArrayLength(this.stack.removeLast()));
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
     private void invoke(InvokeInstruction instruction, int offset) {
         List<CodeTree> params = new ArrayList<>();
-        for(var _ : instruction.typeSymbol().parameterList()) {
+        for (var _ : instruction.typeSymbol().parameterList()) {
             params.add(this.stack.removeLast());
         }
-        if(instruction.opcode() != Opcode.INVOKESTATIC) {
+        if (instruction.opcode() != Opcode.INVOKESTATIC) {
             params.add(this.stack.removeLast());
         }
         params = params.reversed();
@@ -245,10 +253,10 @@ public class CodeTreeConverter {
     );
 
     private void branch(BranchInstruction instruction, int offset) {
-        if(ZERO_ADDING_BRANCH_OPCODES.contains(instruction.opcode())) {
+        if (ZERO_ADDING_BRANCH_OPCODES.contains(instruction.opcode())) {
             this.stack.add(new CodeTree.Constant(0));
         }
-        if(SWAPPED_BRANCH_OPCODES.contains(instruction.opcode())) {
+        if (SWAPPED_BRANCH_OPCODES.contains(instruction.opcode())) {
             var rhs = stack.removeLast();
             var lhs = stack.removeLast();
             stack.add(rhs);
@@ -269,9 +277,10 @@ public class CodeTreeConverter {
                     ComparisonType.LESS_THAN_OR_EQ, this.stack.removeLast(), this.stack.removeLast()));
             case IFLT, IF_ICMPLT -> stack.add(new CodeTree.Compare(
                     ComparisonType.LESS_THAN, this.stack.removeLast(), this.stack.removeLast()));
-            default -> {}
+            default -> {
+            }
         }
-        if(instruction.opcode().toString().contains("IF")) {
+        if (instruction.opcode().toString().contains("IF")) {
             this.statements.add(
                     new Terminator.BranchIf(
                             stack.removeLast(),

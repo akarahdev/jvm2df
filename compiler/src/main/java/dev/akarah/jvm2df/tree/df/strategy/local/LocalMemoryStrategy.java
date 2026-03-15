@@ -10,9 +10,14 @@ import java.util.List;
 
 public interface LocalMemoryStrategy {
     void setup(CodeBlockTransformer transformer);
+
     VariableItem referenceLocal(int index);
+
     void setResultAndReturn(VarItem<?> result);
+
     void compileSubroutineHint(ReconstructedFlow.SubroutineSafeHint hint);
+
     List<VarItem<?>> functionHeadParams(MethodModel methodModel);
+
     List<VarItem<?>> functionCallParams(List<VarItem<?>> parameters);
 }

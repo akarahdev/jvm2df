@@ -12,11 +12,11 @@ import java.util.jar.JarInputStream;
 public class JarToClasses {
     public static List<ClassModel> convert(Path jarFile) {
         var classFiles = new ArrayList<ClassModel>();
-        try(var jarStream = new JarInputStream(new FileInputStream(jarFile.toFile()))) {
+        try (var jarStream = new JarInputStream(new FileInputStream(jarFile.toFile()))) {
             var entry = jarStream.getNextJarEntry();
-            while(entry != null) {
+            while (entry != null) {
                 var classBytes = jarStream.readAllBytes();
-                if(classBytes.length == 0) {
+                if (classBytes.length == 0) {
                     entry = jarStream.getNextJarEntry();
                     continue;
                 }

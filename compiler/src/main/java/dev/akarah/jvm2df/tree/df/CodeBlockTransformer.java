@@ -4,7 +4,10 @@ import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
-import dev.akarah.jvm2df.codetemplate.items.*;
+import dev.akarah.jvm2df.codetemplate.items.Args;
+import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
+import dev.akarah.jvm2df.codetemplate.items.VarItem;
+import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
@@ -66,21 +69,21 @@ public class CodeBlockTransformer {
 
         switch (parentalName) {
             case "diamondfire/event/PlayerEventHandler" -> {
-                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
+                if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
                 this.appendCodeBlock(ActionBlock.playerEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/EntityEventHandler" -> {
-                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
+                if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
                 this.appendCodeBlock(ActionBlock.entityEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/GameEventHandler" -> {
-                if(methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
+                if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     this.popFrame();
                     return List.of();
                 }
@@ -103,7 +106,7 @@ public class CodeBlockTransformer {
     }
 
     public void convertFlowBlock(FlowBlock block) {
-        for(var tree : block.statements()) {
+        for (var tree : block.statements()) {
             this.convertCodeTree(tree);
         }
     }
@@ -189,8 +192,7 @@ public class CodeBlockTransformer {
                 this.globals.setStaticField(clazz, field, this.convertCodeTree(value));
                 yield LiteralItem.number("0");
             }
-            case CodeTree.ObjectGetStatic(String clazz, String field) ->
-                    this.globals.readStaticField(clazz, field);
+            case CodeTree.ObjectGetStatic(String clazz, String field) -> this.globals.readStaticField(clazz, field);
             case CodeTree.ObjectSetField objStore -> {
                 var array = this.convertCodeTree(objStore.obj());
                 this.globals.setField(
@@ -219,7 +221,6 @@ public class CodeBlockTransformer {
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }
-
 
 
     private VarItem<?> convertCompare(CodeTree.Compare compare) {
@@ -264,7 +265,7 @@ public class CodeBlockTransformer {
         this.appendCodeBlock(Bracket.openNormal());
         ifTrue.accept(comparisonResult);
         this.appendCodeBlock(Bracket.closeNormal());
-        if(ifFalse != null) {
+        if (ifFalse != null) {
             this.appendCodeBlock(ActionBlock.else_());
             this.appendCodeBlock(Bracket.openNormal());
             ifFalse.accept(comparisonResult);
@@ -276,16 +277,22 @@ public class CodeBlockTransformer {
     private VarItem<?> convertFlowOperation(ReconstructedFlow flow) {
         return switch (flow) {
             case ReconstructedFlow.If iff -> {
-                if(iff.condition() instanceof CodeTree.Compare compare) {
+                if (iff.condition() instanceof CodeTree.Compare compare) {
                     iff.ifFalse().ifPresentOrElse(
                             onFalse -> this.convertCompare(
                                     compare,
-                                    _ -> { this.convertFlowBlock(iff.ifTrue()); },
-                                    _ -> { this.convertFlowBlock(onFalse); }
+                                    _ -> {
+                                        this.convertFlowBlock(iff.ifTrue());
+                                    },
+                                    _ -> {
+                                        this.convertFlowBlock(onFalse);
+                                    }
                             ),
                             () -> this.convertCompare(
                                     compare,
-                                    _ -> { this.convertFlowBlock(iff.ifTrue()); },
+                                    _ -> {
+                                        this.convertFlowBlock(iff.ifTrue());
+                                    },
                                     null
                             )
                     );
@@ -340,18 +347,18 @@ public class CodeBlockTransformer {
                 var rhsVarItem = this.convertCodeTree(add.rhs());
 
                 var lhsVarString = "";
-                if(lhsVarItem instanceof LiteralItem literalItem) {
+                if (lhsVarItem instanceof LiteralItem literalItem) {
                     lhsVarString = literalItem.value();
                 }
-                if(lhsVarItem instanceof VariableItem variableItem) {
+                if (lhsVarItem instanceof VariableItem variableItem) {
                     lhsVarString = "%var(" + variableItem.name() + ")";
                 }
 
                 var rhsVarString = "";
-                if(rhsVarItem instanceof LiteralItem literalItem) {
+                if (rhsVarItem instanceof LiteralItem literalItem) {
                     rhsVarString = literalItem.value();
                 }
-                if(rhsVarItem instanceof VariableItem variableItem) {
+                if (rhsVarItem instanceof VariableItem variableItem) {
                     rhsVarString = "%var(" + variableItem.name() + ")";
                 }
 
@@ -404,19 +411,19 @@ public class CodeBlockTransformer {
     }
 
     private VarItem<?> convertInvoke(CodeTree.Invoke invoke) {
-        for(var handler : InvokeHandler.INVOKE_HANDLERS) {
+        for (var handler : InvokeHandler.INVOKE_HANDLERS) {
             var result = handler.tryRewrite(invoke).orElse(null);
-            if(result != null) {
+            if (result != null) {
                 return result.apply(this);
             }
         }
 
         List<VarItem<?>> params = new ArrayList<VarItem<?>>();
-        for(var subp : invoke.args()) {
+        for (var subp : invoke.args()) {
             params.add(this.convertCodeTree(subp));
         }
         var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
-        if(!invoke.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
+        if (!invoke.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
             params.addFirst(returnVariable);
         }
         var outline = new CompilationGraph.MethodOutline(
@@ -435,12 +442,12 @@ public class CodeBlockTransformer {
             }
             case VIRTUAL_INTERFACE, VIRTUAL_OVERRIDABLE -> {
                 int searchIdx = 1;
-                if(outline.typeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
+                if (outline.typeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
                     searchIdx = 0;
                 }
-                if(params.get(searchIdx) instanceof VariableItem dispatchParameter) {
+                if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
                     this.appendCodeBlock(ActionBlock.callFunction(
-                            "%var(%var(" + dispatchParameter.name() + ").method." + outline + ")" ,
+                            "%var(%var(" + dispatchParameter.name() + ").method." + outline + ")",
                             this.locals.functionCallParams(params)
                     ));
                 } else {

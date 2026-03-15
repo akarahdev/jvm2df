@@ -36,8 +36,8 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
             predecessors.putIfAbsent(block, new HashSet<>());
 
             var term = block.terminator();
-            if (term instanceof Terminator.Jump jump) {
-                addEdge(block, jump.target());
+            if (term instanceof Terminator.Jump(int target)) {
+                addEdge(block, target);
             } else if (term instanceof Terminator.BranchIf branch) {
                 addEdge(block, branch.ifTrue());
                 addEdge(block, branch.ifFalse());
@@ -158,12 +158,12 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         if (isLoopHeader(block) && !loopHeaders.contains(block)) {
             loopHeaders.add(block);
             BasicBlock exit = findLoopExit(block);
-            
+
             FlowBlock body = reconstructLoopBody(block, exit);
-            
+
             List<CodeTree> statements = new ArrayList<>();
             statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.LoopForever(body)));
-            
+
             if (exit != null && exit != stopAt) {
                 statements.addAll(reconstruct(exit, stopAt).statements());
             }
@@ -179,19 +179,19 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         }
 
         var term = block.terminator();
-        if (term instanceof Terminator.Jump jump) {
-            var target = blocksByOffset.get(jump.target());
+        if (term instanceof Terminator.Jump(int target1)) {
+            var target = blocksByOffset.get(target1);
             if (target != null && !isBackEdge(block, target) && target != stopAt) {
                 statements.addAll(reconstruct(target, stopAt).statements());
             }
-        } else if (term instanceof Terminator.BranchIf branch) {
-            var ifTrue = blocksByOffset.get(branch.ifTrue());
-            var ifFalse = blocksByOffset.get(branch.ifFalse());
+        } else if (term instanceof Terminator.BranchIf(CodeTree operand, int aTrue, int aFalse)) {
+            var ifTrue = blocksByOffset.get(aTrue);
+            var ifFalse = blocksByOffset.get(aFalse);
 
             BasicBlock merge = findMergePoint(block);
 
             statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.If(
-                    branch.operand(),
+                    operand,
                     reconstruct(ifTrue, merge),
                     Optional.of(reconstruct(ifFalse, merge))
             )));
@@ -215,20 +215,20 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         }
 
         var term = header.terminator();
-        if (term instanceof Terminator.Jump jump) {
-            var target = blocksByOffset.get(jump.target());
+        if (term instanceof Terminator.Jump(int target1)) {
+            var target = blocksByOffset.get(target1);
             if (target != null && target != header && target != exit) {
                 statements.addAll(reconstruct(target, exit).statements());
             }
-        } else if (term instanceof Terminator.BranchIf branch) {
-            var ifTrue = blocksByOffset.get(branch.ifTrue());
-            var ifFalse = blocksByOffset.get(branch.ifFalse());
+        } else if (term instanceof Terminator.BranchIf(CodeTree operand, int aTrue, int aFalse)) {
+            var ifTrue = blocksByOffset.get(aTrue);
+            var ifFalse = blocksByOffset.get(aFalse);
 
             BasicBlock merge = findMergePoint(header);
             if (merge == exit) merge = null;
 
             statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.If(
-                    branch.operand(),
+                    operand,
                     (ifTrue == header) ? new FlowBlock(new ArrayList<>()) : reconstruct(ifTrue, merge == null ? exit : merge),
                     Optional.of((ifFalse == header) ? new FlowBlock(new ArrayList<>()) : reconstruct(ifFalse, merge == null ? exit : merge))
             )));
