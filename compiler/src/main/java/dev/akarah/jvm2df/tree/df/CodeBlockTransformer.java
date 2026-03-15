@@ -128,128 +128,9 @@ public class CodeBlockTransformer {
                 this.locals.setResultAndReturn(this.convertCodeTree(ret.code()));
                 yield LiteralItem.number("0");
             }
-            case CodeTree.Invoke invoke -> {
-                for(var handler : InvokeHandler.INVOKE_HANDLERS) {
-                    var result = handler.tryRewrite(invoke).orElse(null);
-                    if(result != null) {
-                        yield result.apply(this);
-                    }
-                }
-
-                List<VarItem<?>> params = new ArrayList<VarItem<?>>();
-                for(var subp : invoke.args()) {
-                    params.add(this.convertCodeTree(subp));
-                }
-                var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
-                if(!invoke.descriptor().endsWith("V")) {
-                    params.addFirst(returnVariable);
-                }
-                this.appendCodeBlock(ActionBlock.callFunction(
-                        invoke.descriptor(),
-                        this.locals.functionCallParams(params)
-                ));
-                yield returnVariable;
-            }
-            case CodeTree.Compare compare -> convertCompare(
-                    compare,
-                    comparisonResult -> {
-                        this.appendCodeBlock(ActionBlock.setVar(
-                                "=",
-                                Args.byVarItems(
-                                        comparisonResult,
-                                        LiteralItem.number("1")
-                                )
-                        ));
-                    },
-                    comparisonResult -> {
-                        this.appendCodeBlock(ActionBlock.setVar(
-                                "=",
-                                Args.byVarItems(
-                                        comparisonResult,
-                                        LiteralItem.number("0")
-                                )
-                        ));
-                    }
-            );
-            case CodeTree.BinOp add -> {
-                var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
-                var op = switch (add.type()) {
-                    case ADD -> "+";
-                    case SUB -> "-";
-                    case MUL -> "x";
-                    case DIV -> "/";
-                    case MOD -> "%";
-                    case SHR, SHL, XOR, AND, OR -> "Bitwise";
-                    case COMPARE_DOUBLES -> "CompareDoubles";
-                };
-                switch (op) {
-                    case "CompareDoubles" -> {
-                        var lhsVarItem = this.convertCodeTree(add.lhs());
-                        var rhsVarItem = this.convertCodeTree(add.rhs());
-
-                        var lhsVarString = "";
-                        if(lhsVarItem instanceof LiteralItem literalItem) {
-                            lhsVarString = literalItem.value();
-                        }
-                        if(lhsVarItem instanceof VariableItem variableItem) {
-                            lhsVarString = "%var(" + variableItem.name() + ")";
-                        }
-
-                        var rhsVarString = "";
-                        if(rhsVarItem instanceof LiteralItem literalItem) {
-                            rhsVarString = literalItem.value();
-                        }
-                        if(rhsVarItem instanceof VariableItem variableItem) {
-                            rhsVarString = "%var(" + variableItem.name() + ")";
-                        }
-
-                        this.appendCodeBlock(ActionBlock.setVar(
-                                "ClampNumber",
-                                Args.byVarItems(
-                                        variable,
-                                        LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
-                                        LiteralItem.number("-1"),
-                                        LiteralItem.number("1")
-                                )
-                        ));
-
-                    }
-                    case "Bitwise" -> {
-                        var bitwiseTag = switch (add.type()) {
-                            case SHR -> ">>";
-                            case SHL -> "<<";
-                            case XOR -> "^";
-                            case AND -> "&";
-                            case OR -> "|";
-                            default -> throw new IllegalStateException("How?");
-                        };
-                        this.appendCodeBlock(
-                                ActionBlock.setVar(
-                                        op,
-                                        Args.byVarItems(
-                                                variable,
-                                                this.convertCodeTree(add.lhs()),
-                                                this.convertCodeTree(add.rhs())
-                                        )
-                                )
-                                        .storeTagInSlot(26, "Operator", bitwiseTag)
-                                        .storeTagInSlot(25, "Precision", "Default")
-                        );
-                    }
-                    default -> {
-                        this.appendCodeBlock(ActionBlock.setVar(
-                                op,
-                                Args.byVarItems(
-                                        variable,
-                                        this.convertCodeTree(add.lhs()),
-                                        this.convertCodeTree(add.rhs())
-                                )
-                        ));
-                    }
-                }
-
-                yield variable;
-            }
+            case CodeTree.Invoke invoke -> this.convertInvoke(invoke);
+            case CodeTree.Compare compare -> this.convertCompare(compare);
+            case CodeTree.BinOp binOp -> this.convertBinOp(binOp);
             case CodeTree.IncrementLocal inc -> {
                 this.appendCodeBlock(ActionBlock.setVar(
                         "+=",
@@ -330,6 +211,33 @@ public class CodeBlockTransformer {
         };
     }
 
+
+
+    private VarItem<?> convertCompare(CodeTree.Compare compare) {
+        return convertCompare(
+                compare,
+                comparisonResult -> {
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            "=",
+                            Args.byVarItems(
+                                    comparisonResult,
+                                    LiteralItem.number("1")
+                            )
+                    ));
+                },
+                comparisonResult -> {
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            "=",
+                            Args.byVarItems(
+                                    comparisonResult,
+                                    LiteralItem.number("0")
+                            )
+                    ));
+                }
+        );
+    }
+
+
     private VarItem<?> convertCompare(CodeTree.Compare compare, Consumer<VarItem<?>> ifTrue, Consumer<VarItem<?>> ifFalse) {
         var op = switch (compare.comparison()) {
             case EQUAL -> "=";
@@ -404,5 +312,110 @@ public class CodeBlockTransformer {
             }
             default -> throw new RuntimeException("unknown flow " + flow);
         };
+    }
+
+    private VarItem<?> convertBinOp(CodeTree.BinOp add) {
+        {
+            var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
+            var op = switch (add.type()) {
+                case ADD -> "+";
+                case SUB -> "-";
+                case MUL -> "x";
+                case DIV -> "/";
+                case MOD -> "%";
+                case SHR, SHL, XOR, AND, OR -> "Bitwise";
+                case COMPARE_DOUBLES -> "CompareDoubles";
+            };
+            switch (op) {
+                case "CompareDoubles" -> {
+                    var lhsVarItem = this.convertCodeTree(add.lhs());
+                    var rhsVarItem = this.convertCodeTree(add.rhs());
+
+                    var lhsVarString = "";
+                    if(lhsVarItem instanceof LiteralItem literalItem) {
+                        lhsVarString = literalItem.value();
+                    }
+                    if(lhsVarItem instanceof VariableItem variableItem) {
+                        lhsVarString = "%var(" + variableItem.name() + ")";
+                    }
+
+                    var rhsVarString = "";
+                    if(rhsVarItem instanceof LiteralItem literalItem) {
+                        rhsVarString = literalItem.value();
+                    }
+                    if(rhsVarItem instanceof VariableItem variableItem) {
+                        rhsVarString = "%var(" + variableItem.name() + ")";
+                    }
+
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            "ClampNumber",
+                            Args.byVarItems(
+                                    variable,
+                                    LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
+                                    LiteralItem.number("-1"),
+                                    LiteralItem.number("1")
+                            )
+                    ));
+
+                }
+                case "Bitwise" -> {
+                    var bitwiseTag = switch (add.type()) {
+                        case SHR -> ">>";
+                        case SHL -> "<<";
+                        case XOR -> "^";
+                        case AND -> "&";
+                        case OR -> "|";
+                        default -> throw new IllegalStateException("How?");
+                    };
+                    this.appendCodeBlock(
+                            ActionBlock.setVar(
+                                            op,
+                                            Args.byVarItems(
+                                                    variable,
+                                                    this.convertCodeTree(add.lhs()),
+                                                    this.convertCodeTree(add.rhs())
+                                            )
+                                    )
+                                    .storeTagInSlot(26, "Operator", bitwiseTag)
+                                    .storeTagInSlot(25, "Precision", "Default")
+                    );
+                }
+                default -> {
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            op,
+                            Args.byVarItems(
+                                    variable,
+                                    this.convertCodeTree(add.lhs()),
+                                    this.convertCodeTree(add.rhs())
+                            )
+                    ));
+                }
+            }
+
+            return variable;
+        }
+    }
+
+    private VarItem<?> convertInvoke(CodeTree.Invoke invoke) {
+        for(var handler : InvokeHandler.INVOKE_HANDLERS) {
+            var result = handler.tryRewrite(invoke).orElse(null);
+            if(result != null) {
+                return result.apply(this);
+            }
+        }
+
+        List<VarItem<?>> params = new ArrayList<VarItem<?>>();
+        for(var subp : invoke.args()) {
+            params.add(this.convertCodeTree(subp));
+        }
+        var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
+        if(!invoke.descriptor().endsWith("V")) {
+            params.addFirst(returnVariable);
+        }
+        this.appendCodeBlock(ActionBlock.callFunction(
+                invoke.descriptor(),
+                this.locals.functionCallParams(params)
+        ));
+        return returnVariable;
     }
 }
