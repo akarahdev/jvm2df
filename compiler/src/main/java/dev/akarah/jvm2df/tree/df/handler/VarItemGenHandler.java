@@ -1,9 +1,6 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
-import dev.akarah.jvm2df.codetemplate.items.BlockTagItem;
-import dev.akarah.jvm2df.codetemplate.items.GameValueItem;
-import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
@@ -35,6 +32,14 @@ public class VarItemGenHandler implements InvokeHandler {
                 var value = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
                 var target = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
                 return new GameValueItem(value, target);
+            });
+        }
+
+        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.descriptor().name().equalsString("vanillaItem")) {
+            return Optional.of(transformer -> {
+                var value = ((CodeTree.Constant) invoke.args().getFirst()).constantDesc().toString();
+                return new VanillaItem(value);
             });
         }
         return Optional.empty();

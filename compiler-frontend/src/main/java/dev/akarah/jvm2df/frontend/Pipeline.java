@@ -56,7 +56,7 @@ public class Pipeline {
                     try {
                         System.out.println(classElements.thisClass().asInternalName() + "#" + methodElements.methodName() + methodElements.methodTypeSymbol().descriptorString());
                         System.out.println(codeModel.toDebugString());
-                        var basicBlocks = this.bytecodeTranslator.split(codeModel, graph);
+                        var basicBlocks = this.bytecodeTranslator.split(methodElements, codeModel, graph);
                         System.out.println(basicBlocks);
                         var flowBlock = this.flowTransformer.convert(basicBlocks);
                         System.out.println(flowBlock);

@@ -13,7 +13,8 @@ public interface VarItem<T extends VarItem<T>> {
             Map.entry("var", VariableItem.CODEC),
             Map.entry("bl_tag", BlockTagItem.CODEC),
             Map.entry("pn_el", ParameterItem.CODEC),
-            Map.entry("g_val", GameValueItem.CODEC)
+            Map.entry("g_val", GameValueItem.CODEC),
+            Map.entry("item", VanillaItem.CODEC)
     );
 
     @SuppressWarnings("unchecked")

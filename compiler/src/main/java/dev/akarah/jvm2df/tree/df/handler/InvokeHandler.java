@@ -15,8 +15,11 @@ public interface InvokeHandler {
             new DFCodeBlocksHandler("playerAction", "player_action", ActionBlock::playerAction),
             new DFCodeBlocksHandler("setVar", "set_var", ActionBlock::setVar),
             new DFCodeBlocksHandler("selectObject", "select_obj", ActionBlock::selectObject),
+            new DFCodeBlocksHandler("ifPlayer", "if_player", ActionBlock::ifPlayer),
             new VarItemGenHandler(),
-            new BoxedPrimitiveHandler()
+            new BoxedPrimitiveHandler(),
+            new BracketHandler(),
+            new VarItemOptimizationHandler()
     );
 
     Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke);

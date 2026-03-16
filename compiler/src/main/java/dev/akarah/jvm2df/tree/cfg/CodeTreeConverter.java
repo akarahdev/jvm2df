@@ -54,10 +54,7 @@ public class CodeTreeConverter {
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
             }
-            case NewPrimitiveArrayInstruction _ -> {
-                this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
-            }
-            case NewReferenceArrayInstruction _ -> {
+            case NewPrimitiveArrayInstruction _, NewReferenceArrayInstruction _ -> {
                 this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
             }
             case ArrayStoreInstruction _ -> {

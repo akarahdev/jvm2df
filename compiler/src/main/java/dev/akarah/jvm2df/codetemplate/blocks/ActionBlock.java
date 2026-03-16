@@ -115,6 +115,18 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock ifPlayer(String action, Args args) {
+        return new ActionBlock(
+                "if_player",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(args)
+        );
+    }
+
     public static ActionBlock setVar(String action, Args args) {
         return new ActionBlock(
                 "set_var",

@@ -6,4 +6,6 @@ public class VarItemGen {
     public static native Object gameValue(String value, String target);
 
     public static native Object lineVar();
+
+    public static native Object vanillaItem(String nbt);
 }

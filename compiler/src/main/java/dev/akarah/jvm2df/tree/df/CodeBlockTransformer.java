@@ -20,6 +20,7 @@ import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
+import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
@@ -468,6 +469,7 @@ public class CodeBlockTransformer {
                 invoke.descriptor().name().stringValue(),
                 invoke.methodTypeDesc()
         );
+        var ownedClass = this.graph.classByEntry(invoke.descriptor().owner());
         switch (invoke.style()) {
             case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
                 this.appendCodeBlock(ActionBlock.callFunction(
@@ -484,11 +486,31 @@ public class CodeBlockTransformer {
                     searchIdx = 0;
                 }
                 if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
-                    this.globals.invokeVirtual(
-                            dispatchParameter,
-                            outline,
-                            this.locals.functionCallParams(params)
-                    );
+                    boolean guaranteedNative = false;
+                    for (var attribute : ownedClass.attributes()) {
+                        if (attribute instanceof RuntimeVisibleAnnotationsAttribute annotationAttribute) {
+                            for (var annotation : annotationAttribute.annotations()) {
+                                if (annotation.className().equalsString("Ldiamondfire/internal/annotation/NativeValue;")) {
+                                    guaranteedNative = true;
+                                }
+                            }
+                        }
+                    }
+                    if (guaranteedNative) {
+                        this.appendCodeBlock(ActionBlock.callFunction(
+                                this.graph.generateFunctionCallName(
+                                        invoke.descriptor().owner(),
+                                        outline
+                                ),
+                                this.locals.functionCallParams(params)
+                        ));
+                    } else {
+                        this.globals.invokeVirtual(
+                                dispatchParameter,
+                                outline,
+                                this.locals.functionCallParams(params)
+                        );
+                    }
                 } else {
                     throw new RuntimeException("unreachable");
                 }

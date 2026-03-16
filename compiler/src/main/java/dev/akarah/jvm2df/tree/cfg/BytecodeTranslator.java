@@ -19,13 +19,14 @@ import java.util.*;
  * terminators between them as necessary to keep the control flow consistent.
  */
 public class BytecodeTranslator {
+    MethodModel methodModel;
     CodeModel codeModel;
     List<CodeElement> instructions;
     Set<Integer> splitTargets;
     CodeTreeConverter converter;
     CompilationGraph graph;
 
-    public List<BasicBlock> split(CodeModel codeModel, CompilationGraph graph) {
+    public List<BasicBlock> split(MethodModel methodModel, CodeModel codeModel, CompilationGraph graph) {
         this.instructions = codeModel.elementList();
         this.splitTargets = new HashSet<>();
         this.codeModel = codeModel;
@@ -61,6 +62,7 @@ public class BytecodeTranslator {
         this.converter = new CodeTreeConverter(block.statements(), this::labelToOffset, graph);
 
         var labelStackSizes = new HashMap<Integer, Integer>();
+
 
         for (var elem : this.instructions) {
             if (elem instanceof Label label) {

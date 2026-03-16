@@ -23,10 +23,21 @@ public class CodeBlocks {
 
     public static native void playerAction(
             String action,
+            Object a
+    );
+
+    public static native void playerAction(
+            String action,
             Object a,
             Object b,
             Object c,
             Object d
+    );
+
+    public static native void ifPlayer(
+            String action,
+            Object a,
+            Object b
     );
 
     public static native <T> T setVar(
@@ -55,6 +66,26 @@ public class CodeBlocks {
             Object d
     );
 
+    public static native <T> T setVar(
+            String action,
+            Object a,
+            Object b,
+            Object c,
+            Object d,
+            Object e
+    );
+
+    public static native <T> T setVar(
+            String action,
+            Object a,
+            Object b,
+            Object c,
+            Object d,
+            Object e,
+            Object f,
+            Object g
+    );
+
     public static native <T> T selectObject(
             String action
     );
@@ -63,4 +94,8 @@ public class CodeBlocks {
             String action,
             Object a
     );
+
+    public static native void openNormal();
+
+    public static native void closeNormal();
 }

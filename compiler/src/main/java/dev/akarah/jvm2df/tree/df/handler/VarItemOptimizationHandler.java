@@ -1,0 +1,34 @@
+package dev.akarah.jvm2df.tree.df.handler;
+
+import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
+import dev.akarah.jvm2df.codetemplate.items.VanillaItem;
+import dev.akarah.jvm2df.codetemplate.items.VarItem;
+import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.instructions.CodeTree;
+
+import java.lang.constant.ConstantDesc;
+import java.util.Optional;
+import java.util.function.Function;
+
+public class VarItemOptimizationHandler implements InvokeHandler {
+    @Override
+    public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
+        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/value/Text")
+                && invoke.descriptor().name().equalsString("of")
+                && invoke.args().size() == 1
+                && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {
+            return Optional.of(transformer -> {
+                return LiteralItem.text(constantDesc.toString());
+            });
+        }
+        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/value/ItemStack")
+                && invoke.descriptor().name().equalsString("of")
+                && invoke.args().size() == 1
+                && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {
+            return Optional.of(transformer -> {
+                return new VanillaItem("{DF_NBT:4671,count:1,id:'" + constantDesc.toString() + "'}");
+            });
+        }
+        return Optional.empty();
+    }
+}

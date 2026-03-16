@@ -33,11 +33,11 @@ public class CodeClientAPI extends WebSocketClient {
                 this.send("mode code");
                 this.send("clear");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (Exception _) {
                     // ignored bruh
                 }
-                this.onMessage("MASSIVE"); // todo: get cc bug fixed
+                this.onMessage("BASIC"); // todo: get cc bug fixed
             }
             case "place done" -> {
                 this.close();
