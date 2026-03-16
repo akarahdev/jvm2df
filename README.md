@@ -11,20 +11,15 @@ Supported features:
 
 Roadmap:
 
-- [ ] `java.lang.String` APIs
+- [x] `java.lang.String` APIs
 - [ ] Control flow optimization
-    - [ ] Simple dominator tree algorithms
+    - [x] Simple dominator tree algorithms
     - [ ] Relooper
 - [ ] Polymorphism
-    - [ ] `extends` clauses and virtual dispatch
-        - There is a form of virtual dispatch supported, but it is only
-          direct type dispatch. Method overrides do not work properly yet.
+    - [x] `extends` clauses and virtual dispatch
     - [ ] `abstract class`
     - [ ] `interface` and `invokeinterface`
 - [ ] `java.lang.MethodHandle` and related APIs
 - [ ] `invokedynamic`
-- [ ] `diamondfire.value.List` APIs
-- [ ] `diamondfire.value.Selection` APIs
-- [ ] `diamondfire.value.Location` APIs
-- [ ] `diamondfire.value.Vector` APIs
+- [ ] `diamondfire.value.*` APIs
 - [ ] Enhanced `for` loop
