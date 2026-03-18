@@ -9,8 +9,6 @@ import java.lang.classfile.Label;
 import java.lang.classfile.Opcode;
 import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.*;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -114,15 +112,6 @@ public class CodeTreeConverter {
         this.statements.add(new CodeTree.StoreLocal(
                 Integer.MAX_VALUE - 1,
                 new CodeTree.ObjectNew(instruction.className().asInternalName())
-        ));
-        this.statements.add(new CodeTree.Invoke(
-                instruction.className(),
-                new CompilationGraph.MethodOutline(
-                        "<fieldsetup>",
-                        MethodTypeDesc.of(ClassDesc.ofDescriptor("V"))
-                ),
-                List.of(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1)),
-                InvokeStyle.STATIC
         ));
         this.stack.add(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1));
     }
