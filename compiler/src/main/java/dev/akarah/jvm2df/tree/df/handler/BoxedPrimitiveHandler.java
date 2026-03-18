@@ -36,8 +36,8 @@ public class BoxedPrimitiveHandler implements InvokeHandler {
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         for (var className : CLASS_NAMES) {
             for (var methodName : METHOD_NAMES) {
-                if (invoke.descriptor().owner().asInternalName().equals(className)
-                        && invoke.descriptor().name().equalsString(methodName)) {
+                if (invoke.classEntry().asInternalName().equals(className)
+                        && invoke.outline().name().equals(methodName)) {
                     return Optional.of(
                             transformer -> transformer.convertCodeTree(invoke.args().getFirst())
                     );

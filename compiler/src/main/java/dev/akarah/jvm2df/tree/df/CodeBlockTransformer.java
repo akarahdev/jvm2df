@@ -85,7 +85,7 @@ public class CodeBlockTransformer {
         this.globals.setup(this, locals);
     }
 
-    public List<CodeLine> transform(
+    public List<CodeLine> transformMethod(
             FlowBlock block,
             MethodModel methodModel
     ) {
@@ -498,16 +498,13 @@ public class CodeBlockTransformer {
         if (!invoke.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
             params.addFirst(returnVariable);
         }
-        var outline = new CompilationGraph.MethodOutline(
-                invoke.descriptor().name().stringValue(),
-                invoke.methodTypeDesc()
-        );
-        var ownedClass = this.graph.classByEntry(invoke.descriptor().owner());
+        var outline = invoke.outline();
+        var ownedClass = this.graph.classByEntry(invoke.classEntry());
         switch (invoke.style()) {
             case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
                 this.appendCodeBlock(ActionBlock.callFunction(
                         this.graph.generateFunctionCallName(
-                                invoke.descriptor().owner(),
+                                invoke.classEntry(),
                                 outline
                         ),
                         this.locals.functionCallParams(params)
@@ -532,7 +529,7 @@ public class CodeBlockTransformer {
                     if (guaranteedNative) {
                         this.appendCodeBlock(ActionBlock.callFunction(
                                 this.graph.generateFunctionCallName(
-                                        invoke.descriptor().owner(),
+                                        invoke.classEntry(),
                                         outline
                                 ),
                                 this.locals.functionCallParams(params)

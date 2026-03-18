@@ -13,16 +13,16 @@ import java.util.function.Function;
 public class VarItemOptimizationHandler implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/value/Text")
-                && invoke.descriptor().name().equalsString("of")
+        if (invoke.classEntry().asInternalName().equals("diamondfire/value/Text")
+                && invoke.outline().name().equals("of")
                 && invoke.args().size() == 1
                 && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {
             return Optional.of(transformer -> {
                 return LiteralItem.text(constantDesc.toString());
             });
         }
-        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/value/ItemStack")
-                && invoke.descriptor().name().equalsString("of")
+        if (invoke.classEntry().asInternalName().equals("diamondfire/value/ItemStack")
+                && invoke.outline().name().equals("of")
                 && invoke.args().size() == 1
                 && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {
             return Optional.of(transformer -> {

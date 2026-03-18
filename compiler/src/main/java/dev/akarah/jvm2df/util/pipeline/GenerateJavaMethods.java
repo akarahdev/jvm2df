@@ -22,7 +22,7 @@ public class GenerateJavaMethods implements PipelineComponent {
                         // System.out.println(basicBlocks);
                         var flowBlock = pipeline.flowTransformer().convert(basicBlocks);
                         // System.out.println(flowBlock);
-                        var newLines = pipeline.codeBlockTransformer().transform(
+                        var newLines = pipeline.codeBlockTransformer().transformMethod(
                                 flowBlock,
                                 methodElements
                         );

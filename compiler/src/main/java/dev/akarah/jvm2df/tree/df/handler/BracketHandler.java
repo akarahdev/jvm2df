@@ -11,15 +11,15 @@ import java.util.function.Function;
 public class BracketHandler implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/internal/CodeBlocks")
-                && invoke.descriptor().name().equalsString("openNormal")) {
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
+                && invoke.outline().name().equals("openNormal")) {
             return Optional.of(transformer -> {
                 transformer.appendCodeBlock(Bracket.openNormal());
                 return null;
             });
         }
-        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/internal/CodeBlocks")
-                && invoke.descriptor().name().equalsString("closeNormal")) {
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
+                && invoke.outline().name().equals("closeNormal")) {
             return Optional.of(transformer -> {
                 transformer.appendCodeBlock(Bracket.closeNormal());
                 return null;

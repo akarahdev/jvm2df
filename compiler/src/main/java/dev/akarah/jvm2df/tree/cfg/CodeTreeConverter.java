@@ -9,6 +9,8 @@ import java.lang.classfile.Label;
 import java.lang.classfile.Opcode;
 import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.*;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -109,22 +111,20 @@ public class CodeTreeConverter {
     }
 
     private void newObj(NewObjectInstruction instruction) {
-        this.stack.add(new CodeTree.ObjectNew(instruction.className().asInternalName()));
-        for (var outline : this.graph.allSuperMethodsFor(this.graph.classByEntry(instruction.className()))) {
-            var methodModel = this.graph.lookupMethodInSuper(
-                    instruction.className(),
-                    outline.name(),
-                    outline.typeDesc()
-            );
-            this.stack.add(new CodeTree.ObjectSetField(
-                    this.stack.removeLast(),
-                    "method." + outline.name() + outline.typeDesc().descriptorString(),
-                    new CodeTree.Constant(this.graph.generateFunctionCallName(
-                            methodModel.parent().orElseThrow().thisClass(),
-                            outline
-                    ))
-            ));
-        }
+        this.statements.add(new CodeTree.StoreLocal(
+                Integer.MAX_VALUE - 1,
+                new CodeTree.ObjectNew(instruction.className().asInternalName())
+        ));
+        this.statements.add(new CodeTree.Invoke(
+                instruction.className(),
+                new CompilationGraph.MethodOutline(
+                        "<fieldsetup>",
+                        MethodTypeDesc.of(ClassDesc.ofDescriptor("V"))
+                ),
+                List.of(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1)),
+                InvokeStyle.STATIC
+        ));
+        this.stack.add(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1));
     }
 
     private void field(FieldInstruction instruction) {
@@ -220,7 +220,11 @@ public class CodeTreeConverter {
         }
         params = params.reversed();
         var invoke = new CodeTree.Invoke(
-                instruction.method(),
+                instruction.method().owner(),
+                new CompilationGraph.MethodOutline(
+                        instruction.method().name().stringValue(),
+                        instruction.typeSymbol()
+                ),
                 params,
                 switch (instruction.opcode()) {
                     case INVOKESTATIC -> InvokeStyle.STATIC;

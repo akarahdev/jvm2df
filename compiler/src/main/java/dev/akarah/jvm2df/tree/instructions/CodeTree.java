@@ -1,9 +1,10 @@
 package dev.akarah.jvm2df.tree.instructions;
 
+import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 
 import java.lang.classfile.CodeElement;
-import java.lang.classfile.constantpool.MemberRefEntry;
+import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ConstantDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
@@ -28,9 +29,10 @@ public interface CodeTree {
     record LoadLocal(int idx) implements CodeTree {
     }
 
-    record Invoke(MemberRefEntry descriptor, List<CodeTree> args, InvokeStyle style) implements CodeTree {
+    record Invoke(ClassEntry classEntry, CompilationGraph.MethodOutline outline, List<CodeTree> args,
+                  InvokeStyle style) implements CodeTree {
         public MethodTypeDesc methodTypeDesc() {
-            return MethodTypeDesc.ofDescriptor(this.descriptor().type().stringValue());
+            return this.outline.typeDesc();
         }
     }
 

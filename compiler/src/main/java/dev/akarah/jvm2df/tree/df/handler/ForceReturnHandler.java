@@ -10,8 +10,8 @@ import java.util.function.Function;
 public class ForceReturnHandler implements InvokeHandler {
     @Override
     public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.descriptor().owner().asInternalName().equals("diamondfire/internal/CodeBlocks")
-                && invoke.descriptor().name().equalsString("ret")) {
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
+                && invoke.outline().name().equals("ret")) {
             return Optional.of(transformer -> {
                 transformer.localMemoryStrategy()
                         .setResultAndReturn(

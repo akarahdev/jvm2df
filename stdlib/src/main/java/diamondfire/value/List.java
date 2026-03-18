@@ -12,7 +12,6 @@ public class List<T> {
                 "CreateList",
                 VarItemGen.lineVar()
         );
-        Control.debug(this.inner);
     }
 
     public static <T> List<T> of() {
@@ -20,9 +19,7 @@ public class List<T> {
     }
 
     public void add(T obj) {
-        Control.debug(this.inner);
         this.inner = CodeBlocks.setVar("AppendValue", this.inner, obj);
-        Control.debug(this.inner);
     }
 
     public void extend(List<T> obj) {
