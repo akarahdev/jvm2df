@@ -1,12 +1,12 @@
 package dev.akarah.jvm2df.frontend;
 
 import dev.akarah.jvm2df.codeclient.CodeClientAPI;
+import dev.akarah.jvm2df.pipeline.GenerateFieldSetup;
+import dev.akarah.jvm2df.pipeline.GenerateJavaMethods;
+import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.strategy.global.DictHeapStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
-import dev.akarah.jvm2df.util.pipeline.GenerateFieldSetup;
-import dev.akarah.jvm2df.util.pipeline.GenerateJavaMethods;
-import dev.akarah.jvm2df.util.pipeline.Pipeline;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;

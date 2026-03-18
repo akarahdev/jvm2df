@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df.util.pipeline;
+package dev.akarah.jvm2df.pipeline;
 
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 

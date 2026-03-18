@@ -27,12 +27,16 @@ public class CodeLineBuilder {
         this.graph = graph;
     }
 
-    public LocalMemoryStrategy localMemoryStrategy() {
+    public LocalMemoryStrategy locals() {
         return this.locals;
     }
 
-    public GlobalMemoryStrategy globalMemoryStrategy() {
+    public GlobalMemoryStrategy globals() {
         return this.globals;
+    }
+
+    public CompilationGraph graph() {
+        return this.graph;
     }
 
     public void appendCodeBlock(CodeBlock<?> codeBlock) {

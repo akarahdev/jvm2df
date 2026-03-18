@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df.tree.df;
+package dev.akarah.jvm2df.pipeline;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
@@ -10,6 +10,7 @@ import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
+import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
@@ -55,7 +56,7 @@ public class FlowToDF {
     ) {
         this.builder.init(methodModel.parent().orElseThrow());
 
-        var params = new ArrayList<VarItem<?>>(this.builder.locals.functionHeadParams(methodModel));
+        var params = new ArrayList<VarItem<?>>(this.builder.locals().functionHeadParams(methodModel));
 
         var parentalName = methodModel.parent()
                 .flatMap(ClassModel::superclass)
@@ -118,18 +119,18 @@ public class FlowToDF {
             case CodeTree.StoreLocal(int idx, CodeTree value) -> {
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "=",
-                        Args.byVarItems(this.builder.locals.referenceLocal(idx), this.convertCodeTree(value))
+                        Args.byVarItems(this.builder.locals().referenceLocal(idx), this.convertCodeTree(value))
                 ));
                 yield LiteralItem.number("0");
             }
-            case CodeTree.LoadLocal(int idx) -> this.builder.locals.referenceLocal(idx);
+            case CodeTree.LoadLocal(int idx) -> this.builder.locals().referenceLocal(idx);
             case CodeTree.ExecuteFlow(ReconstructedFlow flow) -> this.convertFlowOperation(flow);
             case Terminator.ReturnVoid _ -> {
-                this.builder.locals.setResultAndReturn(LiteralItem.number("0"));
+                this.builder.locals().setResultAndReturn(LiteralItem.number("0"));
                 yield LiteralItem.number("0");
             }
             case Terminator.ReturnValue ret -> {
-                this.builder.locals.setResultAndReturn(this.convertCodeTree(ret.code()));
+                this.builder.locals().setResultAndReturn(this.convertCodeTree(ret.code()));
                 yield LiteralItem.number("0");
             }
             case Terminator.Break _ -> {
@@ -147,15 +148,15 @@ public class FlowToDF {
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "+=",
                         Args.byVarItems(
-                                this.builder.locals.referenceLocal(inc.idx()),
+                                this.builder.locals().referenceLocal(inc.idx()),
                                 this.convertCodeTree(inc.value())
                         )
                 ));
-                yield this.builder.locals.referenceLocal(inc.idx());
+                yield this.builder.locals().referenceLocal(inc.idx());
             }
             case CodeTree.ArrayNew arrayNew -> {
-                var alloc = this.builder.globals.allocate();
-                this.builder.globals.setField(
+                var alloc = this.builder.globals().allocate();
+                this.builder.globals().setField(
                         alloc,
                         LiteralItem.string("length"),
                         this.convertCodeTree(arrayNew.size())
@@ -164,24 +165,24 @@ public class FlowToDF {
             }
             case CodeTree.ArrayStore arrayStore -> {
                 var array = this.convertCodeTree(arrayStore.list());
-                this.builder.globals.setField(
+                this.builder.globals().setField(
                         array,
                         this.convertCodeTree(arrayStore.index()),
                         this.convertCodeTree(arrayStore.value())
                 );
                 yield array;
             }
-            case CodeTree.ArrayIndex arrayIndex -> this.builder.globals.readField(
+            case CodeTree.ArrayIndex arrayIndex -> this.builder.globals().readField(
                     this.convertCodeTree(arrayIndex.list()),
                     this.convertCodeTree(arrayIndex.index())
             );
-            case CodeTree.ArrayLength arrayLength -> this.builder.globals.readField(
+            case CodeTree.ArrayLength arrayLength -> this.builder.globals().readField(
                     this.convertCodeTree(arrayLength.list()),
                     LiteralItem.string("length")
             );
             case CodeTree.ObjectNew objectNew -> {
-                var alloc = this.builder.globals.allocate();
-                this.builder.globals.setField(
+                var alloc = this.builder.globals().allocate();
+                this.builder.globals().setField(
                         alloc,
                         LiteralItem.string("class"),
                         LiteralItem.string(objectNew.clazz())
@@ -189,21 +190,21 @@ public class FlowToDF {
                 yield alloc;
             }
             case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value) -> {
-                this.builder.globals.setStaticField(clazz, field, this.convertCodeTree(value));
+                this.builder.globals().setStaticField(clazz, field, this.convertCodeTree(value));
                 yield LiteralItem.number("0");
             }
             case CodeTree.ObjectGetStatic(String clazz, String field) ->
-                    this.builder.globals.readStaticField(clazz, field);
+                    this.builder.globals().readStaticField(clazz, field);
             case CodeTree.ObjectSetField objStore -> {
                 var array = this.convertCodeTree(objStore.obj());
-                this.builder.globals.setField(
+                this.builder.globals().setField(
                         array,
                         LiteralItem.string(objStore.field()),
                         this.convertCodeTree(objStore.value())
                 );
                 yield array;
             }
-            case CodeTree.ObjectGetField objIndex -> this.builder.globals.readField(
+            case CodeTree.ObjectGetField objIndex -> this.builder.globals().readField(
                     this.convertCodeTree(objIndex.obj()),
                     LiteralItem.string(objIndex.field())
             );
@@ -456,15 +457,15 @@ public class FlowToDF {
             params.addFirst(returnVariable);
         }
         var outline = invoke.outline();
-        var ownedClass = this.builder.graph.classByEntry(invoke.classEntry());
+        var ownedClass = this.builder.graph().classByEntry(invoke.classEntry());
         switch (invoke.style()) {
             case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
                 this.builder.appendCodeBlock(ActionBlock.callFunction(
-                        this.builder.graph.generateFunctionCallName(
+                        this.builder.graph().generateFunctionCallName(
                                 invoke.classEntry(),
                                 outline
                         ),
-                        this.builder.locals.functionCallParams(params)
+                        this.builder.locals().functionCallParams(params)
                 ));
             }
             case VIRTUAL_INTERFACE, VIRTUAL_OVERRIDABLE -> {
@@ -485,17 +486,17 @@ public class FlowToDF {
                     }
                     if (guaranteedNative) {
                         this.builder.appendCodeBlock(ActionBlock.callFunction(
-                                this.builder.graph.generateFunctionCallName(
+                                this.builder.graph().generateFunctionCallName(
                                         invoke.classEntry(),
                                         outline
                                 ),
-                                this.builder.locals.functionCallParams(params)
+                                this.builder.locals().functionCallParams(params)
                         ));
                     } else {
-                        this.builder.globals.invokeVirtual(
+                        this.builder.globals().invokeVirtual(
                                 dispatchParameter,
                                 outline,
-                                this.builder.locals.functionCallParams(params)
+                                this.builder.locals().functionCallParams(params)
                         );
                     }
                 } else {

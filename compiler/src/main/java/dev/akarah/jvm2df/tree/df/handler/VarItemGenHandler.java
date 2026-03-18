@@ -1,7 +1,7 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
 import dev.akarah.jvm2df.codetemplate.items.*;
-import dev.akarah.jvm2df.tree.df.FlowToDF;
+import dev.akarah.jvm2df.pipeline.FlowToDF;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
 import java.util.Optional;

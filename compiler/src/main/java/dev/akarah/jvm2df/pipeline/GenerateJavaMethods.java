@@ -1,7 +1,6 @@
-package dev.akarah.jvm2df.util.pipeline;
+package dev.akarah.jvm2df.pipeline;
 
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
-import dev.akarah.jvm2df.tree.df.FlowToDF;
 import dev.akarah.jvm2df.util.Beep;
 
 import javax.sound.sampled.LineUnavailableException;

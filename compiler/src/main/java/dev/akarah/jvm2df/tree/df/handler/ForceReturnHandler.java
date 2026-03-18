@@ -1,7 +1,7 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.tree.df.FlowToDF;
+import dev.akarah.jvm2df.pipeline.FlowToDF;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
 import java.util.Optional;
@@ -13,7 +13,7 @@ public class ForceReturnHandler implements InvokeHandler {
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
                 && invoke.outline().name().equals("ret")) {
             return Optional.of(transformer -> {
-                transformer.builder().localMemoryStrategy()
+                transformer.builder().locals()
                         .setResultAndReturn(
                                 transformer.convertCodeTree(invoke.args().getFirst())
                         );
