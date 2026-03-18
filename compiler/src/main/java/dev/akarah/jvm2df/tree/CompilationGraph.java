@@ -52,6 +52,9 @@ public class CompilationGraph {
     }
 
     public ClassModel classByEntry(ClassEntry name) {
+        if (!this.classDescs.containsKey(name.asInternalName())) {
+            throw new NullPointerException("Please compile with missing class " + name);
+        }
         return this.classDescs.get(name.asInternalName());
     }
 

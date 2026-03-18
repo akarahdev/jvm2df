@@ -74,7 +74,7 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
                 var preds = predecessors.get(b);
                 if (preds != null) {
                     for (var p : preds) {
-                        if (idom.containsKey(p)) {
+                        if (idom.containsKey(p) && rpoIndex.containsKey(p)) {
                             if (newIdom == null) {
                                 newIdom = p;
                             } else {
@@ -103,11 +103,33 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         var finger1 = b1;
         var finger2 = b2;
         while (finger1 != finger2) {
-            while (rpoIndex.get(finger1) > rpoIndex.get(finger2)) {
-                finger1 = idom.get(finger1);
+            Integer idx1 = rpoIndex.get(finger1);
+            Integer idx2 = rpoIndex.get(finger2);
+            if (idx1 == null || idx2 == null) {
+                return (idx1 != null) ? finger1 : finger2;
             }
-            while (rpoIndex.get(finger2) > rpoIndex.get(finger1)) {
-                finger2 = idom.get(finger2);
+
+            while (idx1 > idx2) {
+                var next = idom.get(finger1);
+                if (next == null || next == finger1) {
+                    return finger1;
+                }
+                finger1 = next;
+                idx1 = rpoIndex.get(finger1);
+                if (idx1 == null) {
+                    return finger2;
+                }
+            }
+            while (idx2 > idx1) {
+                var next = idom.get(finger2);
+                if (next == null || next == finger2) {
+                    return finger2;
+                }
+                finger2 = next;
+                idx2 = rpoIndex.get(finger2);
+                if (idx2 == null) {
+                    return finger1;
+                }
             }
         }
         return finger1;
@@ -138,6 +160,16 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
 
     @Override
     public FlowBlock convert(List<BasicBlock> basicBlocks) {
+        // This transformer instance is reused across methods, so all analysis caches
+        // must be reset for each conversion.
+        blocksByOffset.clear();
+        successors.clear();
+        predecessors.clear();
+        idom.clear();
+        dominanceTree.clear();
+        visitedBlocks.clear();
+        loopHeaders.clear();
+
         this.basicBlocks = basicBlocks;
         for (var block : basicBlocks) {
             blocksByOffset.put(block.offset(), block);
@@ -146,8 +178,6 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         computeDominators();
 
         if (basicBlocks.isEmpty()) return new FlowBlock(new ArrayList<>());
-        visitedBlocks.clear();
-        loopHeaders.clear();
         return reconstruct(basicBlocks.getFirst(), null);
     }
 

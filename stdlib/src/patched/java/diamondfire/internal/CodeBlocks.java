@@ -40,6 +40,23 @@ public class CodeBlocks {
             Object b
     );
 
+    public static native void ifVar(
+            String action,
+            Object a,
+            Object b
+    );
+
+    public static native void ifVar(
+            String action,
+            Object a,
+            Object b,
+            Object c
+    );
+
+    public static native <T> T setVar(
+            String action
+    );
+
     public static native <T> T setVar(
             String action,
             Object a
@@ -98,4 +115,6 @@ public class CodeBlocks {
     public static native void openNormal();
 
     public static native void closeNormal();
+
+    public static native <T> void ret(T obj);
 }

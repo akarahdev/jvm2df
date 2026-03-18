@@ -1,19 +1,25 @@
 import diamondfire.event.PlayerEventHandler;
 import diamondfire.value.ItemStack;
-import diamondfire.value.Selection;
-import diamondfire.value.Text;
+import diamondfire.value.List;
+import diamondfire.value.PlayerSelection;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
-        var sel = Selection.defaultTarget();
-        sel.sendMessage(Text.of("<gradient:#777777:#cccccc>Hello there!"));
-        sel.giveItem(ItemStack.of("diamond"));
+        var list = List.<ItemStack>of();
+        list.add(ItemStack.of("diamond"));
+        list.add(ItemStack.of("diamond_sword"));
+
+        var sel = PlayerSelection.defaultTarget();
+
+        for (int i = 0; i < list.length(); i++) {
+            sel.giveItem(list.get(i));
+        }
     }
 
     @Override
     public void RightClick() {
-        var sel = Selection.defaultTarget();
+        var sel = PlayerSelection.defaultTarget();
         if (sel.isHolding(ItemStack.of("diamond"))) {
             sel.launchProjectile(ItemStack.of("fire_charge"));
         }

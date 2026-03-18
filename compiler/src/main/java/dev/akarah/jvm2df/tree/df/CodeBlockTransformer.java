@@ -36,6 +36,10 @@ public class CodeBlockTransformer {
     List<CodeLine> confirmedCodeLines;
     CompilationGraph graph;
 
+    public LocalMemoryStrategy localMemoryStrategy() {
+        return this.locals;
+    }
+
     public void appendCodeBlock(CodeBlock<?> codeBlock) {
         this.codeLineStack.getLast().add(codeBlock);
     }

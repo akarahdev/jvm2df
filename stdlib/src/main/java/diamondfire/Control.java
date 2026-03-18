@@ -1,7 +1,7 @@
 package diamondfire;
 
-import diamondfire.internal.VarItemGen;
 import diamondfire.internal.CodeBlocks;
+import diamondfire.internal.VarItemGen;
 
 public class Control {
     public static void debug(Object argument) {
@@ -21,6 +21,21 @@ public class Control {
                 "Wait",
                 ticks,
                 VarItemGen.tag("Time Unit", "Ticks")
+        );
+    }
+
+    public static void panic(String message) {
+        CodeBlocks.control(
+                "PrintDebug",
+                message,
+                VarItemGen.tag("Permission", "Developer"),
+                VarItemGen.tag("Text Value Merging", "No Spaces"),
+                VarItemGen.tag("Highlighting", "None"),
+                VarItemGen.tag("Sound", "Error"),
+                VarItemGen.tag("Message Style", "Error")
+        );
+        CodeBlocks.control(
+                "End"
         );
     }
 }

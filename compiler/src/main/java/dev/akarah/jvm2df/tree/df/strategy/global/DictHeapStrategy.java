@@ -89,7 +89,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                     "GetDictValue",
                     Args.byVarItems(
                             readVar,
-                            allocationVar,
+                            new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
                             field
                     )
             ));

@@ -37,7 +37,7 @@ public class CodeClientAPI extends WebSocketClient {
                 } catch (Exception _) {
                     // ignored bruh
                 }
-                this.onMessage("BASIC"); // todo: get cc bug fixed
+                this.onMessage("MEGA"); // todo: get cc bug fixed
             }
             case "place done" -> {
                 this.close();
