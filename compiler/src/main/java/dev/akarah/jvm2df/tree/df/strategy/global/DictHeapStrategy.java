@@ -6,17 +6,17 @@ import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 import java.util.List;
 
 public class DictHeapStrategy implements GlobalMemoryStrategy {
-    CodeBlockTransformer transformer;
+    CodeLineBuilder transformer;
     LocalMemoryStrategy localMemoryStrategy;
 
     @Override
-    public void setup(CodeBlockTransformer transformer, LocalMemoryStrategy locals) {
+    public void setup(CodeLineBuilder transformer, LocalMemoryStrategy locals) {
         this.transformer = transformer;
         this.localMemoryStrategy = locals;
     }

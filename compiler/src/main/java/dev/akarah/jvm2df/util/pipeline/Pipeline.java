@@ -5,7 +5,7 @@ import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfg.BytecodeTranslator;
 import dev.akarah.jvm2df.tree.cfr.ControlFlowTransformer;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
@@ -23,7 +23,7 @@ public class Pipeline {
 
     private BytecodeTranslator bytecodeTranslator;
     private ControlFlowTransformer flowTransformer;
-    private CodeBlockTransformer codeBlockTransformer;
+    private CodeLineBuilder codeLineBuilder;
     private LocalMemoryStrategy localMemoryStrategy;
     private GlobalMemoryStrategy globalMemoryStrategy;
 
@@ -36,8 +36,8 @@ public class Pipeline {
         return this.bytecodeTranslator;
     }
 
-    public CodeBlockTransformer codeBlockTransformer() {
-        return this.codeBlockTransformer;
+    public CodeLineBuilder codeLineBuilder() {
+        return this.codeLineBuilder;
     }
 
     public CompilationGraph graph() {
@@ -90,7 +90,7 @@ public class Pipeline {
         this.classes.forEach(graph::register);
 
         this.bytecodeTranslator = new BytecodeTranslator();
-        this.codeBlockTransformer = new CodeBlockTransformer(this.localMemoryStrategy, this.globalMemoryStrategy, graph);
+        this.codeLineBuilder = new CodeLineBuilder(this.localMemoryStrategy, this.globalMemoryStrategy, graph);
 
         for (var component : this.components) {
             codeLines.addAll(component.generate(this));

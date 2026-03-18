@@ -5,8 +5,7 @@ import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.ParameterItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
-import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 
 import java.lang.classfile.MethodModel;
 import java.lang.constant.ClassDesc;
@@ -15,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineVarLocals implements LocalMemoryStrategy {
-    CodeBlockTransformer transformer;
+    CodeLineBuilder transformer;
 
     @Override
-    public void setup(CodeBlockTransformer transformer) {
+    public void setup(CodeLineBuilder transformer) {
         this.transformer = transformer;
     }
 
@@ -37,11 +36,6 @@ public class LineVarLocals implements LocalMemoryStrategy {
                 )
         ));
         transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
-    }
-
-    @Override
-    public void compileSubroutineHint(ReconstructedFlow.SubroutineSafeHint hint) {
-        this.transformer.convertFlowBlock(hint.block());
     }
 
     @Override

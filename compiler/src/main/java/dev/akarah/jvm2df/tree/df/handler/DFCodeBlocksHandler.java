@@ -5,7 +5,7 @@ import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.BlockTagItem;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.FlowToDF;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 public record DFCodeBlocksHandler(String functionName, String codeBlock,
                                   BiFunction<String, Args, CodeBlock<?>> mapper) implements InvokeHandler {
     @Override
-    public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
+    public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
                 && invoke.outline().name().equals(functionName)) {
             var codeArguments = new ArrayList<>(invoke.args());
@@ -57,7 +57,7 @@ public record DFCodeBlocksHandler(String functionName, String codeBlock,
                     ));
                 }
 
-                transformer.appendCodeBlock(this.mapper.apply(
+                transformer.builder().appendCodeBlock(this.mapper.apply(
                         constantDesc.toString(),
                         new Args(arguments)
                 ));

@@ -1,6 +1,7 @@
 package dev.akarah.jvm2df.util.pipeline;
 
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.tree.df.FlowToDF;
 import dev.akarah.jvm2df.util.Beep;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -16,17 +17,15 @@ public class GenerateJavaMethods implements PipelineComponent {
             classElements.methods().forEach(methodElements -> {
                 methodElements.code().ifPresent(codeModel -> {
                     try {
-                        // System.out.println(classElements.thisClass().asInternalName() + "#" + methodElements.methodName() + methodElements.methodTypeSymbol().descriptorString());
-                        // System.out.println(codeModel.toDebugString());
+                        System.out.println(classElements.thisClass().asInternalName() + "#" + methodElements.methodName() + methodElements.methodTypeSymbol().descriptorString());
+                        System.out.println(codeModel.toDebugString());
                         var basicBlocks = pipeline.bytecodeTranslator().split(methodElements, codeModel, pipeline.graph());
-                        // System.out.println(basicBlocks);
+                        System.out.println(basicBlocks);
                         var flowBlock = pipeline.flowTransformer().convert(basicBlocks);
-                        // System.out.println(flowBlock);
-                        var newLines = pipeline.codeBlockTransformer().transformMethod(
-                                flowBlock,
-                                methodElements
-                        );
-                        codeLines.addAll(newLines);
+                        System.out.println(flowBlock);
+                        var flow = new FlowToDF(pipeline.codeLineBuilder());
+                        var newLines = flow.transformMethod(flowBlock, methodElements);
+                        codeLines.add(newLines);
                     } catch (Exception e) {
                         try {
                             Beep.tone(330, 100, 0.5);

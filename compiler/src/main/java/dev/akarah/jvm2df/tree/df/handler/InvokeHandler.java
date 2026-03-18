@@ -2,7 +2,7 @@ package dev.akarah.jvm2df.tree.df.handler;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.FlowToDF;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
 import java.util.List;
@@ -24,5 +24,5 @@ public interface InvokeHandler {
             new ForceReturnHandler()
     );
 
-    Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke);
+    Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke);
 }

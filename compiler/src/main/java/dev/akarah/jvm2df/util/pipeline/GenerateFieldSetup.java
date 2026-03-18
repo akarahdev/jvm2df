@@ -19,10 +19,9 @@ public class GenerateFieldSetup implements PipelineComponent {
         var variable = new VariableItem("local.0", "line");
 
         pipeline.classes().forEach(classElements -> {
-            pipeline.codeBlockTransformer().setup(classElements);
-            pipeline.codeBlockTransformer().pushFrame();
+            pipeline.codeLineBuilder().init(classElements);
 
-            pipeline.codeBlockTransformer().appendCodeBlock(
+            pipeline.codeLineBuilder().appendCodeBlock(
                     ActionBlock.function(
                             functionNameForSetup(classElements.thisClass()),
                             List.of(parameter)
@@ -47,7 +46,7 @@ public class GenerateFieldSetup implements PipelineComponent {
             }
 
 
-            lines.add(new CodeLine(pipeline.codeBlockTransformer().popFrame()));
+            lines.add(pipeline.codeLineBuilder().built());
         });
         return lines;
     }

@@ -3,13 +3,13 @@ package dev.akarah.jvm2df.tree.df.strategy.global;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 import java.util.List;
 
 public interface GlobalMemoryStrategy {
-    void setup(CodeBlockTransformer transformer, LocalMemoryStrategy locals);
+    void setup(CodeLineBuilder transformer, LocalMemoryStrategy locals);
 
     VarItem<?> allocate();
 

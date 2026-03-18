@@ -1,7 +1,7 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.tree.df.CodeBlockTransformer;
+import dev.akarah.jvm2df.tree.df.FlowToDF;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class BoxedPrimitiveHandler implements InvokeHandler {
     );
 
     @Override
-    public Optional<Function<CodeBlockTransformer, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
+    public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         for (var className : CLASS_NAMES) {
             for (var methodName : METHOD_NAMES) {
                 if (invoke.classEntry().asInternalName().equals(className)

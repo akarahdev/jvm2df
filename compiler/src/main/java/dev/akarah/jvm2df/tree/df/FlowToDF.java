@@ -2,7 +2,6 @@ package dev.akarah.jvm2df.tree.df;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
-import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
@@ -27,76 +26,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CodeBlockTransformer {
-    LocalMemoryStrategy locals;
-    GlobalMemoryStrategy globals;
-    ClassModel classModel;
-    MethodModel methodModel;
-    FlowBlock block;
-    List<List<CodeBlock<?>>> codeLineStack;
-    List<CodeLine> confirmedCodeLines;
-    CompilationGraph graph;
+public class FlowToDF {
+    CodeLineBuilder builder;
 
-    public CodeBlockTransformer(
+    public FlowToDF(
             LocalMemoryStrategy locals,
             GlobalMemoryStrategy globals,
             CompilationGraph graph
     ) {
-        this.locals = locals;
-        this.globals = globals;
-        this.graph = graph;
+        this.builder = new CodeLineBuilder(
+                locals,
+                globals,
+                graph
+        );
     }
 
-    public LocalMemoryStrategy localMemoryStrategy() {
-        return this.locals;
+    public FlowToDF(CodeLineBuilder builder) {
+        this.builder = builder;
     }
 
-    public GlobalMemoryStrategy globalMemoryStrategy() {
-        return this.globals;
+    public CodeLineBuilder builder() {
+        return this.builder;
     }
 
-    public MethodModel currentMethod() {
-        return this.methodModel;
-    }
-
-    public ClassModel currentClass() {
-        return this.classModel;
-    }
-
-    public void appendCodeBlock(CodeBlock<?> codeBlock) {
-        this.codeLineStack.getLast().add(codeBlock);
-    }
-
-    public List<CodeBlock<?>> popFrame() {
-        this.confirmedCodeLines.add(new CodeLine(this.codeLineStack.getLast()));
-        return this.codeLineStack.removeLast();
-    }
-
-    public void pushFrame() {
-        this.codeLineStack.add(new ArrayList<>());
-    }
-
-    public void setup(ClassModel classModel) {
-        this.classModel = classModel;
-        this.codeLineStack = new ArrayList<>(new ArrayList<>());
-        this.confirmedCodeLines = new ArrayList<>();
-        this.codeLineStack = new ArrayList<>();
-        this.locals.setup(this);
-        this.globals.setup(this, locals);
-    }
-
-    public List<CodeLine> transformMethod(
+    public CodeLine transformMethod(
             FlowBlock block,
             MethodModel methodModel
     ) {
-        this.methodModel = methodModel;
-        this.setup(methodModel.parent().orElseThrow());
+        this.builder.init(methodModel.parent().orElseThrow());
 
-        this.block = block;
+        var params = new ArrayList<VarItem<?>>(this.builder.locals.functionHeadParams(methodModel));
 
-        var params = new ArrayList<>(this.locals.functionHeadParams(this.methodModel));
-
-        this.pushFrame();
         var parentalName = methodModel.parent()
                 .flatMap(ClassModel::superclass)
                 .map(ClassEntry::asInternalName)
@@ -105,27 +65,24 @@ public class CodeBlockTransformer {
         switch (parentalName) {
             case "diamondfire/event/PlayerEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
-                    this.popFrame();
-                    return List.of();
+                    return this.builder.built();
                 }
-                this.appendCodeBlock(ActionBlock.playerEvent(methodModel.methodName().stringValue()));
+                this.builder.appendCodeBlock(ActionBlock.playerEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/EntityEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
-                    this.popFrame();
-                    return List.of();
+                    return this.builder.built();
                 }
-                this.appendCodeBlock(ActionBlock.entityEvent(methodModel.methodName().stringValue()));
+                this.builder.appendCodeBlock(ActionBlock.entityEvent(methodModel.methodName().stringValue()));
             }
             case "diamondfire/event/GameEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
-                    this.popFrame();
-                    return List.of();
+                    return this.builder.built();
                 }
-                this.appendCodeBlock(ActionBlock.gameEvent(methodModel.methodName().stringValue()));
+                this.builder.appendCodeBlock(ActionBlock.gameEvent(methodModel.methodName().stringValue()));
             }
             default -> {
-                this.appendCodeBlock(ActionBlock.function(
+                this.builder.appendCodeBlock(ActionBlock.function(
                         methodModel.parent().orElseThrow().thisClass().asInternalName()
                                 + "#"
                                 + methodModel.methodName().stringValue()
@@ -135,9 +92,9 @@ public class CodeBlockTransformer {
             }
         }
 
-        this.convertFlowBlock(this.block);
-        this.popFrame();
-        return this.confirmedCodeLines;
+        this.convertFlowBlock(block);
+
+        return this.builder.built();
     }
 
     public void convertFlowBlock(FlowBlock block) {
@@ -159,46 +116,46 @@ public class CodeBlockTransformer {
                 }
             };
             case CodeTree.StoreLocal(int idx, CodeTree value) -> {
-                this.appendCodeBlock(ActionBlock.setVar(
+                this.builder.appendCodeBlock(ActionBlock.setVar(
                         "=",
-                        Args.byVarItems(this.locals.referenceLocal(idx), this.convertCodeTree(value))
+                        Args.byVarItems(this.builder.locals.referenceLocal(idx), this.convertCodeTree(value))
                 ));
                 yield LiteralItem.number("0");
             }
-            case CodeTree.LoadLocal(int idx) -> this.locals.referenceLocal(idx);
+            case CodeTree.LoadLocal(int idx) -> this.builder.locals.referenceLocal(idx);
             case CodeTree.ExecuteFlow(ReconstructedFlow flow) -> this.convertFlowOperation(flow);
             case Terminator.ReturnVoid _ -> {
-                this.locals.setResultAndReturn(LiteralItem.number("0"));
+                this.builder.locals.setResultAndReturn(LiteralItem.number("0"));
                 yield LiteralItem.number("0");
             }
             case Terminator.ReturnValue ret -> {
-                this.locals.setResultAndReturn(this.convertCodeTree(ret.code()));
+                this.builder.locals.setResultAndReturn(this.convertCodeTree(ret.code()));
                 yield LiteralItem.number("0");
             }
             case Terminator.Break _ -> {
-                this.appendCodeBlock(ActionBlock.control("StopRepeat", Args.byVarItems()));
+                this.builder.appendCodeBlock(ActionBlock.control("StopRepeat", Args.byVarItems()));
                 yield LiteralItem.number("0");
             }
             case Terminator.Continue _ -> {
-                this.appendCodeBlock(ActionBlock.control("Skip", Args.byVarItems()));
+                this.builder.appendCodeBlock(ActionBlock.control("Skip", Args.byVarItems()));
                 yield LiteralItem.number("0");
             }
             case CodeTree.Invoke invoke -> this.convertInvoke(invoke);
             case CodeTree.Compare compare -> this.convertCompare(compare);
             case CodeTree.BinOp binOp -> this.convertBinOp(binOp);
             case CodeTree.IncrementLocal inc -> {
-                this.appendCodeBlock(ActionBlock.setVar(
+                this.builder.appendCodeBlock(ActionBlock.setVar(
                         "+=",
                         Args.byVarItems(
-                                this.locals.referenceLocal(inc.idx()),
+                                this.builder.locals.referenceLocal(inc.idx()),
                                 this.convertCodeTree(inc.value())
                         )
                 ));
-                yield this.locals.referenceLocal(inc.idx());
+                yield this.builder.locals.referenceLocal(inc.idx());
             }
             case CodeTree.ArrayNew arrayNew -> {
-                var alloc = this.globals.allocate();
-                this.globals.setField(
+                var alloc = this.builder.globals.allocate();
+                this.builder.globals.setField(
                         alloc,
                         LiteralItem.string("length"),
                         this.convertCodeTree(arrayNew.size())
@@ -207,24 +164,24 @@ public class CodeBlockTransformer {
             }
             case CodeTree.ArrayStore arrayStore -> {
                 var array = this.convertCodeTree(arrayStore.list());
-                this.globals.setField(
+                this.builder.globals.setField(
                         array,
                         this.convertCodeTree(arrayStore.index()),
                         this.convertCodeTree(arrayStore.value())
                 );
                 yield array;
             }
-            case CodeTree.ArrayIndex arrayIndex -> this.globals.readField(
+            case CodeTree.ArrayIndex arrayIndex -> this.builder.globals.readField(
                     this.convertCodeTree(arrayIndex.list()),
                     this.convertCodeTree(arrayIndex.index())
             );
-            case CodeTree.ArrayLength arrayLength -> this.globals.readField(
+            case CodeTree.ArrayLength arrayLength -> this.builder.globals.readField(
                     this.convertCodeTree(arrayLength.list()),
                     LiteralItem.string("length")
             );
             case CodeTree.ObjectNew objectNew -> {
-                var alloc = this.globals.allocate();
-                this.globals.setField(
+                var alloc = this.builder.globals.allocate();
+                this.builder.globals.setField(
                         alloc,
                         LiteralItem.string("class"),
                         LiteralItem.string(objectNew.clazz())
@@ -232,26 +189,27 @@ public class CodeBlockTransformer {
                 yield alloc;
             }
             case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value) -> {
-                this.globals.setStaticField(clazz, field, this.convertCodeTree(value));
+                this.builder.globals.setStaticField(clazz, field, this.convertCodeTree(value));
                 yield LiteralItem.number("0");
             }
-            case CodeTree.ObjectGetStatic(String clazz, String field) -> this.globals.readStaticField(clazz, field);
+            case CodeTree.ObjectGetStatic(String clazz, String field) ->
+                    this.builder.globals.readStaticField(clazz, field);
             case CodeTree.ObjectSetField objStore -> {
                 var array = this.convertCodeTree(objStore.obj());
-                this.globals.setField(
+                this.builder.globals.setField(
                         array,
                         LiteralItem.string(objStore.field()),
                         this.convertCodeTree(objStore.value())
                 );
                 yield array;
             }
-            case CodeTree.ObjectGetField objIndex -> this.globals.readField(
+            case CodeTree.ObjectGetField objIndex -> this.builder.globals.readField(
                     this.convertCodeTree(objIndex.obj()),
                     LiteralItem.string(objIndex.field())
             );
             case CodeTree.Negate negate -> {
                 var tmp = new VariableItem("tmp.neg." + negate.hashCode(), "line");
-                this.appendCodeBlock(ActionBlock.setVar(
+                this.builder.appendCodeBlock(ActionBlock.setVar(
                         "x",
                         Args.byVarItems(
                                 tmp,
@@ -270,7 +228,7 @@ public class CodeBlockTransformer {
         return convertCompare(
                 compare,
                 comparisonResult -> {
-                    this.appendCodeBlock(ActionBlock.setVar(
+                    this.builder.appendCodeBlock(ActionBlock.setVar(
                             "=",
                             Args.byVarItems(
                                     comparisonResult,
@@ -279,7 +237,7 @@ public class CodeBlockTransformer {
                     ));
                 },
                 comparisonResult -> {
-                    this.appendCodeBlock(ActionBlock.setVar(
+                    this.builder.appendCodeBlock(ActionBlock.setVar(
                             "=",
                             Args.byVarItems(
                                     comparisonResult,
@@ -301,18 +259,18 @@ public class CodeBlockTransformer {
             case LESS_THAN_OR_EQ -> "<=";
         };
         var comparisonResult = new VariableItem("tmp.compare_result." + compare.hashCode(), "line");
-        this.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
+        this.builder.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
                 this.convertCodeTree(compare.lhs()),
                 this.convertCodeTree(compare.rhs())
         )));
-        this.appendCodeBlock(Bracket.openNormal());
+        this.builder.appendCodeBlock(Bracket.openNormal());
         ifTrue.accept(comparisonResult);
-        this.appendCodeBlock(Bracket.closeNormal());
+        this.builder.appendCodeBlock(Bracket.closeNormal());
         if (ifFalse != null) {
-            this.appendCodeBlock(ActionBlock.else_());
-            this.appendCodeBlock(Bracket.openNormal());
+            this.builder.appendCodeBlock(ActionBlock.else_());
+            this.builder.appendCodeBlock(Bracket.openNormal());
             ifFalse.accept(comparisonResult);
-            this.appendCodeBlock(Bracket.closeNormal());
+            this.builder.appendCodeBlock(Bracket.closeNormal());
         }
         return comparisonResult;
     }
@@ -341,28 +299,28 @@ public class CodeBlockTransformer {
                     );
                 } else {
                     var result = this.convertCodeTree(iff.condition());
-                    this.appendCodeBlock(ActionBlock.ifVar(
+                    this.builder.appendCodeBlock(ActionBlock.ifVar(
                             "=",
                             Args.byVarItems(result, LiteralItem.number("1"))
                     ));
-                    this.appendCodeBlock(Bracket.openNormal());
+                    this.builder.appendCodeBlock(Bracket.openNormal());
                     this.convertFlowBlock(iff.ifTrue());
-                    this.appendCodeBlock(Bracket.closeNormal());
+                    this.builder.appendCodeBlock(Bracket.closeNormal());
 
                     iff.ifFalse().ifPresent(falseBlock -> {
-                        this.appendCodeBlock(ActionBlock.else_());
-                        this.appendCodeBlock(Bracket.openNormal());
+                        this.builder.appendCodeBlock(ActionBlock.else_());
+                        this.builder.appendCodeBlock(Bracket.openNormal());
                         this.convertFlowBlock(falseBlock);
-                        this.appendCodeBlock(Bracket.closeNormal());
+                        this.builder.appendCodeBlock(Bracket.closeNormal());
                     });
                 }
                 yield LiteralItem.number("0");
             }
             case ReconstructedFlow.LoopForever loopForever -> {
-                this.appendCodeBlock(ActionBlock.repeat("Forever", Args.byVarItems()));
-                this.appendCodeBlock(Bracket.openRepeat());
+                this.builder.appendCodeBlock(ActionBlock.repeat("Forever", Args.byVarItems()));
+                this.builder.appendCodeBlock(Bracket.openRepeat());
                 this.convertFlowBlock(loopForever.block());
-                this.appendCodeBlock(Bracket.closeRepeat());
+                this.builder.appendCodeBlock(Bracket.closeRepeat());
                 yield LiteralItem.number("0");
             }
             case ReconstructedFlow.While while_ -> {
@@ -377,25 +335,24 @@ public class CodeBlockTransformer {
                         case GREATER_THAN_OR_EQ -> ">=";
                         case LESS_THAN_OR_EQ -> "<=";
                     };
-                    this.appendCodeBlock(ActionBlock.repeat("While", op, Args.byVarItems(
+                    this.builder.appendCodeBlock(ActionBlock.repeat("While", op, Args.byVarItems(
                             this.convertCodeTree(lhs),
                             this.convertCodeTree(rhs)
                     )));
                 } else {
                     var result = this.convertCodeTree(while_.condition());
-                    this.appendCodeBlock(ActionBlock.repeat(
+                    this.builder.appendCodeBlock(ActionBlock.repeat(
                             "While",
                             "=",
                             Args.byVarItems(result, LiteralItem.number("1"))
                     ));
                 }
-                this.appendCodeBlock(Bracket.openRepeat());
+                this.builder.appendCodeBlock(Bracket.openRepeat());
                 this.convertFlowBlock(while_.block());
-                this.appendCodeBlock(Bracket.closeRepeat());
+                this.builder.appendCodeBlock(Bracket.closeRepeat());
                 yield LiteralItem.number("0");
             }
             case ReconstructedFlow.SubroutineSafeHint hint -> {
-                this.locals.compileSubroutineHint(hint);
                 yield LiteralItem.number("0");
             }
             default -> throw new RuntimeException("unknown flow " + flow);
@@ -434,7 +391,7 @@ public class CodeBlockTransformer {
                     rhsVarString = "%var(" + variableItem.name() + ")";
                 }
 
-                this.appendCodeBlock(ActionBlock.setVar(
+                this.builder.appendCodeBlock(ActionBlock.setVar(
                         "ClampNumber",
                         Args.byVarItems(
                                 variable,
@@ -454,7 +411,7 @@ public class CodeBlockTransformer {
                     case OR -> "|";
                     default -> throw new IllegalStateException("How?");
                 };
-                this.appendCodeBlock(
+                this.builder.appendCodeBlock(
                         ActionBlock.setVar(
                                         op,
                                         Args.byVarItems(
@@ -468,7 +425,7 @@ public class CodeBlockTransformer {
                 );
             }
             default -> {
-                this.appendCodeBlock(ActionBlock.setVar(
+                this.builder.appendCodeBlock(ActionBlock.setVar(
                         op,
                         Args.byVarItems(
                                 variable,
@@ -499,15 +456,15 @@ public class CodeBlockTransformer {
             params.addFirst(returnVariable);
         }
         var outline = invoke.outline();
-        var ownedClass = this.graph.classByEntry(invoke.classEntry());
+        var ownedClass = this.builder.graph.classByEntry(invoke.classEntry());
         switch (invoke.style()) {
             case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
-                this.appendCodeBlock(ActionBlock.callFunction(
-                        this.graph.generateFunctionCallName(
+                this.builder.appendCodeBlock(ActionBlock.callFunction(
+                        this.builder.graph.generateFunctionCallName(
                                 invoke.classEntry(),
                                 outline
                         ),
-                        this.locals.functionCallParams(params)
+                        this.builder.locals.functionCallParams(params)
                 ));
             }
             case VIRTUAL_INTERFACE, VIRTUAL_OVERRIDABLE -> {
@@ -527,18 +484,18 @@ public class CodeBlockTransformer {
                         }
                     }
                     if (guaranteedNative) {
-                        this.appendCodeBlock(ActionBlock.callFunction(
-                                this.graph.generateFunctionCallName(
+                        this.builder.appendCodeBlock(ActionBlock.callFunction(
+                                this.builder.graph.generateFunctionCallName(
                                         invoke.classEntry(),
                                         outline
                                 ),
-                                this.locals.functionCallParams(params)
+                                this.builder.locals.functionCallParams(params)
                         ));
                     } else {
-                        this.globals.invokeVirtual(
+                        this.builder.globals.invokeVirtual(
                                 dispatchParameter,
                                 outline,
-                                this.locals.functionCallParams(params)
+                                this.builder.locals.functionCallParams(params)
                         );
                     }
                 } else {
