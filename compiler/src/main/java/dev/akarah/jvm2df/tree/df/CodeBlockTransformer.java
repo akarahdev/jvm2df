@@ -30,14 +30,37 @@ import java.util.function.Consumer;
 public class CodeBlockTransformer {
     LocalMemoryStrategy locals;
     GlobalMemoryStrategy globals;
+    ClassModel classModel;
     MethodModel methodModel;
     FlowBlock block;
     List<List<CodeBlock<?>>> codeLineStack;
     List<CodeLine> confirmedCodeLines;
     CompilationGraph graph;
 
+    public CodeBlockTransformer(
+            LocalMemoryStrategy locals,
+            GlobalMemoryStrategy globals,
+            CompilationGraph graph
+    ) {
+        this.locals = locals;
+        this.globals = globals;
+        this.graph = graph;
+    }
+
     public LocalMemoryStrategy localMemoryStrategy() {
         return this.locals;
+    }
+
+    public GlobalMemoryStrategy globalMemoryStrategy() {
+        return this.globals;
+    }
+
+    public MethodModel currentMethod() {
+        return this.methodModel;
+    }
+
+    public ClassModel currentClass() {
+        return this.classModel;
     }
 
     public void appendCodeBlock(CodeBlock<?> codeBlock) {
@@ -53,17 +76,23 @@ public class CodeBlockTransformer {
         this.codeLineStack.add(new ArrayList<>());
     }
 
-    public List<CodeLine> transform(FlowBlock block, MethodModel methodModel, LocalMemoryStrategy locals, GlobalMemoryStrategy globals, CompilationGraph graph) {
-        this.block = block;
-        this.methodModel = methodModel;
+    public void setup(ClassModel classModel) {
+        this.classModel = classModel;
         this.codeLineStack = new ArrayList<>(new ArrayList<>());
         this.confirmedCodeLines = new ArrayList<>();
-        this.locals = locals;
-        this.globals = globals;
+        this.codeLineStack = new ArrayList<>();
         this.locals.setup(this);
         this.globals.setup(this, locals);
-        this.graph = graph;
-        this.codeLineStack = new ArrayList<>();
+    }
+
+    public List<CodeLine> transform(
+            FlowBlock block,
+            MethodModel methodModel
+    ) {
+        this.methodModel = methodModel;
+        this.setup(methodModel.parent().orElseThrow());
+
+        this.block = block;
 
         var params = new ArrayList<>(this.locals.functionHeadParams(this.methodModel));
 

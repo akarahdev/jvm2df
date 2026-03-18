@@ -6,10 +6,7 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.MethodTypeDesc;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CompilationGraph {
     Map<String, ClassModel> classDescs = new HashMap<>();
@@ -81,5 +78,9 @@ public class CompilationGraph {
             MethodOutline outline
     ) {
         return className.asInternalName() + "#" + outline;
+    }
+
+    public List<ClassModel> allClasses() {
+        return this.classDescs.values().stream().toList();
     }
 }
