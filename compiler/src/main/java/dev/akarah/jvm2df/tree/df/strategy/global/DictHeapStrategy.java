@@ -116,7 +116,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     @Override
     public void invokeVirtual(VariableItem callerItem, CompilationGraph.MethodOutline methodOutline, List<VarItem<?>> parameters) {
         this.transformer.appendCodeBlock(ActionBlock.callFunction(
-                "%var(class.%entry(%var(" + callerItem.name() + "),class).method." + methodOutline + ")",
+                "%entry(class.%entry(%var(" + callerItem.name() + "),class),method." + methodOutline + ")",
                 parameters
         ));
     }

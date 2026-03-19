@@ -6,7 +6,6 @@ import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 
-import java.lang.classfile.constantpool.ClassEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +19,20 @@ public class GenerateFieldSetup implements PipelineComponent {
 
             pipeline.codeLineBuilder().appendCodeBlock(
                     ActionBlock.function(
-                            functionNameForSetup(classElements.thisClass()),
+                            classElements.thisClass().asInternalName() + "#<fieldsetup>()V",
                             List.of()
                     )
             );
+
+            var classVariable = new VariableItem(
+                    "class." + classElements.thisClass().asInternalName(),
+                    "unsaved"
+            );
+
+            pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
+                    "CreateDict",
+                    Args.byVarItems(classVariable)
+            ));
 
             for (var outline : pipeline.graph().allSuperMethodsFor(pipeline.graph().classByEntry(classElements.thisClass()))) {
                 var methodModel = pipeline.graph().lookupMethodInSuper(
@@ -33,12 +42,12 @@ public class GenerateFieldSetup implements PipelineComponent {
                 );
 
                 pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
-                        "=",
+                        "SetDictValue",
                         Args.byVarItems(
-                                new VariableItem(
-                                        "class." + classElements.thisClass().asInternalName()
-                                                + ".method." + outline.name() + outline.typeDesc().descriptorString(),
-                                        "unsaved"),
+                                classVariable,
+                                LiteralItem.string(
+                                        "method." + outline.name() + outline.typeDesc().descriptorString()
+                                ),
                                 LiteralItem.string(pipeline.graph().generateFunctionCallName(
                                         methodModel.parent().orElseThrow().thisClass(),
                                         outline
@@ -61,9 +70,5 @@ public class GenerateFieldSetup implements PipelineComponent {
         });
         lines.add(pipeline.codeLineBuilder().built());
         return lines;
-    }
-
-    public static String functionNameForSetup(ClassEntry classEntry) {
-        return classEntry.asInternalName() + "#<fieldsetup>()V";
     }
 }
