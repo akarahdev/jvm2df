@@ -326,6 +326,8 @@ public class FlowToDF {
                 yield LiteralItem.number("0");
             }
             case ReconstructedFlow.While while_ -> {
+                this.builder.appendCodeBlock(ActionBlock.repeat("Forever", Args.byVarItems()));
+                this.builder.appendCodeBlock(Bracket.openRepeat());
                 if (while_.condition() instanceof CodeTree.Compare(
                         ComparisonType comparison, CodeTree lhs, CodeTree rhs
                 )) {
@@ -337,19 +339,23 @@ public class FlowToDF {
                         case GREATER_THAN_OR_EQ -> ">=";
                         case LESS_THAN_OR_EQ -> "<=";
                     };
-                    this.builder.appendCodeBlock(ActionBlock.repeat("While", op, Args.byVarItems(
+                    this.builder.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
                             this.convertCodeTree(lhs),
                             this.convertCodeTree(rhs)
                     )));
+                    this.builder.appendCodeBlock(Bracket.openNormal());
+                    this.builder.appendCodeBlock(ActionBlock.control("StopRepeat", Args.byVarItems()));
+                    this.builder.appendCodeBlock(Bracket.closeNormal());
                 } else {
                     var result = this.convertCodeTree(while_.condition());
-                    this.builder.appendCodeBlock(ActionBlock.repeat(
-                            "While",
+                    this.builder.appendCodeBlock(ActionBlock.ifVar(
                             "=",
                             Args.byVarItems(result, LiteralItem.number("1"))
                     ));
+                    this.builder.appendCodeBlock(Bracket.openNormal());
+                    this.builder.appendCodeBlock(ActionBlock.control("StopRepeat", Args.byVarItems()));
+                    this.builder.appendCodeBlock(Bracket.closeNormal());
                 }
-                this.builder.appendCodeBlock(Bracket.openRepeat());
                 this.convertFlowBlock(while_.block());
                 this.builder.appendCodeBlock(Bracket.closeRepeat());
                 yield LiteralItem.number("0");

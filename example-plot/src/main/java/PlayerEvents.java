@@ -1,4 +1,3 @@
-import diamondfire.Control;
 import diamondfire.event.PlayerEventHandler;
 import diamondfire.value.ItemStack;
 import diamondfire.value.List;
@@ -8,21 +7,14 @@ import diamondfire.value.Text;
 public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
-        var complex = new ComplexNumber(5, 10);
+        var list = List.<Double>of();
+        list.add(10.0);
+        list.add(20.0);
 
         var sel = PlayerSelection.defaultTarget();
-        sel.sendMessage(Text.of(complex.toString()));
-        sel.sendMessage(Text.of(complex.getClass().toString()));
-
-        var elements = complex.elements();
-        Control.debug(elements);
-        Control.debug(elements[0]);
-        Control.debug(elements[1]);
-
-        var elementsList = List.byArray(elements);
-        Control.debug(elementsList);
-        Control.debug(elementsList.get(0));
-        Control.debug(elementsList.get(1));
+        for (var elem : list) {
+            sel.sendMessage(Text.of(Double.toString(elem)));
+        }
 
     }
 

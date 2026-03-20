@@ -69,7 +69,8 @@ public class CodeTreeConverter {
                 this.stack.add(new CodeTree.ArrayIndex(array, index));
             }
             case StackInstruction instruction -> {
-                var num = 1000000 - 1 + new Random().nextInt(Integer.MAX_VALUE - 1000000);
+                var value1Var = 1000000 - 1 + new Random().nextInt(Integer.MAX_VALUE - 1000000);
+                var value2Var = 1000000 - 1 + new Random().nextInt(Integer.MAX_VALUE - 1000000);
                 switch (instruction.opcode()) {
                     case POP -> {
                         this.stack.removeLast();
@@ -79,17 +80,22 @@ public class CodeTreeConverter {
                         this.stack.removeLast();
                     }
                     case DUP -> {
-                        var value = this.stack.removeLast();
-                        this.statements.add(new CodeTree.StoreLocal(num, value));
-                        this.stack.add(new CodeTree.LoadLocal(num));
-                        this.stack.add(new CodeTree.LoadLocal(num));
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
                     }
                     case DUP2 -> {
-                        var value = this.stack.removeLast();
-                        this.statements.add(new CodeTree.StoreLocal(num, value));
-                        this.stack.add(new CodeTree.LoadLocal(num));
-                        this.stack.add(new CodeTree.LoadLocal(num));
-                        this.stack.add(new CodeTree.LoadLocal(num));
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
+                    }
+                    case DUP_X1 -> {
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
+                        this.statements.add(new CodeTree.StoreLocal(value2Var, this.stack.removeLast()));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
+                        this.stack.add(new CodeTree.LoadLocal(value2Var));
+                        this.stack.add(new CodeTree.LoadLocal(value1Var));
                     }
                     default -> throw new RuntimeException("i'm doing this later this SUCKS");
                 }

@@ -4,7 +4,9 @@ import diamondfire.Control;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
-public class List<T> {
+import java.util.Iterator;
+
+public class List<T> implements Iterable<T> {
     Object inner;
 
     private List() {
@@ -20,8 +22,8 @@ public class List<T> {
 
     public static <T> List<T> byArray(T[] array) {
         var l = new List<T>();
-        for (int i = 0; i < array.length; i++) {
-            l.add(array[i]);
+        for (var elem : array) {
+            l.add(elem);
         }
         return l;
     }
@@ -123,5 +125,30 @@ public class List<T> {
 
     public Object raw() {
         return this.inner;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ListIterator<>(this);
+    }
+
+    private static class ListIterator<T> implements Iterator<T> {
+        List<T> inner;
+        int idx;
+
+        public ListIterator(List<T> list) {
+            this.inner = list;
+            this.idx = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return idx >= inner.length();
+        }
+
+        @Override
+        public T next() {
+            return inner.get(idx++);
+        }
     }
 }
