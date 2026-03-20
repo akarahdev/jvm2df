@@ -6,6 +6,7 @@ import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
 import dev.akarah.jvm2df.tree.df.VarPattern;
 
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class GenerateFieldSetup implements PipelineComponent {
         var lines = new ArrayList<CodeLine>();
 
         pipeline.classes().forEach(classElements -> {
+
             pipeline.codeLineBuilder().init(classElements);
 
             pipeline.codeLineBuilder().appendCodeBlock(
@@ -31,13 +33,22 @@ public class GenerateFieldSetup implements PipelineComponent {
                     Args.byVarItems(classVariable)
             ));
 
+
             for (var outline : pipeline.graph().allSuperMethodsFor(pipeline.graph().classByEntry(classElements.thisClass()))) {
                 var methodModel = pipeline.graph().lookupMethodInSuper(
                         classElements.thisClass(),
                         outline.name(),
                         outline.typeDesc()
                 );
-
+                if (methodModel.flags().has(AccessFlag.STATIC)) {
+                    continue;
+                }
+                if (methodModel.flags().has(AccessFlag.ABSTRACT)) {
+                    return;
+                }
+                if (methodModel.flags().has(AccessFlag.INTERFACE)) {
+                    return;
+                }
                 pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
                         "SetDictValue",
                         Args.byVarItems(
@@ -58,6 +69,12 @@ public class GenerateFieldSetup implements PipelineComponent {
         pipeline.codeLineBuilder().init(null);
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.gameEvent("PlotStartup"));
         pipeline.classes().forEach(classElements -> {
+            if (classElements.flags().has(AccessFlag.ABSTRACT)) {
+                return;
+            }
+            if (classElements.flags().has(AccessFlag.INTERFACE)) {
+                return;
+            }
             pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.callFunction(
                     classElements.thisClass().asInternalName() + "#<fieldsetup>()V",
                     List.of()
