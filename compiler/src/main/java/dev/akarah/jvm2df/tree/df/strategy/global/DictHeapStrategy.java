@@ -7,6 +7,7 @@ import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
+import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 import java.util.List;
@@ -23,12 +24,12 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> allocate() {
-        var allocationNameVar = new VariableItem("tmp.allocation", "line");
+        var allocationNameVar = VarPattern.temporary("allocation");
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "=",
                 Args.byVarItems(
                         allocationNameVar,
-                        LiteralItem.string("heap.%random(-100000000,100000000)")
+                        VarPattern.newMemoryAddress()
                 )
         ));
         this.transformer.appendCodeBlock(ActionBlock.setVar(
@@ -83,7 +84,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> readField(VarItem<?> allocation, VarItem<?> field) {
-        var readVar = new VariableItem("tmp.read." + new Object().hashCode(), "line");
+        var readVar = VarPattern.temporary("read");
         if (allocation instanceof VariableItem allocationVar) {
             this.transformer.appendCodeBlock(ActionBlock.setVar(
                     "GetDictValue",
@@ -101,7 +102,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> readStaticField(String clazz, String field) {
-        var readVar = new VariableItem("tmp.read." + new Object().hashCode(), "line");
+        var readVar = VarPattern.temporary("read");
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "GetDictValue",
                 Args.byVarItems(
@@ -115,10 +116,16 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public void invokeVirtual(VariableItem callerItem, CompilationGraph.MethodOutline methodOutline, List<VarItem<?>> parameters) {
+        var classValue = (VariableItem) this.readField(callerItem, LiteralItem.string("class"));
+        // TODO: enable classVariable1 when
+        var classVariable1 = VarPattern.classInfo("%var(" + classValue.name() + ")").name();
+        var classVariable2 = VarPattern.classInfo("%entry(%var(" + callerItem.name() + "),class)").name();
+        var methodEntry = VarPattern.methodInfo(methodOutline);
         this.transformer.appendCodeBlock(ActionBlock.callFunction(
-                "%entry(class.%entry(%var(" + callerItem.name() + "),class),method." + methodOutline + ")",
+                "%entry(" + classVariable2 + "," + methodEntry + ")",
                 parameters
         ));
+
     }
 
     @Override

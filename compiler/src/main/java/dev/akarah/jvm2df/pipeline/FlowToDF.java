@@ -11,6 +11,7 @@ import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
+import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
@@ -209,7 +210,7 @@ public class FlowToDF {
                     LiteralItem.string(objIndex.field())
             );
             case CodeTree.Negate negate -> {
-                var tmp = new VariableItem("tmp.neg." + negate.hashCode(), "line");
+                var tmp = VarPattern.temporary("neg");
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "x",
                         Args.byVarItems(
@@ -259,7 +260,7 @@ public class FlowToDF {
             case GREATER_THAN_OR_EQ -> ">=";
             case LESS_THAN_OR_EQ -> "<=";
         };
-        var comparisonResult = new VariableItem("tmp.compare_result." + compare.hashCode(), "line");
+        var comparisonResult = VarPattern.temporary("compare_result");
         this.builder.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
                 this.convertCodeTree(compare.lhs()),
                 this.convertCodeTree(compare.rhs())
@@ -361,7 +362,7 @@ public class FlowToDF {
     }
 
     private VarItem<?> convertBinOp(CodeTree.BinOp add) {
-        var variable = new VariableItem("tmp.binop." + add.hashCode(), "line");
+        var variable = VarPattern.temporary("binop");
         var op = switch (add.type()) {
             case ADD -> "+";
             case SUB -> "-";
@@ -452,7 +453,7 @@ public class FlowToDF {
         for (var subp : invoke.args()) {
             params.add(this.convertCodeTree(subp));
         }
-        var returnVariable = new VariableItem("tmp.ret_result." + invoke.hashCode(), "line");
+        var returnVariable = VarPattern.temporary("result");
         if (!invoke.methodTypeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
             params.addFirst(returnVariable);
         }
