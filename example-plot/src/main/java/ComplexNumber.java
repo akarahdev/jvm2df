@@ -11,4 +11,8 @@ public class ComplexNumber {
     public String toString() {
         return Double.toString(real).concat("+").concat(Double.toString(imag)).concat("i");
     }
+
+    public Double[] elements() {
+        return new Double[]{this.real, this.imag};
+    }
 }

@@ -49,7 +49,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                         "SetDictValue",
                         Args.byVarItems(
                                 new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                                fieldLiteral,
+                                LiteralItem.string(fieldLiteral.value()),
                                 value
                         )
                 ));
@@ -86,14 +86,26 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     public VarItem<?> readField(VarItem<?> allocation, VarItem<?> field) {
         var readVar = VarPattern.temporary("read");
         if (allocation instanceof VariableItem allocationVar) {
-            this.transformer.appendCodeBlock(ActionBlock.setVar(
-                    "GetDictValue",
-                    Args.byVarItems(
-                            readVar,
-                            new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                            field
-                    )
-            ));
+            if (field instanceof LiteralItem literalItem) {
+                this.transformer.appendCodeBlock(ActionBlock.setVar(
+                        "GetDictValue",
+                        Args.byVarItems(
+                                readVar,
+                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
+                                LiteralItem.string(literalItem.value())
+                        )
+                ));
+            } else if (field instanceof VariableItem variableItem) {
+                this.transformer.appendCodeBlock(ActionBlock.setVar(
+                        "GetDictValue",
+                        Args.byVarItems(
+                                readVar,
+                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
+                                LiteralItem.string("%var(" + variableItem.name() + ")")
+                        )
+                ));
+            }
+
             return readVar;
         } else {
             throw new RuntimeException("Allocations must be variables");

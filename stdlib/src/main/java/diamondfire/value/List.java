@@ -18,6 +18,23 @@ public class List<T> {
         return new List<>();
     }
 
+    public static <T> List<T> byArray(T[] array) {
+        var l = new List<T>();
+        for (int i = 0; i < array.length; i++) {
+            l.add(array[i]);
+        }
+        return l;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T[] toArray() {
+        var arr = new Object[this.length()];
+        for (int i = 0; i < this.length(); i++) {
+            arr[i] = this.get(i);
+        }
+        return (T[]) arr;
+    }
+
     public void add(T obj) {
         this.inner = CodeBlocks.setVar("AppendValue", this.inner, obj);
     }
@@ -102,5 +119,9 @@ public class List<T> {
         CodeBlocks.ret(true);
         CodeBlocks.closeNormal();
         return false;
+    }
+
+    public Object raw() {
+        return this.inner;
     }
 }
