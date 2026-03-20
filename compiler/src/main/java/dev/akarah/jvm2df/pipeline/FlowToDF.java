@@ -373,12 +373,12 @@ public class FlowToDF {
                         ComparisonType comparison, CodeTree lhs, CodeTree rhs
                 )) {
                     var op = switch (comparison) {
-                        case EQUAL -> "=";
-                        case NOT_EQUAL -> "!=";
-                        case GREATER_THAN -> ">";
-                        case LESS_THAN -> "<";
-                        case GREATER_THAN_OR_EQ -> ">=";
-                        case LESS_THAN_OR_EQ -> "<=";
+                        case EQUAL -> "!=";
+                        case NOT_EQUAL -> "=";
+                        case GREATER_THAN -> "<=";
+                        case LESS_THAN -> ">=";
+                        case GREATER_THAN_OR_EQ -> "<";
+                        case LESS_THAN_OR_EQ -> ">";
                     };
                     this.builder.appendCodeBlock(ActionBlock.ifVar(op, Args.byVarItems(
                             this.convertCodeTree(lhs),

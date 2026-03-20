@@ -143,7 +143,7 @@ public class List<T> implements Iterable<T> {
 
         @Override
         public boolean hasNext() {
-            return idx >= inner.length();
+            return idx < inner.length();
         }
 
         @Override
