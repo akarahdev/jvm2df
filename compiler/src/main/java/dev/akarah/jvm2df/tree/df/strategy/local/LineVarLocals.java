@@ -1,10 +1,12 @@
 package dev.akarah.jvm2df.tree.df.strategy.local;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
+import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.ParameterItem;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 
 import java.lang.classfile.MethodModel;
@@ -67,5 +69,10 @@ public class LineVarLocals implements LocalMemoryStrategy {
     @Override
     public List<VarItem<?>> functionCallParams(List<VarItem<?>> parameters) {
         return parameters;
+    }
+
+    @Override
+    public List<CodeLine> codeLineContributions(Pipeline pipeline) {
+        return List.of();
     }
 }

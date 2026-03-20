@@ -3,6 +3,7 @@ package dev.akarah.jvm2df.frontend;
 import dev.akarah.jvm2df.codeclient.CodeClientAPI;
 import dev.akarah.jvm2df.pipeline.GenerateFieldSetup;
 import dev.akarah.jvm2df.pipeline.GenerateJavaMethods;
+import dev.akarah.jvm2df.pipeline.LocalAndGlobalContributions;
 import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.strategy.global.DictHeapStrategy;
@@ -25,7 +26,8 @@ public class Main {
                 .setLocalMemoryStrategy(new LineVarLocals())
                 .setGlobalMemoryStrategy(new DictHeapStrategy())
                 .registerComponent(new GenerateJavaMethods())
-                .registerComponent(new GenerateFieldSetup());
+                .registerComponent(new GenerateFieldSetup())
+                .registerComponent(new LocalAndGlobalContributions());
         var codeLines = pipeline.execute();
         try {
             System.out.println("=== CC STARTS BELOW");

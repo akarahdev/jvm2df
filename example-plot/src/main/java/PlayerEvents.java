@@ -1,5 +1,4 @@
 import diamondfire.event.PlayerEventHandler;
-import diamondfire.value.ItemStack;
 import diamondfire.value.List;
 import diamondfire.value.PlayerSelection;
 import diamondfire.value.Text;
@@ -16,13 +15,5 @@ public class PlayerEvents extends PlayerEventHandler {
             sel.sendMessage(Text.of(Double.toString(elem)));
         }
 
-    }
-
-    @Override
-    public void RightClick() {
-        var sel = PlayerSelection.defaultTarget();
-        if (sel.isHolding(ItemStack.of("diamond"))) {
-            sel.launchProjectile(ItemStack.of("fire_charge"));
-        }
     }
 }

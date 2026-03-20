@@ -1,7 +1,9 @@
 package dev.akarah.jvm2df.tree.df.strategy.global;
 
+import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
@@ -30,4 +32,6 @@ public interface GlobalMemoryStrategy {
     void reference(VarItem<?> allocation);
 
     void dereference(VarItem<?> allocation);
+
+    List<CodeLine> codeLineContributions(Pipeline pipeline);
 }

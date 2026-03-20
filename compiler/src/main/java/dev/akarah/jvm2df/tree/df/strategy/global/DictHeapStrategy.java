@@ -1,15 +1,16 @@
 package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
-import dev.akarah.jvm2df.codetemplate.items.Args;
-import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
-import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
+import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.codetemplate.items.*;
+import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DictHeapStrategy implements GlobalMemoryStrategy {
@@ -137,7 +138,6 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                 "%entry(" + classVariable1 + "," + methodEntry + ")",
                 parameters
         ));
-
     }
 
     @Override
@@ -148,5 +148,96 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     @Override
     public void dereference(VarItem<?> allocation) {
 
+    }
+
+    @Override
+    public List<CodeLine> codeLineContributions(Pipeline pipeline) {
+        var totals = new ArrayList<CodeLine>();
+        totals.add(allocationFunc(pipeline));
+        totals.add(deallocationFunc(pipeline));
+        return totals;
+    }
+
+    private CodeLine allocationFunc(Pipeline pipeline) {
+        this.transformer = pipeline.codeLineBuilder();
+        this.transformer.init(null);
+
+        this.transformer.appendCodeBlock(
+                ActionBlock.function(
+                        "dhs::reference",
+                        List.of(new ParameterItem("ref", "txt", false, false))
+                )
+        );
+
+        var allocation = new VariableItem("ref", "line");
+
+        this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                "StartsWith",
+                Args.byVarItems(allocation, LiteralItem.string("heap::"))
+        ));
+        this.transformer.appendCodeBlock(Bracket.openNormal());
+        var out = this.readField(allocation, LiteralItem.string("refcount"));
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "+=",
+                Args.byVarItems(out, LiteralItem.number("1"))
+        ));
+        this.setField(
+                allocation,
+                LiteralItem.string("refcount"),
+                out
+        );
+        this.transformer.appendCodeBlock(Bracket.closeNormal());
+        return this.transformer.built();
+    }
+
+    private CodeLine deallocationFunc(Pipeline pipeline) {
+        this.transformer = pipeline.codeLineBuilder();
+        this.transformer.init(null);
+
+        this.transformer.appendCodeBlock(
+                ActionBlock.function(
+                        "dhs::dereference",
+                        List.of(new ParameterItem("ref", "txt", false, false))
+                )
+        );
+
+        var allocation = new VariableItem("ref", "line");
+
+        this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                "StartsWith",
+                Args.byVarItems(allocation, LiteralItem.string("heap::"))
+        ).storeTagInSlot(26, "Ignore Case", "False"));
+        this.transformer.appendCodeBlock(Bracket.openNormal());
+
+        var out = this.readField(allocation, LiteralItem.string("refcount"));
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "-=",
+                Args.byVarItems(out, LiteralItem.number("1"))
+        ));
+        this.setField(
+                allocation,
+                LiteralItem.string("refcount"),
+                out
+        );
+        this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                "<=",
+                Args.byVarItems(
+                        out,
+                        LiteralItem.number("0")
+                )
+        ));
+        this.transformer.appendCodeBlock(Bracket.openNormal());
+        this.transformer.appendCodeBlock(
+                ActionBlock.setVar(
+                                "PurgeVars",
+                                Args.byVarItems(
+                                        allocation
+                                )
+                        ).storeTagInSlot(26, "Ignore Case", "False")
+                        .storeTagInSlot(25, "Match Requirement", "Entire name")
+        );
+        this.transformer.appendCodeBlock(Bracket.closeNormal());
+        this.transformer.appendCodeBlock(Bracket.closeNormal());
+        return this.transformer.built();
     }
 }

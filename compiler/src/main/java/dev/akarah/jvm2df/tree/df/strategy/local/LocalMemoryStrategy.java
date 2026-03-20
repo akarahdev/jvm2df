@@ -1,7 +1,9 @@
 package dev.akarah.jvm2df.tree.df.strategy.local;
 
+import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 
 import java.lang.classfile.MethodModel;
@@ -17,4 +19,6 @@ public interface LocalMemoryStrategy {
     List<VarItem<?>> functionHeadParams(MethodModel methodModel);
 
     List<VarItem<?>> functionCallParams(List<VarItem<?>> parameters);
+
+    List<CodeLine> codeLineContributions(Pipeline pipeline);
 }

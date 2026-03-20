@@ -48,7 +48,7 @@ public class CodeLineBuilder {
         this.confirmedCodeLines = new ArrayList<>();
         this.codeLineStack = new ArrayList<>();
         this.locals.setup(this);
-        this.globals.setup(this, locals);
+        this.globals.setup(this, this.locals);
     }
 
     public CodeLine built() {
