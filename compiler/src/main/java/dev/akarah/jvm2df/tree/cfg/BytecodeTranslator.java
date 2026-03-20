@@ -135,7 +135,9 @@ public class BytecodeTranslator {
         }
 
         for (int i = 0; i < this.converter.stack.size(); i++) {
-            block.statements().add(new CodeTree.StoreLocal(stackSlotBase + i, this.converter.stack.get(i)));
+            block.statements().add(
+                    new CodeTree.StoreLocal(stackSlotBase + i, this.converter.stack.get(i), CodeTree.Kind.PRIMITIVE)
+            );
         }
 
         if (terminator != null) {

@@ -16,6 +16,10 @@ public class VarPattern {
         return new VariableItem(namespace + "::" + new Object().hashCode(), "unsaved");
     }
 
+    public static VariableItem gcRoots() {
+        return new VariableItem("gcRoots", "unsaved");
+    }
+
     public static VariableItem temporary(String namespace) {
         return new VariableItem("tmp::" + namespace + "::" + new Object().hashCode(), "line");
     }

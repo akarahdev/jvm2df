@@ -148,7 +148,9 @@ public class List<T> implements Iterable<T> {
 
         @Override
         public T next() {
-            return inner.get(idx++);
+            var value = this.inner.get(idx);
+            this.idx += 1;
+            return value;
         }
     }
 }

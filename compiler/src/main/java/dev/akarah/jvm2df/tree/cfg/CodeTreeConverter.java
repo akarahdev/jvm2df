@@ -49,7 +49,11 @@ public class CodeTreeConverter {
                 this.statements.add(new CodeTree.IncrementLocal(instruction.slot(), new CodeTree.Constant(instruction.constant())));
             }
             case StoreInstruction instruction -> {
-                this.statements.add(new CodeTree.StoreLocal(instruction.slot(), this.stack.removeLast()));
+                var kind = switch (instruction.typeKind()) {
+                    case REFERENCE -> CodeTree.Kind.REFERENCE;
+                    default -> CodeTree.Kind.PRIMITIVE;
+                };
+                this.statements.add(new CodeTree.StoreLocal(instruction.slot(), this.stack.removeLast(), kind));
             }
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
@@ -80,19 +84,19 @@ public class CodeTreeConverter {
                         this.stack.removeLast();
                     }
                     case DUP -> {
-                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast(), CodeTree.Kind.PRIMITIVE));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                     }
                     case DUP2 -> {
-                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast(), CodeTree.Kind.PRIMITIVE));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                     }
                     case DUP_X1 -> {
-                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast()));
-                        this.statements.add(new CodeTree.StoreLocal(value2Var, this.stack.removeLast()));
+                        this.statements.add(new CodeTree.StoreLocal(value1Var, this.stack.removeLast(), CodeTree.Kind.PRIMITIVE));
+                        this.statements.add(new CodeTree.StoreLocal(value2Var, this.stack.removeLast(), CodeTree.Kind.PRIMITIVE));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
                         this.stack.add(new CodeTree.LoadLocal(value2Var));
                         this.stack.add(new CodeTree.LoadLocal(value1Var));
@@ -117,7 +121,8 @@ public class CodeTreeConverter {
     private void newObj(NewObjectInstruction instruction) {
         this.statements.add(new CodeTree.StoreLocal(
                 Integer.MAX_VALUE - 1,
-                new CodeTree.ObjectNew(instruction.className().asInternalName())
+                new CodeTree.ObjectNew(instruction.className().asInternalName()),
+                CodeTree.Kind.REFERENCE
         ));
         this.stack.add(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1));
     }

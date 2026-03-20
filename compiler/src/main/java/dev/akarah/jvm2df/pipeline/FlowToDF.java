@@ -25,11 +25,14 @@ import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class FlowToDF {
     CodeLineBuilder builder;
+    Set<Integer> storedLocals;
 
     public FlowToDF(
             LocalMemoryStrategy locals,
@@ -41,6 +44,25 @@ public class FlowToDF {
                 globals,
                 graph
         );
+    }
+
+    private Set<Integer> storedLocals(FlowBlock flowBlock) {
+        var set = new HashSet<Integer>();
+        for (var statement : flowBlock.statements()) {
+            switch (statement) {
+                case CodeTree.StoreLocal(int idx, CodeTree value, CodeTree.Kind kind) -> {
+                    set.add(idx);
+                }
+                case CodeTree.ExecuteFlow(ReconstructedFlow flow) -> {
+                    for (var block : flow.targets()) {
+                        set.addAll(this.storedLocals(block));
+                    }
+                }
+                default -> {
+                }
+            }
+        }
+        return set;
     }
 
     public FlowToDF(CodeLineBuilder builder) {
@@ -56,6 +78,7 @@ public class FlowToDF {
             MethodModel methodModel
     ) {
         this.builder.init(methodModel.parent().orElseThrow());
+        this.storedLocals = this.storedLocals(block);
 
         var params = new ArrayList<VarItem<?>>(this.builder.locals().functionHeadParams(methodModel));
 
@@ -117,21 +140,39 @@ public class FlowToDF {
                     throw new RuntimeException("I can't handle this right now :(");
                 }
             };
-            case CodeTree.StoreLocal(int idx, CodeTree value) -> {
+            case CodeTree.StoreLocal(int idx, CodeTree value, CodeTree.Kind kind) -> {
+                if (kind.equals(CodeTree.Kind.REFERENCE) && idx <= 65535) {
+                    this.builder().globals().dereference(this.builder.locals().referenceLocal(idx));
+                }
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "=",
                         Args.byVarItems(this.builder.locals().referenceLocal(idx), this.convertCodeTree(value))
                 ));
+                if (kind.equals(CodeTree.Kind.REFERENCE) && idx <= 65535) {
+                    this.builder().globals().reference(this.builder.locals().referenceLocal(idx));
+                }
                 yield LiteralItem.number("0");
             }
             case CodeTree.LoadLocal(int idx) -> this.builder.locals().referenceLocal(idx);
             case CodeTree.ExecuteFlow(ReconstructedFlow flow) -> this.convertFlowOperation(flow);
             case Terminator.ReturnVoid _ -> {
+                for (var elem : this.storedLocals) {
+                    if (elem <= 65535) {
+                        this.builder().globals().cleanup(elem);
+                    }
+                }
                 this.builder.locals().setResultAndReturn(LiteralItem.number("0"));
                 yield LiteralItem.number("0");
             }
             case Terminator.ReturnValue ret -> {
-                this.builder.locals().setResultAndReturn(this.convertCodeTree(ret.code()));
+                var val = this.convertCodeTree(ret.code());
+
+                for (var elem : this.storedLocals) {
+                    if (elem <= 65535) {
+                        this.builder().globals().cleanup(elem);
+                    }
+                }
+                this.builder.locals().setResultAndReturn(val);
                 yield LiteralItem.number("0");
             }
             case Terminator.Break _ -> {

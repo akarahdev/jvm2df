@@ -33,5 +33,7 @@ public interface GlobalMemoryStrategy {
 
     void dereference(VarItem<?> allocation);
 
+    void cleanup(int locals);
+
     List<CodeLine> codeLineContributions(Pipeline pipeline);
 }

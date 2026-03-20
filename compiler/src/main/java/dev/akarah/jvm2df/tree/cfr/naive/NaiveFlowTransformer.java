@@ -42,15 +42,25 @@ public class NaiveFlowTransformer implements ControlFlowTransformer {
 
     private CodeTree instructionMapper(Terminator terminator) {
         return switch (terminator) {
-            case Terminator.Jump(int target) -> new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(target));
+            case Terminator.Jump(int target) -> new CodeTree.StoreLocal(
+                    LABEL_VARIABLE, new CodeTree.Constant(target), CodeTree.Kind.PRIMITIVE
+            );
             case Terminator.BranchIf(CodeTree condition, int ifTrue, int ifFalse) -> new CodeTree.ExecuteFlow(
                     new ReconstructedFlow.If(
                             condition,
                             FlowBlock.by(
-                                    new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifTrue))
+                                    new CodeTree.StoreLocal(
+                                            LABEL_VARIABLE,
+                                            new CodeTree.Constant(ifTrue),
+                                            CodeTree.Kind.PRIMITIVE
+                                    )
                             ),
                             Optional.of(FlowBlock.by(
-                                    new CodeTree.StoreLocal(LABEL_VARIABLE, new CodeTree.Constant(ifFalse))
+                                    new CodeTree.StoreLocal(
+                                            LABEL_VARIABLE,
+                                            new CodeTree.Constant(ifFalse),
+                                            CodeTree.Kind.PRIMITIVE
+                                    )
                             ))
                     )
             );

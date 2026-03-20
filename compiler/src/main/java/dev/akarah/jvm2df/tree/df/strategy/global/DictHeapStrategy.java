@@ -142,12 +142,26 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public void reference(VarItem<?> allocation) {
-
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                "dhs::reference",
+                List.of(allocation)
+        ));
     }
 
     @Override
     public void dereference(VarItem<?> allocation) {
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                "dhs::dereference",
+                List.of(allocation)
+        ));
+    }
 
+    @Override
+    public void cleanup(int locals) {
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                "dhs::dereference",
+                List.of(this.localMemoryStrategy.referenceLocal(locals))
+        ));
     }
 
     @Override
@@ -165,7 +179,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         this.transformer.appendCodeBlock(
                 ActionBlock.function(
                         "dhs::reference",
-                        List.of(new ParameterItem("ref", "txt", false, false))
+                        List.of(new ParameterItem("ref", "any", false, false))
                 )
         );
 
@@ -176,16 +190,19 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                 Args.byVarItems(allocation, LiteralItem.string("heap::"))
         ));
         this.transformer.appendCodeBlock(Bracket.openNormal());
-        var out = this.readField(allocation, LiteralItem.string("refcount"));
+        var out = VarPattern.temporary("root_count");
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "GetDictValue",
+                Args.byVarItems(out, VarPattern.gcRoots(), allocation)
+        ));
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "+=",
                 Args.byVarItems(out, LiteralItem.number("1"))
         ));
-        this.setField(
-                allocation,
-                LiteralItem.string("refcount"),
-                out
-        );
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "SetDictValue",
+                Args.byVarItems(VarPattern.gcRoots(), allocation, out)
+        ));
         this.transformer.appendCodeBlock(Bracket.closeNormal());
         return this.transformer.built();
     }
@@ -197,7 +214,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         this.transformer.appendCodeBlock(
                 ActionBlock.function(
                         "dhs::dereference",
-                        List.of(new ParameterItem("ref", "txt", false, false))
+                        List.of(new ParameterItem("ref", "any", false, false))
                 )
         );
 
@@ -209,16 +226,16 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         ).storeTagInSlot(26, "Ignore Case", "False"));
         this.transformer.appendCodeBlock(Bracket.openNormal());
 
-        var out = this.readField(allocation, LiteralItem.string("refcount"));
+        var out = VarPattern.temporary("root_count");
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "GetDictValue",
+                Args.byVarItems(out, VarPattern.gcRoots(), allocation)
+        ));
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "-=",
                 Args.byVarItems(out, LiteralItem.number("1"))
         ));
-        this.setField(
-                allocation,
-                LiteralItem.string("refcount"),
-                out
-        );
+
         this.transformer.appendCodeBlock(ActionBlock.ifVar(
                 "<=",
                 Args.byVarItems(
@@ -229,13 +246,20 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         this.transformer.appendCodeBlock(Bracket.openNormal());
         this.transformer.appendCodeBlock(
                 ActionBlock.setVar(
-                                "PurgeVars",
-                                Args.byVarItems(
-                                        allocation
-                                )
-                        ).storeTagInSlot(26, "Ignore Case", "False")
-                        .storeTagInSlot(25, "Match Requirement", "Entire name")
+                        "RemoveDictEntry",
+                        Args.byVarItems(
+                                VarPattern.gcRoots(),
+                                allocation
+                        )
+                )
         );
+        this.transformer.appendCodeBlock(Bracket.closeNormal());
+        this.transformer.appendCodeBlock(ActionBlock.else_());
+        this.transformer.appendCodeBlock(Bracket.openNormal());
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "SetDictValue",
+                Args.byVarItems(VarPattern.gcRoots(), allocation, out)
+        ));
         this.transformer.appendCodeBlock(Bracket.closeNormal());
         this.transformer.appendCodeBlock(Bracket.closeNormal());
         return this.transformer.built();

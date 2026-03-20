@@ -63,6 +63,10 @@ public class GenerateFieldSetup implements PipelineComponent {
                     List.of()
             ));
         });
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
+                "CreateDict",
+                Args.byVarItems(VarPattern.gcRoots())
+        ));
         lines.add(pipeline.codeLineBuilder().built());
         return lines;
     }

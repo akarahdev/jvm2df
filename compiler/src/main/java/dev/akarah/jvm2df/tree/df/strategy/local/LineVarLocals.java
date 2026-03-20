@@ -8,6 +8,8 @@ import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
+import dev.akarah.jvm2df.tree.df.VarPattern;
+import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 
 import java.lang.classfile.MethodModel;
 import java.lang.constant.ClassDesc;
@@ -17,15 +19,17 @@ import java.util.List;
 
 public class LineVarLocals implements LocalMemoryStrategy {
     CodeLineBuilder transformer;
+    GlobalMemoryStrategy globals;
 
     @Override
-    public void setup(CodeLineBuilder transformer) {
+    public void setup(CodeLineBuilder transformer, GlobalMemoryStrategy globals) {
         this.transformer = transformer;
+        this.globals = globals;
     }
 
     @Override
     public VariableItem referenceLocal(int index) {
-        return new VariableItem("local." + index, "line");
+        return VarPattern.local(index);
     }
 
     @Override

@@ -17,10 +17,15 @@ import java.util.List;
  * JVM bytecode.
  */
 public interface CodeTree {
+    enum Kind {
+        PRIMITIVE,
+        REFERENCE
+    }
+
     record Constant(ConstantDesc constantDesc) implements CodeTree {
     }
 
-    record StoreLocal(int idx, CodeTree value) implements CodeTree {
+    record StoreLocal(int idx, CodeTree value, Kind kind) implements CodeTree {
     }
 
     record IncrementLocal(int idx, CodeTree value) implements CodeTree {
