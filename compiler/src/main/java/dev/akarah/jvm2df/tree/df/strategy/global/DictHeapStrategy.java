@@ -39,6 +39,14 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                         new VariableItem("%var(" + allocationNameVar.name() + ")", "unsaved")
                 )
         ));
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "SetDictValue",
+                Args.byVarItems(
+                        VarPattern.gcAllocations(),
+                        allocationNameVar,
+                        LiteralItem.number("1")
+                )
+        ));
         return allocationNameVar;
     }
 

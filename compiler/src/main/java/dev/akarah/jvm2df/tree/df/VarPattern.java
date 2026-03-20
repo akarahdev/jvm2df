@@ -20,6 +20,10 @@ public class VarPattern {
         return new VariableItem("gcRoots", "unsaved");
     }
 
+    public static VariableItem gcAllocations() {
+        return new VariableItem("gcAllocations", "unsaved");
+    }
+
     public static VariableItem temporary(String namespace) {
         return new VariableItem("tmp::" + namespace + "::" + new Object().hashCode(), "line");
     }
