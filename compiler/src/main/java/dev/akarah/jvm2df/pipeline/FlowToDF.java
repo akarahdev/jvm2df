@@ -390,7 +390,7 @@ public class FlowToDF {
                 } else {
                     var result = this.convertCodeTree(while_.condition());
                     this.builder.appendCodeBlock(ActionBlock.ifVar(
-                            "=",
+                            "!=",
                             Args.byVarItems(result, LiteralItem.number("1"))
                     ));
                     this.builder.appendCodeBlock(Bracket.openNormal());

@@ -7,6 +7,7 @@ import dev.akarah.jvm2df.pipeline.LocalAndGlobalContributions;
 import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.cfr.dom.DominanceFlowTransformer;
 import dev.akarah.jvm2df.tree.df.strategy.global.DictHeapStrategy;
+import dev.akarah.jvm2df.tree.df.strategy.global.TracingGCStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LineVarLocals;
 
 import java.net.URISyntaxException;
@@ -24,7 +25,7 @@ public class Main {
                 .setJarPath(path)
                 .setFlowTransformer(new DominanceFlowTransformer())
                 .setLocalMemoryStrategy(new LineVarLocals())
-                .setGlobalMemoryStrategy(new DictHeapStrategy())
+                .setGlobalMemoryStrategy(new TracingGCStrategy(new DictHeapStrategy()))
                 .registerComponent(new GenerateJavaMethods())
                 .registerComponent(new GenerateFieldSetup())
                 .registerComponent(new LocalAndGlobalContributions());

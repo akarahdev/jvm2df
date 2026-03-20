@@ -11,6 +11,10 @@ import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import java.util.List;
 
 public interface GlobalMemoryStrategy {
+    CodeLineBuilder transformer();
+
+    LocalMemoryStrategy locals();
+
     void setup(CodeLineBuilder transformer, LocalMemoryStrategy locals);
 
     VarItem<?> allocate();
