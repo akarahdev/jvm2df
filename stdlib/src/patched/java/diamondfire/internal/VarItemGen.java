@@ -8,4 +8,8 @@ public class VarItemGen {
     public static native Object lineVar();
 
     public static native Object vanillaItem(String nbt);
+
+    public static native Object classHandle(Object className);
+
+    public static native Object readField(Object allocation, Object field);
 }

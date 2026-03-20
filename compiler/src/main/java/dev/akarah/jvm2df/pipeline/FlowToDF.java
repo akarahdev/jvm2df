@@ -474,35 +474,37 @@ public class FlowToDF {
                 if (outline.typeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
                     searchIdx = 0;
                 }
-                if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
-                    boolean guaranteedNative = false;
-                    for (var attribute : ownedClass.attributes()) {
-                        if (attribute instanceof RuntimeVisibleAnnotationsAttribute annotationAttribute) {
-                            for (var annotation : annotationAttribute.annotations()) {
-                                if (annotation.className().equalsString("Ldiamondfire/internal/annotation/NativeValue;")) {
-                                    guaranteedNative = true;
-                                }
+                boolean guaranteedNative = false;
+                for (var attribute : ownedClass.attributes()) {
+                    if (attribute instanceof RuntimeVisibleAnnotationsAttribute annotationAttribute) {
+                        for (var annotation : annotationAttribute.annotations()) {
+                            if (annotation.className().equalsString("Ldiamondfire/internal/annotation/NativeValue;")) {
+                                guaranteedNative = true;
                             }
                         }
                     }
-                    if (guaranteedNative) {
-                        this.builder.appendCodeBlock(ActionBlock.callFunction(
-                                this.builder.graph().generateFunctionCallName(
-                                        invoke.classEntry(),
-                                        outline
-                                ),
-                                this.builder.locals().functionCallParams(params)
-                        ));
-                    } else {
+                }
+                if (guaranteedNative) {
+                    this.builder.appendCodeBlock(ActionBlock.callFunction(
+                            this.builder.graph().generateFunctionCallName(
+                                    invoke.classEntry(),
+                                    outline
+                            ),
+                            this.builder.locals().functionCallParams(params)
+                    ));
+                } else {
+                    if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
                         this.builder.globals().invokeVirtual(
                                 dispatchParameter,
                                 outline,
                                 this.builder.locals().functionCallParams(params)
                         );
+                    } else {
+                        throw new RuntimeException("unreachable");
                     }
-                } else {
-                    throw new RuntimeException("unreachable");
+
                 }
+
             }
         }
         return returnVariable;

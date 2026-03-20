@@ -1,20 +1,16 @@
 import diamondfire.event.PlayerEventHandler;
 import diamondfire.value.ItemStack;
-import diamondfire.value.List;
 import diamondfire.value.PlayerSelection;
+import diamondfire.value.Text;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
-        var list = List.<ItemStack>of();
-        list.add(ItemStack.of("diamond"));
-        list.add(ItemStack.of("diamond_sword"));
+        var complex = new ComplexNumber(5, 10);
 
         var sel = PlayerSelection.defaultTarget();
-
-        for (int i = 0; i < list.length(); i++) {
-            sel.giveItem(list.get(i));
-        }
+        sel.sendMessage(Text.of(complex.toString()));
+        sel.sendMessage(Text.of(complex.getClass().toString()));
     }
 
     @Override

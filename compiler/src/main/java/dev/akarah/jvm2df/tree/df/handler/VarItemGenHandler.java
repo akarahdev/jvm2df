@@ -1,9 +1,6 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
-import dev.akarah.jvm2df.codetemplate.items.BlockTagItem;
-import dev.akarah.jvm2df.codetemplate.items.GameValueItem;
-import dev.akarah.jvm2df.codetemplate.items.VanillaItem;
-import dev.akarah.jvm2df.codetemplate.items.VarItem;
+import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.pipeline.FlowToDF;
 import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
@@ -44,6 +41,27 @@ public class VarItemGenHandler implements InvokeHandler {
             return Optional.of(transformer -> {
                 var value = ((CodeTree.Constant) invoke.args().getFirst()).constantDesc().toString();
                 return new VanillaItem(value);
+            });
+        }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("readField")) {
+            return Optional.of(transformer -> {
+                var value = transformer.convertCodeTree(invoke.args().getFirst());
+                var field = transformer.convertCodeTree(invoke.args().get(1));
+                return transformer.builder().globals().readField(value, field);
+            });
+        }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("classHandle")) {
+            return Optional.of(transformer -> {
+                var value = transformer.convertCodeTree(invoke.args().getFirst());
+                if (value instanceof VariableItem variableItem) {
+                    return VarPattern.classInfo("%var(" + variableItem.name() + ")");
+                } else {
+                    throw new RuntimeException("Can not grab the class of an Inline Value object");
+                }
             });
         }
         return Optional.empty();
