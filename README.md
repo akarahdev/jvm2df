@@ -8,6 +8,7 @@ Supported features:
 - Local variables, for loops, while loops, if conditions
 - Arrays
 - Objects
+- Garbage collection
 
 Roadmap:
 
@@ -18,8 +19,8 @@ Roadmap:
 - [ ] Polymorphism
     - [x] `extends` clauses and virtual dispatch
     - [ ] `abstract class`
-    - [ ] `interface` and `invokeinterface`
+    - [x] `interface` and `invokeinterface`
 - [ ] `java.lang.MethodHandle` and related APIs
 - [ ] `invokedynamic`
 - [ ] `diamondfire.value.*` APIs
-- [ ] Enhanced `for` loop
+- [x] Enhanced `for` loop
