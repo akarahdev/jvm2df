@@ -1,10 +1,12 @@
 package dev.akarah.jvm2df.tree.df.handler;
 
+import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.pipeline.FlowToDF;
 import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -62,6 +64,17 @@ public class VarItemGenHandler implements InvokeHandler {
                 } else {
                     throw new RuntimeException("Can not grab the class of an Inline Value object");
                 }
+            });
+        }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("runGc")) {
+            return Optional.of(transformer -> {
+                transformer.builder().appendCodeBlock(ActionBlock.callFunction(
+                        VarPattern.gcFunc(),
+                        List.of()
+                ));
+                return LiteralItem.number("0");
             });
         }
         return Optional.empty();

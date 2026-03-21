@@ -199,6 +199,18 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock repeat(String action, String subAction, Args args, String attribute) {
+        return new ActionBlock(
+                "repeat",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.of(subAction),
+                Optional.of(attribute),
+                Optional.of(""),
+                Optional.of(args)
+        );
+    }
+
     public static ActionBlock selectObject(String action, Args args) {
         return new ActionBlock(
                 "select_obj",

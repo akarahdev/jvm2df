@@ -12,4 +12,6 @@ public class VarItemGen {
     public static native Object classHandle(Object className);
 
     public static native Object readField(Object allocation, Object field);
+
+    public static native void runGc();
 }

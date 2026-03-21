@@ -38,7 +38,7 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
     @Override
     public VarItem<?> allocate() {
         var value = this.inner.allocate();
-        this.setField(value, LiteralItem.string("mark"), LiteralItem.number("0"));
+        this.setField(value, LiteralItem.string("dhs::marked"), LiteralItem.number("0"));
         this.transformer().appendCodeBlock(ActionBlock.setVar(
                 "SetDictValue",
                 Args.byVarItems(
@@ -104,6 +104,7 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
         var totals = new ArrayList<CodeLine>();
         totals.add(allocationFunc(pipeline));
         totals.add(deallocationFunc(pipeline));
+        totals.add(gcFunc(pipeline));
         return totals;
     }
 
@@ -122,7 +123,7 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
         this.transformer().appendCodeBlock(ActionBlock.ifVar(
                 "StartsWith",
                 Args.byVarItems(allocation, LiteralItem.string("heap::"))
-        ));
+        ).storeTagInSlot(26, "Ignore Case", "False"));
         this.transformer().appendCodeBlock(Bracket.openNormal());
         var out = VarPattern.temporary("root_count");
         this.transformer().appendCodeBlock(ActionBlock.setVar(
@@ -177,24 +178,160 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
                 )
         ));
         this.transformer().appendCodeBlock(Bracket.openNormal());
-        this.transformer().appendCodeBlock(
-                ActionBlock.setVar(
-                        "RemoveDictEntry",
-                        Args.byVarItems(
-                                VarPattern.gcRoots(),
-                                allocation
-                        )
-                )
-        );
+        {
+            this.transformer().appendCodeBlock(
+                    ActionBlock.setVar(
+                            "RemoveDictEntry",
+                            Args.byVarItems(
+                                    VarPattern.gcRoots(),
+                                    allocation
+                            )
+                    )
+            );
+        }
         this.transformer().appendCodeBlock(Bracket.closeNormal());
         this.transformer().appendCodeBlock(ActionBlock.else_());
         this.transformer().appendCodeBlock(Bracket.openNormal());
+        {
+            this.transformer().appendCodeBlock(ActionBlock.setVar(
+                    "SetDictValue",
+                    Args.byVarItems(VarPattern.gcRoots(), allocation, out)
+            ));
+        }
+        this.transformer().appendCodeBlock(Bracket.closeNormal());
+        this.transformer().appendCodeBlock(Bracket.closeNormal());
+        return this.transformer().built();
+    }
+
+    private CodeLine gcFunc(Pipeline pipeline) {
+        this.inner.transformer().init(null);
+
+        this.transformer().appendCodeBlock(
+                ActionBlock.function(
+                        VarPattern.gcFunc(),
+                        List.of()
+                )
+        );
+
+        var workList = new VariableItem("worklist", "line");
+
         this.transformer().appendCodeBlock(ActionBlock.setVar(
-                "SetDictValue",
-                Args.byVarItems(VarPattern.gcRoots(), allocation, out)
+                "CreateList",
+                Args.byVarItems(workList)
         ));
-        this.transformer().appendCodeBlock(Bracket.closeNormal());
-        this.transformer().appendCodeBlock(Bracket.closeNormal());
+
+        // iterate thru gc roots, collect all of them and mark them as present
+        var unused = new VariableItem("_", "line");
+        var root = new VariableItem("root", "line");
+
+        this.transformer().appendCodeBlock(ActionBlock.repeat(
+                "ForEachEntry",
+                Args.byVarItems(root, unused, VarPattern.gcRoots())
+        ));
+        this.transformer().appendCodeBlock(Bracket.openRepeat());
+        {
+            var mark = this.inner.readField(root, LiteralItem.string("dhs::marked"));
+            this.transformer().appendCodeBlock(ActionBlock.ifVar(
+                    "=",
+                    Args.byVarItems(mark, LiteralItem.number("0"))
+            ));
+
+            this.transformer().appendCodeBlock(Bracket.openNormal());
+            {
+                this.inner.setField(root, LiteralItem.string("dhs::marked"), LiteralItem.number("1"));
+                this.transformer().appendCodeBlock(ActionBlock.setVar(
+                        "AppendValue",
+                        Args.byVarItems(workList, root)
+                ));
+            }
+            this.transformer().appendCodeBlock(Bracket.closeNormal());
+        }
+        this.transformer().appendCodeBlock(Bracket.closeRepeat());
+
+        // now, loop thru the work list and recursively mark
+        // we do an iterative approach here so we don't have to cope with cycles and multiple functions
+        this.transformer().appendCodeBlock(ActionBlock.repeat(
+                "While",
+                "ListSizeEquals",
+                Args.byVarItems(workList),
+                "NOT"
+        ));
+        this.transformer().appendCodeBlock(Bracket.openRepeat());
+        {
+            var obj = new VariableItem("obj", "line");
+            this.transformer().appendCodeBlock(ActionBlock.setVar(
+                    "PopListValue",
+                    Args.byVarItems(obj, workList)
+            ));
+            var key = new VariableItem("key", "line");
+            var value = new VariableItem("value", "line");
+            this.transformer().appendCodeBlock(ActionBlock.repeat(
+                    "ForEachEntry",
+                    Args.byVarItems(key, value, new VariableItem("%var(obj)", "unsaved"))
+            ));
+            this.transformer().appendCodeBlock(Bracket.openRepeat());
+            {
+                this.transformer().appendCodeBlock(ActionBlock.ifVar(
+                        "StartsWith",
+                        Args.byVarItems(value, LiteralItem.string("heap::"))
+                ).storeTagInSlot(26, "Ignore Case", "False"));
+                this.transformer().appendCodeBlock(Bracket.openNormal());
+                {
+                    var markValue = this.readField(value, LiteralItem.string("dhs::marked"));
+                    this.transformer().appendCodeBlock(ActionBlock.ifVar(
+                            "=",
+                            Args.byVarItems(markValue, LiteralItem.number("0"))
+                    ));
+                    this.transformer().appendCodeBlock(Bracket.openNormal());
+                    {
+                        this.setField(value, LiteralItem.string("dhs::marked"), LiteralItem.number("1"));
+                        this.transformer().appendCodeBlock(ActionBlock.setVar(
+                                "AppendValue",
+                                Args.byVarItems(workList, value)
+                        ));
+                    }
+                    this.transformer().appendCodeBlock(Bracket.closeNormal());
+                }
+                this.transformer().appendCodeBlock(Bracket.closeNormal());
+            }
+            this.transformer().appendCodeBlock(Bracket.closeRepeat());
+        }
+        this.transformer().appendCodeBlock(Bracket.closeRepeat());
+
+
+        // now that every allocation is marked, we can sweep along them
+        // if a thing is marked, unmark it
+        // if a thing is not marked, free it :)
+        var currentAllocation = new VariableItem("allocation", "line");
+        this.transformer().appendCodeBlock(ActionBlock.repeat(
+                "ForEachEntry",
+                Args.byVarItems(currentAllocation, unused, VarPattern.gcAllocations())
+        ));
+        this.transformer().appendCodeBlock(Bracket.openRepeat());
+        {
+            var isMarked = this.inner.readField(currentAllocation, LiteralItem.string("dhs::marked"));
+            this.transformer().appendCodeBlock(ActionBlock.ifVar(
+                    "=",
+                    Args.byVarItems(isMarked, LiteralItem.number("0"))
+            ));
+            this.transformer().appendCodeBlock(Bracket.openNormal());
+            {
+                this.transformer().appendCodeBlock(ActionBlock.setVar(
+                                "PurgeVars",
+                                Args.byVarItems(currentAllocation)
+                        ).storeTagInSlot(25, "Match Requirement", "Entire name")
+                        .storeTagInSlot(26, "Ignore Case", "False"));
+            }
+            this.transformer().appendCodeBlock(Bracket.closeNormal());
+            this.transformer().appendCodeBlock(ActionBlock.else_());
+            this.transformer().appendCodeBlock(Bracket.openNormal());
+            {
+                this.setField(currentAllocation, LiteralItem.string("dhs::marked"), LiteralItem.number("0"));
+            }
+            this.transformer().appendCodeBlock(Bracket.closeNormal());
+        }
+        this.transformer().appendCodeBlock(Bracket.closeRepeat());
+
         return this.transformer().built();
     }
 }

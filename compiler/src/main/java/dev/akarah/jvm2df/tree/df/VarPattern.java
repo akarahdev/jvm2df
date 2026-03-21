@@ -47,4 +47,8 @@ public class VarPattern {
     public static LiteralItem newMemoryAddress() {
         return LiteralItem.string("heap::%round(%random(1,10000000))");
     }
+
+    public static String gcFunc() {
+        return "globals::gc";
+    }
 }

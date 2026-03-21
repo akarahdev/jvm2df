@@ -20,5 +20,6 @@ public class PlayerEvents extends PlayerEventHandler {
                 sel.sendMessage(Text.of(Double.toString(elem)));
             }
         }
+        System.gc();
     }
 }
