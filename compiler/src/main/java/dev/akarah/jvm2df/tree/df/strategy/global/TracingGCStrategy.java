@@ -303,10 +303,15 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
         // if a thing is marked, unmark it
         // if a thing is not marked, free it :)
         var currentAllocation = new VariableItem("allocation", "line");
-        this.transformer().appendCodeBlock(ActionBlock.repeat(
-                "ForEachEntry",
-                Args.byVarItems(currentAllocation, unused, VarPattern.gcAllocations())
+        var allocationKeys = new VariableItem("allocationKeys", "line");
+        this.transformer().appendCodeBlock(ActionBlock.setVar(
+                "GetDictKeys",
+                Args.byVarItems(allocationKeys, VarPattern.gcAllocations())
         ));
+        this.transformer().appendCodeBlock(ActionBlock.repeat(
+                "ForEach",
+                Args.byVarItems(currentAllocation, allocationKeys)
+        ).storeTagInSlot(26, "Allow List Changes", "True"));
         this.transformer().appendCodeBlock(Bracket.openRepeat());
         {
             var isMarked = this.inner.readField(currentAllocation, LiteralItem.string("dhs::marked"));
@@ -321,6 +326,10 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
                                 Args.byVarItems(currentAllocation)
                         ).storeTagInSlot(25, "Match Requirement", "Entire name")
                         .storeTagInSlot(26, "Ignore Case", "False"));
+                this.transformer().appendCodeBlock(ActionBlock.setVar(
+                        "RemoveDictEntry",
+                        Args.byVarItems(VarPattern.gcAllocations(), currentAllocation)
+                ));
             }
             this.transformer().appendCodeBlock(Bracket.closeNormal());
             this.transformer().appendCodeBlock(ActionBlock.else_());
