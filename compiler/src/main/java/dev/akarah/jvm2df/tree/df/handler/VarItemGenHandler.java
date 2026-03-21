@@ -77,6 +77,19 @@ public class VarItemGenHandler implements InvokeHandler {
                 return LiteralItem.number("0");
             });
         }
+
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("gcAllocationCount")) {
+            return Optional.of(transformer -> {
+                var variable = new VariableItem("len", "line");
+                transformer.builder().appendCodeBlock(ActionBlock.setVar(
+                        "GetDictSize",
+                        Args.byVarItems(variable, VarPattern.gcAllocations())
+                ));
+                return variable;
+            });
+        }
         return Optional.empty();
     }
 }

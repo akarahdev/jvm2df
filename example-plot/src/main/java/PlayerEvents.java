@@ -9,10 +9,20 @@ public class PlayerEvents extends PlayerEventHandler {
 
     @Override
     public void Sneak() {
-        for (int i = 0; i < 4000; i++) {
-            var a = new Object();
+        while (true) {
+            var rt = Runtime.getRuntime();
+            for (int i = 0; i < 400; i++) {
+                var a = new Object();
+                Control.debug(a);
+                var free = rt.freeMemory();
+                if (free <= 4000) {
+                    Control.debug("gc!");
+                    Control.debug(i);
+                    rt.gc();
+                }
+            }
+            Control.debug(rt.freeMemory());
+            Control.wait(1);
         }
-        Control.wait(40);
-        System.gc();
     }
 }

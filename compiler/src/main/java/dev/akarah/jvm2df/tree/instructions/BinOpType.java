@@ -11,5 +11,5 @@ public enum BinOpType {
     XOR,
     AND,
     OR,
-    COMPARE_DOUBLES
+    COMPARE_NUMBERS
 }

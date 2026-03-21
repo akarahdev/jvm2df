@@ -417,10 +417,10 @@ public class FlowToDF {
             case DIV -> "/";
             case MOD -> "%";
             case SHR, SHL, XOR, AND, OR -> "Bitwise";
-            case COMPARE_DOUBLES -> "CompareDoubles";
+            case COMPARE_NUMBERS -> "CompareNumbers";
         };
         switch (op) {
-            case "CompareDoubles" -> {
+            case "CompareNumbers" -> {
                 var lhsVarItem = this.convertCodeTree(add.lhs());
                 var rhsVarItem = this.convertCodeTree(add.rhs());
 
@@ -439,17 +439,15 @@ public class FlowToDF {
                 if (rhsVarItem instanceof VariableItem variableItem) {
                     rhsVarString = "%var(" + variableItem.name() + ")";
                 }
-
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "ClampNumber",
                         Args.byVarItems(
                                 variable,
-                                LiteralItem.number("%math(" + lhsVarString + "-" + rhsVarString + "*1000)"),
+                                LiteralItem.number("%math(%math(" + lhsVarString + "-" + rhsVarString + ")*1000)"),
                                 LiteralItem.number("-1"),
                                 LiteralItem.number("1")
                         )
                 ));
-
             }
             case "Bitwise" -> {
                 var bitwiseTag = switch (add.type()) {

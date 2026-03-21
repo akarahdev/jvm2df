@@ -197,10 +197,10 @@ public class CodeTreeConverter {
             case IXOR, LXOR ->
                     this.stack.add(new CodeTree.BinOp(BinOpType.XOR, stack.removeLast(), stack.removeLast()));
             case IOR, LOR -> this.stack.add(new CodeTree.BinOp(BinOpType.OR, stack.removeLast(), stack.removeLast()));
-            case DCMPG, DCMPL, FCMPG, FCMPL -> {
+            case DCMPG, DCMPL, FCMPG, FCMPL, LCMP -> {
                 var rhs = stack.removeLast();
                 var lhs = stack.removeLast();
-                this.stack.add(new CodeTree.BinOp(BinOpType.COMPARE_DOUBLES, lhs, rhs));
+                this.stack.add(new CodeTree.BinOp(BinOpType.COMPARE_NUMBERS, lhs, rhs));
             }
             case ARRAYLENGTH -> {
                 this.stack.add(new CodeTree.ArrayLength(this.stack.removeLast()));
