@@ -89,6 +89,20 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock process(String data, List<VarItem<?>> params) {
+        return new ActionBlock(
+                "process",
+                Optional.of(data),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(
+                        Args.byVarItems(params)
+                )
+        );
+    }
+
     public static ActionBlock callFunction(String data, List<VarItem<?>> params) {
         return new ActionBlock(
                 "call_func",

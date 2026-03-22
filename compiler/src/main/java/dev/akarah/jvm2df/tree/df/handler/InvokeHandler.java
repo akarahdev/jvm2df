@@ -21,7 +21,8 @@ public interface InvokeHandler {
             new BoxedPrimitiveHandler(),
             new BracketHandler(),
             new VarItemOptimizationHandler(),
-            new ForceReturnHandler()
+            new ForceReturnHandler(),
+            new ThreadHandler()
     );
 
     Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke);

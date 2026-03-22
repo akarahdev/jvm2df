@@ -24,3 +24,4 @@ Roadmap:
 - [ ] `invokedynamic`
 - [ ] `diamondfire.value.*` APIs
 - [x] Enhanced `for` loop
+- [x] `java.lang.Thread`

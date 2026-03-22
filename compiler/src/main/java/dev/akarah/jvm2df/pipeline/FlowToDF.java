@@ -106,6 +106,25 @@ public class FlowToDF {
                 }
                 this.builder.appendCodeBlock(ActionBlock.gameEvent(methodModel.methodName().stringValue()));
             }
+            case "java/lang/Thread" -> {
+                if (methodModel.methodName().equalsString("run")) {
+                    this.builder.appendCodeBlock(ActionBlock.process(
+                            methodModel.parent().orElseThrow().thisClass().asInternalName()
+                                    + "#"
+                                    + methodModel.methodName().stringValue()
+                                    + methodModel.methodTypeSymbol().descriptorString(),
+                            params
+                    ));
+                } else {
+                    this.builder.appendCodeBlock(ActionBlock.function(
+                            methodModel.parent().orElseThrow().thisClass().asInternalName()
+                                    + "#"
+                                    + methodModel.methodName().stringValue()
+                                    + methodModel.methodTypeSymbol().descriptorString(),
+                            params
+                    ));
+                }
+            }
             default -> {
                 this.builder.appendCodeBlock(ActionBlock.function(
                         methodModel.parent().orElseThrow().thisClass().asInternalName()
