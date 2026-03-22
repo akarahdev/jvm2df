@@ -542,7 +542,8 @@ public class FlowToDF {
                         this.builder.globals().invokeVirtual(
                                 dispatchParameter,
                                 outline,
-                                this.builder.locals().functionCallParams(params)
+                                this.builder.locals().functionCallParams(params),
+                                false
                         );
                     } else {
                         throw new RuntimeException("unreachable");

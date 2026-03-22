@@ -30,7 +30,8 @@ public interface GlobalMemoryStrategy {
     void invokeVirtual(
             VariableItem callerItem,
             CompilationGraph.MethodOutline methodOutline,
-            List<VarItem<?>> parameters
+            List<VarItem<?>> parameters,
+            boolean seperateProcess
     );
 
     void reference(VarItem<?> allocation);

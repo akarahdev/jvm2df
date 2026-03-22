@@ -71,8 +71,13 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
-    public void invokeVirtual(VariableItem callerItem, CompilationGraph.MethodOutline methodOutline, List<VarItem<?>> parameters) {
-        this.inner.invokeVirtual(callerItem, methodOutline, parameters);
+    public void invokeVirtual(
+            VariableItem callerItem,
+            CompilationGraph.MethodOutline methodOutline,
+            List<VarItem<?>> parameters,
+            boolean process
+    ) {
+        this.inner.invokeVirtual(callerItem, methodOutline, parameters, process);
     }
 
     @Override

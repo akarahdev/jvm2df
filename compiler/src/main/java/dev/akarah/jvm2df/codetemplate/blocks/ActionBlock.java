@@ -103,6 +103,20 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock startProcess(String data, List<VarItem<?>> params) {
+        return new ActionBlock(
+                "start_process",
+                Optional.of(data),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(
+                        Args.byVarItems(params)
+                )
+        );
+    }
+
     public static ActionBlock playerAction(String action, Args args) {
         return new ActionBlock(
                 "player_action",

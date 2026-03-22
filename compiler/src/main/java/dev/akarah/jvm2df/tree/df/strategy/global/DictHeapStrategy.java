@@ -139,16 +139,30 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
-    public void invokeVirtual(VariableItem callerItem, CompilationGraph.MethodOutline methodOutline, List<VarItem<?>> parameters) {
+    public void invokeVirtual(
+            VariableItem callerItem,
+            CompilationGraph.MethodOutline methodOutline,
+            List<VarItem<?>> parameters,
+            boolean process
+    ) {
         var classValue = (VariableItem) this.readField(callerItem, LiteralItem.string("class"));
         // TODO: enable classVariable2 when nested %entry is fixed
         var classVariable1 = VarPattern.classInfo("%var(" + classValue.name() + ")").name();
         var classVariable2 = VarPattern.classInfo("%entry(%var(" + callerItem.name() + "),class)").name();
         var methodEntry = VarPattern.methodInfo(methodOutline);
-        this.transformer.appendCodeBlock(ActionBlock.callFunction(
-                "%entry(" + classVariable1 + "," + methodEntry + ")",
-                parameters
-        ));
+        if (process) {
+            this.transformer.appendCodeBlock(ActionBlock.startProcess(
+                            "%entry(" + classVariable1 + "," + methodEntry + ")",
+                            parameters
+                    ).storeTagInSlot(25, "Local Variables", "Don't copy")
+                    .storeTagInSlot(26, "Target Mode", "With no targets"));
+        } else {
+            this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                    "%entry(" + classVariable1 + "," + methodEntry + ")",
+                    parameters
+            ));
+        }
+
     }
 
     @Override
