@@ -1,19 +1,21 @@
 import diamondfire.Control;
 
 public class GCBackgroundThread extends Thread {
+    private Runtime RUNTIME;
+
     static {
         new GCBackgroundThread().start();
     }
 
     @Override
     public void run() {
+        RUNTIME = Runtime.getRuntime();
         while (true) {
-            var rt = Runtime.getRuntime();
-            if (rt.freeMemory() < 4500) {
-                rt.gc();
+            if (RUNTIME.freeMemory() < 4500) {
+                RUNTIME.gc();
             }
             Control.wait(1);
-            Control.debug(rt.freeMemory());
+            Control.debug(RUNTIME.freeMemory());
         }
     }
 }

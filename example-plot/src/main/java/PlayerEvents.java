@@ -9,6 +9,5 @@ public class PlayerEvents extends PlayerEventHandler {
 
     @Override
     public void Sneak() {
-        new PlayerLoopThread().start();
     }
 }
