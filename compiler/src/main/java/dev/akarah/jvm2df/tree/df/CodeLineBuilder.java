@@ -91,9 +91,21 @@ public class CodeLineBuilder {
     }
 
     public CodeLine built() {
+        this.finalizeLine();
         var copy = new ArrayList<>(this.codeLineStack);
         this.codeLineStack.clear();
         return new CodeLine(copy);
+    }
+
+    public void finalizeLine() {
+        if (this.codeLineStack.isEmpty()) {
+            return;
+        }
+        if (this.codeLineStack.getLast() instanceof ActionBlock actionBlock
+                && actionBlock.block().equals("control")
+                && actionBlock.action().orElse("").equals("Return")) {
+            this.codeLineStack.removeLast();
+        }
     }
 
 

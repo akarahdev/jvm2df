@@ -17,6 +17,8 @@ public class GenerateFieldSetup implements PipelineComponent {
         var lines = new ArrayList<CodeLine>();
 
         pipeline.classes().forEach(classElements -> {
+            var methodKeys = new ArrayList<LiteralItem>();
+            var methodValues = new ArrayList<LiteralItem>();
 
             pipeline.codeLineBuilder().init(classElements);
 
@@ -34,7 +36,6 @@ public class GenerateFieldSetup implements PipelineComponent {
                     Args.byVarItems(classVariable)
             ));
 
-
             for (var outline : pipeline.graph().allSuperMethodsFor(pipeline.graph().classByEntry(classElements.thisClass()))) {
                 var methodModel = pipeline.graph().lookupMethodInSuper(
                         classElements.thisClass(),
@@ -50,20 +51,19 @@ public class GenerateFieldSetup implements PipelineComponent {
                 if (methodModel.flags().has(AccessFlag.INTERFACE)) {
                     return;
                 }
-                pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
-                        "SetDictValue",
-                        Args.byVarItems(
-                                classVariable,
-                                LiteralItem.string(VarPattern.methodInfo(outline)),
-                                LiteralItem.string(pipeline.graph().generateFunctionCallName(
-                                        methodModel.parent().orElseThrow().thisClass(),
-                                        outline
-                                ))
-                        )
-                ));
+                methodKeys.add(LiteralItem.string(VarPattern.methodInfo(outline)));
+                methodValues.add(LiteralItem.string(pipeline.graph().generateFunctionCallName(
+                        methodModel.parent().orElseThrow().thisClass(),
+                        outline
+                )));
             }
 
-
+            var av = pipeline.codeLineBuilder().createListQuickly(methodKeys);
+            var bv = pipeline.codeLineBuilder().createListQuickly(methodValues);
+            pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
+                    "CreateDict",
+                    Args.byVarItems(classVariable, av, bv)
+            ));
             lines.add(pipeline.codeLineBuilder().built());
         });
 
