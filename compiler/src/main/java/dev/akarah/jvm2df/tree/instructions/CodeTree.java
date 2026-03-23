@@ -71,7 +71,7 @@ public interface CodeTree {
     record ObjectGetStatic(String clazz, String field) implements CodeTree {
     }
 
-    record ObjectSetStatic(String clazz, String field, CodeTree value) implements CodeTree {
+    record ObjectSetStatic(String clazz, String field, CodeTree value, Kind kind) implements CodeTree {
     }
 
     record Compare(ComparisonType comparison, CodeTree lhs, CodeTree rhs) implements CodeTree {

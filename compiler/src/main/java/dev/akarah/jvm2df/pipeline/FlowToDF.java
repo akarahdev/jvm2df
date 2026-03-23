@@ -264,8 +264,14 @@ public class FlowToDF {
                 );
                 yield alloc;
             }
-            case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value) -> {
+            case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value, CodeTree.Kind kind) -> {
+                if (kind.equals(CodeTree.Kind.REFERENCE)) {
+                    this.builder().globals().dereference(this.builder.globals().readStaticField(clazz, field));
+                }
                 this.builder.globals().setStaticField(clazz, field, this.convertCodeTree(value));
+                if (kind.equals(CodeTree.Kind.REFERENCE)) {
+                    this.builder().globals().reference(this.builder.globals().readStaticField(clazz, field));
+                }
                 yield LiteralItem.number("0");
             }
             case CodeTree.ObjectGetStatic(String clazz, String field) ->

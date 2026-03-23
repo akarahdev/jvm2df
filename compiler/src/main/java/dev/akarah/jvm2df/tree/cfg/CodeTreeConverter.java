@@ -136,7 +136,8 @@ public class CodeTreeConverter {
             case PUTSTATIC -> this.statements.add(new CodeTree.ObjectSetStatic(
                     instruction.owner().asSymbol().descriptorString(),
                     instruction.field().name().stringValue(),
-                    this.stack.removeLast()
+                    this.stack.removeLast(),
+                    instruction.typeSymbol().isPrimitive() ? CodeTree.Kind.PRIMITIVE : CodeTree.Kind.REFERENCE
             ));
             case GETFIELD -> this.stack.add(new CodeTree.ObjectGetField(
                     this.stack.removeLast(),
