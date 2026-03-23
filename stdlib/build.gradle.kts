@@ -49,4 +49,5 @@ dependencies {
 
 tasks.jar {
     from(sourceSets["patched"].output)
+    from(sourceSets["generated"].output)
 }

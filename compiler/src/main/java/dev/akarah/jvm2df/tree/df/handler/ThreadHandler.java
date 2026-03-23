@@ -25,7 +25,9 @@ public class ThreadHandler implements InvokeHandler {
                                 "run",
                                 MethodTypeDesc.of(ClassDesc.ofDescriptor("V"))
                         ),
-                        List.of(),
+                        List.of(
+                                transformer.convertCodeTree(invoke.args().getFirst())
+                        ),
                         true
                 );
                 return null;

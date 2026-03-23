@@ -29,6 +29,12 @@ public class CodeBlocks {
     public static native void playerAction(
             String action,
             Object a,
+            Object b
+    );
+
+    public static native void playerAction(
+            String action,
+            Object a,
             Object b,
             Object c,
             Object d
@@ -103,11 +109,11 @@ public class CodeBlocks {
             Object g
     );
 
-    public static native <T> T selectObject(
+    public static native void selectObject(
             String action
     );
 
-    public static native <T> T selectObject(
+    public static native void selectObject(
             String action,
             Object a
     );

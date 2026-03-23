@@ -14,7 +14,9 @@ public interface VarItem<T extends VarItem<T>> {
             Map.entry("bl_tag", BlockTagItem.CODEC),
             Map.entry("pn_el", ParameterItem.CODEC),
             Map.entry("g_val", GameValueItem.CODEC),
-            Map.entry("item", VanillaItem.CODEC)
+            Map.entry("item", VanillaItem.CODEC),
+            Map.entry("snd", SoundItem.CODEC),
+            Map.entry("part", ParticleItem.CODEC)
     );
 
     @SuppressWarnings("unchecked")

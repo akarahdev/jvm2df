@@ -28,7 +28,7 @@ public class SoundGenerator implements ResourceGenerator {
             }
             dedup.add(idName);
             var regularName = particle.soundId();
-            sb.append("    public static String ")
+            sb.append("    public static final String ")
                     .append(idName)
                     .append(" = ")
                     .append('"')

@@ -2,16 +2,45 @@ package diamondfire.value;
 
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
-import diamondfire.internal.annotation.NativeValue;
 
-@NativeValue
 public final class Particle {
-    public static Particle of(String id) {
-        return CodeBlocks.setVar(
+    Object inner;
+
+    public Particle(String id) {
+        this.inner = CodeBlocks.setVar(
                 "SetParticleType",
                 VarItemGen.lineVar(),
                 VarItemGen.emptyParticle(),
                 id
         );
+    }
+
+    public Particle setType(String id) {
+        this.inner = CodeBlocks.setVar(
+                "SetParticleType",
+                VarItemGen.lineVar(),
+                VarItemGen.emptyParticle(),
+                id
+        );
+        return this;
+    }
+
+    public Particle setAmount(int value) {
+        this.inner = CodeBlocks.setVar(
+                "SetParticleAmount",
+                VarItemGen.lineVar(),
+                value
+        );
+        return this;
+    }
+
+    public Particle setSpread(double horizontal, double vertical) {
+        this.inner = CodeBlocks.setVar(
+                "SetParticleSpread",
+                VarItemGen.lineVar(),
+                horizontal,
+                vertical
+        );
+        return this;
     }
 }

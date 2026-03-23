@@ -47,4 +47,35 @@ public class PlayerSelection {
         CodeBlocks.playerAction("LaunchProj", itemStack);
         CodeBlocks.selectObject("Reset");
     }
+
+    public void playSound(Sound sound) {
+        CodeBlocks.selectObject("PlayerName", this.inner);
+        CodeBlocks.playerAction(
+                "PlaySound",
+                sound.inner,
+                VarItemGen.tag("Sound Source", "Master")
+        );
+        CodeBlocks.selectObject("Reset");
+    }
+
+    public void displayParticle(Location location, Particle particle) {
+        CodeBlocks.selectObject("PlayerName", this.inner);
+        CodeBlocks.playerAction(
+                "Particle",
+                particle.inner,
+                location
+        );
+        CodeBlocks.selectObject("Reset");
+    }
+
+    public Location location() {
+        CodeBlocks.selectObject("PlayerName", this.inner);
+        var out = (Location) CodeBlocks.setVar(
+                "=",
+                VarItemGen.lineVar(),
+                VarItemGen.gameValue("Location", "Selection")
+        );
+        CodeBlocks.selectObject("Reset");
+        return out;
+    }
 }

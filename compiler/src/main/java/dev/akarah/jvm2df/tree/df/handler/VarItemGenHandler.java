@@ -90,6 +90,20 @@ public class VarItemGenHandler implements InvokeHandler {
                 return variable;
             });
         }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("emptySound")) {
+            return Optional.of(transformer -> new SoundItem(1, 2, "Pling"));
+        }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("emptyParticle")) {
+            return Optional.of(transformer -> new ParticleItem(
+                    "Rain",
+                    new ParticleItem.Cluster(1, 0.0, 0.0),
+                    new ParticleItem.Data()
+            ));
+        }
         return Optional.empty();
     }
 }
