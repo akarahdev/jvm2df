@@ -70,10 +70,18 @@ public class GenerateFieldSetup implements PipelineComponent {
         pipeline.codeLineBuilder().init(null);
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.gameEvent("PlotStartup"));
 
-        var funcsToCall = pipeline.classes().stream()
-                .map(x -> x.thisClass().asInternalName() + "#<fieldsetup>()V")
-                .map(LiteralItem::string)
-                .toList();
+        var funcsToCall = new ArrayList<>(
+                pipeline.classes().stream()
+                        .map(x -> x.thisClass().asInternalName() + "#<fieldsetup>()V")
+                        .map(LiteralItem::string)
+                        .toList()
+        );
+        funcsToCall.addAll(
+                pipeline.classes().stream()
+                        .map(x -> x.thisClass().asInternalName() + "#<clinit>()V")
+                        .map(LiteralItem::string)
+                        .toList()
+        );
         var tmp = VarPattern.temporary("class");
         var createdList = pipeline.codeLineBuilder().createListQuickly(funcsToCall);
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.repeat(
