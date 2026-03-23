@@ -23,7 +23,7 @@ public class CompilationGraph {
 
     public void register(ClassModel model) {
         this.classDescs.put(
-                model.thisClass().asInternalName(),
+                model.thisClass().asSymbol().descriptorString(),
                 model
         );
     }
@@ -49,10 +49,10 @@ public class CompilationGraph {
     }
 
     public ClassModel classByEntry(ClassEntry name) {
-        if (!this.classDescs.containsKey(name.asInternalName())) {
+        if (!this.classDescs.containsKey(name.asSymbol().descriptorString())) {
             throw new NullPointerException("Please compile with missing class " + name);
         }
-        return this.classDescs.get(name.asInternalName());
+        return this.classDescs.get(name.asSymbol().descriptorString());
     }
 
     public MethodModel lookupMethodExact(ClassEntry className, String methodName, MethodTypeDesc typeDesc) {
@@ -77,7 +77,7 @@ public class CompilationGraph {
             ClassEntry className,
             MethodOutline outline
     ) {
-        return className.asInternalName() + "#" + outline;
+        return className.asSymbol().descriptorString() + "#" + outline;
     }
 
     public List<ClassModel> allClasses() {

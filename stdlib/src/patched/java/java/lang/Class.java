@@ -1,18 +1,18 @@
 package java.lang;
 
 public class Class<T> {
-    String className;
+    String descriptor;
 
-    public Class(String className) {
-        this.className = className;
+    public Class(String descriptor) {
+        this.descriptor = descriptor;
     }
 
     public static Class<?> forName(String name) {
-        return new Class<>(name);
+        return new Class<>("L".concat(name).concat(";"));
     }
 
     @Override
     public String toString() {
-        return "Class{".concat(this.className).concat("}");
+        return "Class{".concat(this.descriptor).concat("}");
     }
 }

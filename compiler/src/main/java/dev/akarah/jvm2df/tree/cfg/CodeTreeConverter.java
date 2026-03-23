@@ -121,7 +121,7 @@ public class CodeTreeConverter {
     private void newObj(NewObjectInstruction instruction) {
         this.statements.add(new CodeTree.StoreLocal(
                 Integer.MAX_VALUE - 1,
-                new CodeTree.ObjectNew(instruction.className().asInternalName()),
+                new CodeTree.ObjectNew("L" + instruction.className().asInternalName() + ";"),
                 CodeTree.Kind.REFERENCE
         ));
         this.stack.add(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1));
@@ -130,11 +130,11 @@ public class CodeTreeConverter {
     private void field(FieldInstruction instruction) {
         switch (instruction.opcode()) {
             case GETSTATIC -> this.stack.add(new CodeTree.ObjectGetStatic(
-                    instruction.owner().asInternalName(),
+                    instruction.owner().asSymbol().descriptorString(),
                     instruction.field().name().stringValue()
             ));
             case PUTSTATIC -> this.statements.add(new CodeTree.ObjectSetStatic(
-                    instruction.owner().asInternalName(),
+                    instruction.owner().asSymbol().descriptorString(),
                     instruction.field().name().stringValue(),
                     this.stack.removeLast()
             ));

@@ -109,7 +109,7 @@ public class FlowToDF {
             case "java/lang/Thread" -> {
                 if (methodModel.methodName().equalsString("run")) {
                     this.builder.appendCodeBlock(ActionBlock.process(
-                            methodModel.parent().orElseThrow().thisClass().asInternalName()
+                            methodModel.parent().orElseThrow().thisClass().asSymbol().descriptorString()
                                     + "#"
                                     + methodModel.methodName().stringValue()
                                     + methodModel.methodTypeSymbol().descriptorString(),
@@ -117,7 +117,7 @@ public class FlowToDF {
                     ));
                 } else {
                     this.builder.appendCodeBlock(ActionBlock.function(
-                            methodModel.parent().orElseThrow().thisClass().asInternalName()
+                            methodModel.parent().orElseThrow().thisClass().asSymbol().descriptorString()
                                     + "#"
                                     + methodModel.methodName().stringValue()
                                     + methodModel.methodTypeSymbol().descriptorString(),
@@ -127,7 +127,7 @@ public class FlowToDF {
             }
             default -> {
                 this.builder.appendCodeBlock(ActionBlock.function(
-                        methodModel.parent().orElseThrow().thisClass().asInternalName()
+                        methodModel.parent().orElseThrow().thisClass().asSymbol().descriptorString()
                                 + "#"
                                 + methodModel.methodName().stringValue()
                                 + methodModel.methodTypeSymbol().descriptorString(),
@@ -155,6 +155,20 @@ public class FlowToDF {
                 case Float i -> LiteralItem.number(i.toString());
                 case Double i -> LiteralItem.number(i.toString());
                 case String string -> LiteralItem.string(string);
+                case ClassDesc classDesc -> {
+                    var alloc = this.builder().globals().allocate();
+                    this.builder().globals().setField(
+                            alloc,
+                            LiteralItem.string("class"),
+                            LiteralItem.string("Ljava/lang/Class;")
+                    );
+                    this.builder().globals().setField(
+                            alloc,
+                            LiteralItem.string("descriptor"),
+                            LiteralItem.string(classDesc.descriptorString())
+                    );
+                    yield alloc;
+                }
                 default -> {
                     throw new RuntimeException("I can't handle this right now :(");
                 }

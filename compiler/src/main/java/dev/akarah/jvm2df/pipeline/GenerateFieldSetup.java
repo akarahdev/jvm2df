@@ -24,7 +24,7 @@ public class GenerateFieldSetup implements PipelineComponent {
 
             pipeline.codeLineBuilder().appendCodeBlock(
                     ActionBlock.function(
-                            classElements.thisClass().asInternalName() + "#<fieldsetup>()V",
+                            classElements.thisClass().asSymbol().descriptorString() + "#<fieldsetup>()V",
                             List.of()
                     )
             );
@@ -72,13 +72,13 @@ public class GenerateFieldSetup implements PipelineComponent {
 
         var funcsToCall = new ArrayList<>(
                 pipeline.classes().stream()
-                        .map(x -> x.thisClass().asInternalName() + "#<fieldsetup>()V")
+                        .map(x -> x.thisClass().asSymbol().descriptorString() + "#<fieldsetup>()V")
                         .map(LiteralItem::string)
                         .toList()
         );
         funcsToCall.addAll(
                 pipeline.classes().stream()
-                        .map(x -> x.thisClass().asInternalName() + "#<clinit>()V")
+                        .map(x -> x.thisClass().asSymbol().descriptorString() + "#<clinit>()V")
                         .map(LiteralItem::string)
                         .toList()
         );

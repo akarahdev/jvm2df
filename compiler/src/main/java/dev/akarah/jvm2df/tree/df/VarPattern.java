@@ -29,7 +29,7 @@ public class VarPattern {
     }
 
     public static VariableItem classInfo(ClassEntry classEntry) {
-        return classInfo(classEntry.asInternalName());
+        return classInfo(classEntry.asSymbol().descriptorString());
     }
 
     public static VariableItem classInfo(String internalName) {
