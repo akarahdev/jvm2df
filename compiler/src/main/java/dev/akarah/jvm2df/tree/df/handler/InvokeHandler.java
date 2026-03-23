@@ -14,7 +14,7 @@ public interface InvokeHandler {
             new DFCodeBlocksHandler("control", "control", ActionBlock::control),
             new DFCodeBlocksHandler("playerAction", "player_action", ActionBlock::playerAction),
             new DFCodeBlocksHandler("setVar", "set_var", ActionBlock::setVar),
-            new DFCodeBlocksHandler("ifVar", "if_var", ActionBlock::setVar),
+            new DFCodeBlocksHandler("ifVar", "if_var", ActionBlock::ifVar),
             new DFCodeBlocksHandler("selectObject", "select_obj", ActionBlock::selectObject),
             new DFCodeBlocksHandler("ifPlayer", "if_player", ActionBlock::ifPlayer),
             new VarItemGenHandler(),
