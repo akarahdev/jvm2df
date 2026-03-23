@@ -34,13 +34,15 @@ public class LineVarLocals implements LocalMemoryStrategy {
 
     @Override
     public void setResultAndReturn(VarItem<?> result) {
-        transformer.appendCodeBlock(ActionBlock.setVar(
-                "=",
-                Args.byVarItems(
-                        new VariableItem("return", "line"),
-                        result
-                )
-        ));
+        if (result != null) {
+            transformer.appendCodeBlock(ActionBlock.setVar(
+                    "=",
+                    Args.byVarItems(
+                            new VariableItem("return", "line"),
+                            result
+                    )
+            ));
+        }
         transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
     }
 

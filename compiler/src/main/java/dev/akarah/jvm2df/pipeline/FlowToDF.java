@@ -180,7 +180,7 @@ public class FlowToDF {
                         this.builder().globals().cleanup(elem);
                     }
                 }
-                this.builder.locals().setResultAndReturn(LiteralItem.number("0"));
+                this.builder.locals().setResultAndReturn(null);
                 yield LiteralItem.number("0");
             }
             case Terminator.ReturnValue ret -> {
