@@ -1,7 +1,11 @@
 package dev.akarah.jvm2df.tree.df;
 
+import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeBlock;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
+import dev.akarah.jvm2df.codetemplate.items.Args;
+import dev.akarah.jvm2df.codetemplate.items.VarItem;
+import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
@@ -41,6 +45,41 @@ public class CodeLineBuilder {
 
     public void appendCodeBlock(CodeBlock<?> codeBlock) {
         this.codeLineStack.add(codeBlock);
+    }
+
+    public VariableItem createListQuickly(List<? extends VarItem<?>> elements) {
+        var variable = VarPattern.temporary("created_list");
+        var currentSet = new ArrayList<VarItem<?>>();
+        currentSet.add(variable);
+        int codeblocks = 0;
+        for (var value : elements) {
+            currentSet.add(value);
+            if (currentSet.size() >= 27) {
+                if (codeblocks == 0) {
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            "CreateList",
+                            Args.byVarItems(currentSet)
+                    ));
+                    currentSet.clear();
+                    currentSet.add(variable);
+                } else {
+                    this.appendCodeBlock(ActionBlock.setVar(
+                            "AppendValue",
+                            Args.byVarItems(currentSet)
+                    ));
+                    currentSet.clear();
+                    currentSet.add(variable);
+                }
+                codeblocks++;
+            }
+        }
+        if (currentSet.size() > 1) {
+            this.appendCodeBlock(ActionBlock.setVar(
+                    "AppendValue",
+                    Args.byVarItems(currentSet)
+            ));
+        }
+        return variable;
     }
 
     public void init(ClassModel classModel) {

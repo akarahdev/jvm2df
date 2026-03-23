@@ -1,6 +1,7 @@
 package dev.akarah.jvm2df.pipeline;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
+import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
@@ -68,18 +69,23 @@ public class GenerateFieldSetup implements PipelineComponent {
 
         pipeline.codeLineBuilder().init(null);
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.gameEvent("PlotStartup"));
-        pipeline.classes().forEach(classElements -> {
-            if (classElements.flags().has(AccessFlag.ABSTRACT)) {
-                return;
-            }
-            if (classElements.flags().has(AccessFlag.INTERFACE)) {
-                return;
-            }
-            pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.callFunction(
-                    classElements.thisClass().asInternalName() + "#<fieldsetup>()V",
-                    List.of()
-            ));
-        });
+
+        var funcsToCall = pipeline.classes().stream()
+                .map(x -> x.thisClass().asInternalName() + "#<fieldsetup>()V")
+                .map(LiteralItem::string)
+                .toList();
+        var tmp = VarPattern.temporary("class");
+        var createdList = pipeline.codeLineBuilder().createListQuickly(funcsToCall);
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.repeat(
+                "ForEach",
+                Args.byVarItems(tmp, createdList)
+        ).storeTagInSlot(26, "Allow List Changes", "True"));
+        pipeline.codeLineBuilder().appendCodeBlock(Bracket.openRepeat());
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.callFunction(
+                "%var(" + tmp.name() + ")",
+                List.of()
+        ));
+        pipeline.codeLineBuilder().appendCodeBlock(Bracket.closeRepeat());
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
                 "CreateDict",
                 Args.byVarItems(VarPattern.gcRoots())
