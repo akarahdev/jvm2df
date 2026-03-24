@@ -14,7 +14,7 @@ import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 import java.util.List;
 
-public class DictHeapStrategy implements GlobalMemoryStrategy {
+public class GameVarHeapStrategy implements GlobalMemoryStrategy {
     CodeLineBuilder transformer;
     LocalMemoryStrategy localMemoryStrategy;
 
@@ -44,12 +44,6 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                         VarPattern.newMemoryAddress()
                 )
         ));
-        this.transformer.appendCodeBlock(ActionBlock.setVar(
-                "CreateDict",
-                Args.byVarItems(
-                        new VariableItem("%var(" + allocationNameVar.name() + ")", "unsaved")
-                )
-        ));
         return allocationNameVar;
     }
 
@@ -58,19 +52,17 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         if (allocation instanceof VariableItem allocationVar) {
             if (field instanceof LiteralItem fieldLiteral) {
                 this.transformer.appendCodeBlock(ActionBlock.setVar(
-                        "SetDictValue",
+                        "=",
                         Args.byVarItems(
-                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                                LiteralItem.string(fieldLiteral.value()),
+                                new VariableItem("%var(" + allocationVar.name() + ")." + fieldLiteral.value(), "unsaved"),
                                 value
                         )
                 ));
             } else if (field instanceof VariableItem fieldVar) {
                 this.transformer.appendCodeBlock(ActionBlock.setVar(
-                        "SetDictValue",
+                        "=",
                         Args.byVarItems(
-                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                                LiteralItem.string("%var(" + fieldVar.name() + ")"),
+                                new VariableItem("%var(" + allocationVar.name() + ").%var(" + fieldVar.name() + ")", "unsaved"),
                                 value
                         )
                 ));
@@ -85,10 +77,9 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     @Override
     public void setStaticField(String clazz, String field, VarItem<?> value) {
         this.transformer.appendCodeBlock(ActionBlock.setVar(
-                "SetDictValue",
+                "=",
                 Args.byVarItems(
-                        new VariableItem("statics", "unsaved"),
-                        LiteralItem.string(clazz + "." + field),
+                        new VariableItem(clazz + "." + field, "unsaved"),
                         value
                 )
         ));
@@ -99,23 +90,15 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         var readVar = VarPattern.temporary("read");
         if (allocation instanceof VariableItem allocationVar) {
             if (field instanceof LiteralItem literalItem) {
-                this.transformer.appendCodeBlock(ActionBlock.setVar(
-                        "GetDictValue",
-                        Args.byVarItems(
-                                readVar,
-                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                                LiteralItem.string(literalItem.value())
-                        )
-                ));
+                readVar = new VariableItem(
+                        "%var(" + allocationVar.name() + ")." + literalItem.value(),
+                        "unsaved"
+                );
             } else if (field instanceof VariableItem variableItem) {
-                this.transformer.appendCodeBlock(ActionBlock.setVar(
-                        "GetDictValue",
-                        Args.byVarItems(
-                                readVar,
-                                new VariableItem("%var(" + allocationVar.name() + ")", "unsaved"),
-                                LiteralItem.string("%var(" + variableItem.name() + ")")
-                        )
-                ));
+                readVar = new VariableItem(
+                        "%var(" + allocationVar.name() + ").%var(" + variableItem + ")",
+                        "unsaved"
+                );
             }
 
             return readVar;
@@ -126,16 +109,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public VarItem<?> readStaticField(String clazz, String field) {
-        var readVar = VarPattern.temporary("read");
-        this.transformer.appendCodeBlock(ActionBlock.setVar(
-                "GetDictValue",
-                Args.byVarItems(
-                        readVar,
-                        new VariableItem("statics", "unsaved"),
-                        LiteralItem.string(clazz + "." + field)
-                )
-        ));
-        return readVar;
+        return new VariableItem(clazz + "." + field, "unsaved");
     }
 
     @Override
@@ -146,9 +120,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
             boolean process
     ) {
         var classValue = (VariableItem) this.readField(callerItem, LiteralItem.string("class"));
-        // TODO: enable classVariable2 when nested %entry is fixed
         var classVariable1 = VarPattern.classInfo("%var(" + classValue.name() + ")").name();
-        var classVariable2 = VarPattern.classInfo("%entry(%var(" + callerItem.name() + "),class)").name();
         var methodEntry = VarPattern.methodInfo(methodOutline);
         if (process) {
             this.transformer.appendCodeBlock(ActionBlock.startProcess(

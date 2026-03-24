@@ -26,6 +26,7 @@ public class Main {
                 .setFlowTransformer(new DominanceFlowTransformer())
                 .setLocalMemoryStrategy(new LineVarLocals())
                 .setGlobalMemoryStrategy(new TracingGCStrategy(new DictHeapStrategy()))
+                // .setGlobalMemoryStrategy(new TracingGCStrategy(new GameVarHeapStrategy()))
                 .registerComponent(new GenerateJavaMethods())
                 .registerComponent(new GenerateFieldSetup())
                 .registerComponent(new LocalAndGlobalContributions());
