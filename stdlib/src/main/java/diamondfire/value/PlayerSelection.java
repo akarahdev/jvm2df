@@ -1,6 +1,5 @@
 package diamondfire.value;
 
-import diamondfire.Control;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
@@ -22,27 +21,9 @@ public class PlayerSelection {
     }
 
     public void sendMessage(Text text) {
-        Control.wait(18);
-        Control.debug(VarItemGen.gameValue("CPU Usage", "Default"));
-        Control.wait(40);
-        Control.debug("Field getting...");
-        var inner = this.inner;
-        Control.wait(18);
-        Control.debug(VarItemGen.gameValue("CPU Usage", "Default"));
-        Control.wait(40);
-        Control.debug("Selecting...");
-        CodeBlocks.selectObject("PlayerName", inner);
-        Control.wait(18);
-        Control.debug(VarItemGen.gameValue("CPU Usage", "Default"));
-        Control.wait(40);
-        Control.debug("Executing action...");
+        CodeBlocks.selectObject("PlayerName", this.inner);
         CodeBlocks.playerAction("SendMessage", text, VarItemGen.tag("Inherit Styles", "True"), VarItemGen.tag("Text Value Merging", "Add spaces"), VarItemGen.tag("Alignment Mode", "Regular"));
-        Control.wait(18);
-        Control.debug(VarItemGen.gameValue("CPU Usage", "Default"));
-        Control.wait(40);
-        Control.debug("Stopping...");
-        Control.wait(18);
-        Control.debug(VarItemGen.gameValue("CPU Usage", "Default"));
+        CodeBlocks.selectObject("Reset");
     }
 
     public void giveItem(ItemStack item) {

@@ -104,6 +104,7 @@ public class CodeTreeConverter {
                     default -> throw new RuntimeException("i'm doing this later this SUCKS");
                 }
             }
+            case InvokeDynamicInstruction instruction -> this.invokeDynamic(instruction);
             case InvokeInstruction instruction -> this.invoke(instruction, offset);
             case BranchInstruction instruction -> this.branch(instruction, offset);
             case OperatorInstruction instruction -> this.operator(instruction, offset);
@@ -208,6 +209,33 @@ public class CodeTreeConverter {
             }
             default -> {
             }
+        }
+    }
+
+    private void invokeDynamic(InvokeDynamicInstruction instruction) {
+        List<CodeTree> params = new ArrayList<>();
+        for (var _ : instruction.typeSymbol().parameterList()) {
+            params.add(this.stack.removeLast());
+        }
+        params = params.reversed();
+
+        var invoke = new CodeTree.InvokeDynamic(
+                instruction.bootstrapMethod().owner(),
+                new CompilationGraph.MethodOutline(
+                        instruction.bootstrapMethod().methodName(),
+                        instruction.bootstrapMethod().invocationType()
+                ),
+                instruction.bootstrapArgs()
+                        .stream()
+                        .map(CodeTree.Constant::new)
+                        .map(x -> (CodeTree) x)
+                        .toList(),
+                params
+        );
+        if (TypeKind.from(instruction.typeSymbol().returnType()) == TypeKind.VOID) {
+            this.statements.add(invoke);
+        } else {
+            this.stack.add(invoke);
         }
     }
 

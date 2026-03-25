@@ -5,6 +5,7 @@ import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.constantpool.ClassEntry;
+import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
@@ -39,6 +40,14 @@ public interface CodeTree {
         public MethodTypeDesc methodTypeDesc() {
             return this.outline.typeDesc();
         }
+    }
+
+    record InvokeDynamic(
+            ClassDesc bootstrapMethodOwner,
+            CompilationGraph.MethodOutline bootstrapMethod,
+            List<CodeTree> constantArgs,
+            List<CodeTree> dynamicArgs
+    ) implements CodeTree {
     }
 
     record BinOp(BinOpType type, CodeTree lhs, CodeTree rhs) implements CodeTree {

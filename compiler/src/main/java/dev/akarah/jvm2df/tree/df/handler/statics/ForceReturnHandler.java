@@ -1,4 +1,4 @@
-package dev.akarah.jvm2df.tree.df.handler;
+package dev.akarah.jvm2df.tree.df.handler.statics;
 
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
 import dev.akarah.jvm2df.pipeline.FlowToDF;

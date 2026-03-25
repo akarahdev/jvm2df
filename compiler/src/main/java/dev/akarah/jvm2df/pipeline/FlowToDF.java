@@ -12,7 +12,8 @@ import dev.akarah.jvm2df.tree.cfr.FlowBlock;
 import dev.akarah.jvm2df.tree.cfr.ReconstructedFlow;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
 import dev.akarah.jvm2df.tree.df.VarPattern;
-import dev.akarah.jvm2df.tree.df.handler.InvokeHandler;
+import dev.akarah.jvm2df.tree.df.handler.dynamic.InvokeDynamicHandler;
+import dev.akarah.jvm2df.tree.df.handler.statics.InvokeHandler;
 import dev.akarah.jvm2df.tree.df.strategy.global.GlobalMemoryStrategy;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 import dev.akarah.jvm2df.tree.instructions.CodeTree;
@@ -301,6 +302,7 @@ public class FlowToDF {
                 ));
                 yield tmp;
             }
+            case CodeTree.InvokeDynamic invokeDynamic -> convertInvokeDynamic(invokeDynamic);
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }
@@ -593,5 +595,15 @@ public class FlowToDF {
             }
         }
         return returnVariable;
+    }
+
+    private VarItem<?> convertInvokeDynamic(CodeTree.InvokeDynamic invoke) {
+        for (var handler : InvokeDynamicHandler.INVOKE_HANDLERS) {
+            var rewrite = handler.tryRewrite(invoke);
+            if (rewrite.isPresent()) {
+                return rewrite.get().apply(this);
+            }
+        }
+        throw new RuntimeException("I don't understand this invokedynamic " + invoke);
     }
 }
