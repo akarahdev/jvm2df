@@ -179,6 +179,18 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock ifVar(String action, Args args, String attribute) {
+        return new ActionBlock(
+                "if_var",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.empty(),
+                Optional.of(attribute),
+                Optional.empty(),
+                Optional.of(args)
+        );
+    }
+
     public static ActionBlock else_() {
         return new ActionBlock(
                 "else",

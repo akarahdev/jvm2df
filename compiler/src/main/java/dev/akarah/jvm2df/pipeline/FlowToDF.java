@@ -364,7 +364,8 @@ public class FlowToDF {
                 var params = buildSuperClassParams(castValueTo.descriptor(), clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
                         "Contains",
-                        Args.byVarItems(params)
+                        Args.byVarItems(params),
+                        "NOT"
                 ));
                 this.builder.appendCodeBlock(Bracket.openNormal());
                 this.builder.appendCodeBlock(ActionBlock.control(
@@ -670,7 +671,13 @@ public class FlowToDF {
     private ArrayList<VarItem<?>> buildSuperClassParams(ClassEntry descriptor, VariableItem clazz) {
         var params = new ArrayList<VarItem<?>>();
         var classVar = VarPattern.classInfo("%var(" + clazz.name() + ")");
-        var type = LiteralItem.string("%entry(" + classVar.name() + "," + VarPattern.classesExtendingThisClass() + ")");
+        var type = LiteralItem.string(
+                "%entry("
+                        + VarPattern.classInfo(descriptor).name()
+                        + ","
+                        + VarPattern.classesExtendingThisClass()
+                        + ")"
+        );
         params.add(type);
         params.add(clazz);
         return params;
