@@ -51,4 +51,8 @@ public class VarPattern {
     public static String gcFunc() {
         return "globals::gc";
     }
+
+    public static String classOfFunc() {
+        return "globals::classOf";
+    }
 }

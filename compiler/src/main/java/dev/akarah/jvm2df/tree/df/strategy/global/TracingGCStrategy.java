@@ -72,7 +72,7 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
 
     @Override
     public void invokeVirtual(
-            VariableItem callerItem,
+            VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,
             List<VarItem<?>> parameters,
             boolean process
@@ -106,7 +106,7 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
 
     @Override
     public List<CodeLine> codeLineContributions(Pipeline pipeline) {
-        var totals = new ArrayList<CodeLine>();
+        var totals = new ArrayList<CodeLine>(this.inner.codeLineContributions(pipeline));
         totals.add(allocationFunc(pipeline));
         totals.add(deallocationFunc(pipeline));
         totals.add(gcFunc(pipeline));

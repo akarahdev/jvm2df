@@ -22,7 +22,6 @@ import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
-import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
@@ -560,37 +559,12 @@ public class FlowToDF {
                 if (outline.typeDesc().returnType().equals(ClassDesc.ofDescriptor("V"))) {
                     searchIdx = 0;
                 }
-                boolean guaranteedNative = false;
-                for (var attribute : ownedClass.attributes()) {
-                    if (attribute instanceof RuntimeVisibleAnnotationsAttribute annotationAttribute) {
-                        for (var annotation : annotationAttribute.annotations()) {
-                            if (annotation.className().equalsString("Ldiamondfire/internal/annotation/NativeValue;")) {
-                                guaranteedNative = true;
-                            }
-                        }
-                    }
-                }
-                if (guaranteedNative) {
-                    this.builder.appendCodeBlock(ActionBlock.callFunction(
-                            this.builder.graph().generateFunctionCallName(
-                                    invoke.classEntry(),
-                                    outline
-                            ),
-                            this.builder.locals().functionCallParams(params)
-                    ));
-                } else {
-                    if (params.get(searchIdx) instanceof VariableItem dispatchParameter) {
-                        this.builder.globals().invokeVirtual(
-                                dispatchParameter,
-                                outline,
-                                this.builder.locals().functionCallParams(params),
-                                false
-                        );
-                    } else {
-                        throw new RuntimeException("unreachable");
-                    }
-
-                }
+                this.builder.globals().invokeVirtual(
+                        params.getFirst(),
+                        outline,
+                        this.builder.locals().functionCallParams(params),
+                        false
+                );
 
             }
         }

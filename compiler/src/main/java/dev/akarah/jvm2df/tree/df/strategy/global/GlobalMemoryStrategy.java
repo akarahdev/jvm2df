@@ -2,7 +2,6 @@ package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
@@ -28,7 +27,7 @@ public interface GlobalMemoryStrategy {
     VarItem<?> readStaticField(String clazz, String field);
 
     void invokeVirtual(
-            VariableItem callerItem,
+            VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,
             List<VarItem<?>> parameters,
             boolean seperateProcess

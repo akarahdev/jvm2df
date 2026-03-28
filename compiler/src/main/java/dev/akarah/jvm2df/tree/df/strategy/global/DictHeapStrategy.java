@@ -1,11 +1,9 @@
 package dev.akarah.jvm2df.tree.df.strategy.global;
 
 import dev.akarah.jvm2df.codetemplate.blocks.ActionBlock;
+import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
-import dev.akarah.jvm2df.codetemplate.items.Args;
-import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
-import dev.akarah.jvm2df.codetemplate.items.VarItem;
-import dev.akarah.jvm2df.codetemplate.items.VariableItem;
+import dev.akarah.jvm2df.codetemplate.items.*;
 import dev.akarah.jvm2df.pipeline.Pipeline;
 import dev.akarah.jvm2df.tree.CompilationGraph;
 import dev.akarah.jvm2df.tree.df.CodeLineBuilder;
@@ -13,6 +11,7 @@ import dev.akarah.jvm2df.tree.df.VarPattern;
 import dev.akarah.jvm2df.tree.df.strategy.local.LocalMemoryStrategy;
 
 import java.util.List;
+import java.util.Map;
 
 public class DictHeapStrategy implements GlobalMemoryStrategy {
     CodeLineBuilder transformer;
@@ -140,15 +139,17 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public void invokeVirtual(
-            VariableItem callerItem,
+            VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,
             List<VarItem<?>> parameters,
             boolean process
     ) {
-        var classValue = (VariableItem) this.readField(callerItem, LiteralItem.string("class"));
-        // TODO: enable classVariable2 when nested %entry is fixed
+        var classValue = VarPattern.temporary("classOf");
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                VarPattern.classOfFunc(),
+                List.of(classValue, callerItem)
+        ));
         var classVariable1 = VarPattern.classInfo("%var(" + classValue.name() + ")").name();
-        var classVariable2 = VarPattern.classInfo("%entry(%var(" + callerItem.name() + "),class)").name();
         var methodEntry = VarPattern.methodInfo(methodOutline);
         if (process) {
             this.transformer.appendCodeBlock(ActionBlock.startProcess(
@@ -182,7 +183,80 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
 
     @Override
     public List<CodeLine> codeLineContributions(Pipeline pipeline) {
-        return List.of();
+        return List.of(
+                classOfFunc()
+        );
+    }
+
+    private CodeLine classOfFunc() {
+        this.transformer().init(null);
+
+        this.transformer().appendCodeBlock(
+                ActionBlock.function(
+                        VarPattern.classOfFunc(),
+                        List.of(
+                                new ParameterItem("class", "var", false, false),
+                                new ParameterItem("obj", "any", false, false)
+                        )
+                )
+        );
+
+        var classVar = new VariableItem("class", "line");
+        var objVar = new VariableItem("obj", "line");
+
+        // reference types
+        this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                "StartsWith",
+                Args.byVarItems(objVar, LiteralItem.string("heap::"))
+        ));
+        this.transformer.appendCodeBlock(Bracket.openNormal());
+        {
+            this.transformer.appendCodeBlock(ActionBlock.setVar(
+                    "GetDictValue",
+                    Args.byVarItems(
+                            classVar,
+                            new VariableItem("%var(" + objVar.name() + ")", "unsaved"),
+                            LiteralItem.string("class")
+                    )
+            ));
+            this.transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
+        }
+        this.transformer.appendCodeBlock(Bracket.closeNormal());
+
+        // primitive types
+        var map = Map.ofEntries(
+                Map.entry("String", "Ljava/lang/String;"),
+                Map.entry("Number", "Ljava/lang/Double;"),
+                Map.entry("Styled Text", "Ldiamondfire/value/Text;"),
+                Map.entry("Location", "Ldiamondfire/value/Location;"),
+                Map.entry("Item", "Ldiamondfire/value/Item;"),
+                Map.entry("List", "Ldiamondfire/value/List;"),
+                Map.entry("Potion effect", "Ldiamondfire/value/PotionEffect;"),
+                Map.entry("Sound", "Ldiamondfire/value/Sound;"),
+                Map.entry("Particle", "Ldiamondfire/value/Particle;"),
+                Map.entry("Vector", "Ldiamondfire/value/Vector;"),
+                Map.entry("Dictionary", "Ldiamondfire/value/Dictionary;")
+        );
+
+        // other types
+        for (var entry : map.entrySet()) {
+            this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                    "VarIsType",
+                    Args.byVarItems(objVar)
+            ).storeTagInSlot(26, "Variable Type", entry.getKey()));
+            this.transformer.appendCodeBlock(Bracket.openNormal());
+            {
+                this.transformer.appendCodeBlock(ActionBlock.setVar(
+                        "=",
+                        Args.byVarItems(classVar, LiteralItem.string(entry.getValue()))
+                ));
+                this.transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
+            }
+            this.transformer.appendCodeBlock(Bracket.closeNormal());
+        }
+
+
+        return this.transformer().built();
     }
 
 
