@@ -89,6 +89,12 @@ public interface CodeTree {
     record ExecuteFlow(ReconstructedFlow flow) implements CodeTree {
     }
 
+    record Wrap(CodeTree base, Number min, Number max) implements CodeTree {
+    }
+
+    record Round(CodeTree base) implements CodeTree {
+    }
+
     record Unknown(CodeElement codeElement) implements CodeTree {
     }
 }

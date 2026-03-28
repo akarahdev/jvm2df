@@ -24,6 +24,7 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -302,6 +303,31 @@ public class FlowToDF {
                 yield tmp;
             }
             case CodeTree.InvokeDynamic invokeDynamic -> convertInvokeDynamic(invokeDynamic);
+            case CodeTree.Wrap wrap -> {
+                var tmp = VarPattern.temporary("wrap");
+                var fmt = new DecimalFormat("##########################################################.###");
+                this.builder.appendCodeBlock(ActionBlock.setVar(
+                        "WrapNum",
+                        Args.byVarItems(
+                                tmp,
+                                this.convertCodeTree(wrap.base()),
+                                LiteralItem.number(fmt.format(wrap.min().doubleValue())),
+                                LiteralItem.number(fmt.format(wrap.max().doubleValue() + 1))
+                        )
+                ));
+                yield tmp;
+            }
+            case CodeTree.Round round -> {
+                var tmp = VarPattern.temporary("wrap");
+                this.builder.appendCodeBlock(ActionBlock.setVar(
+                        " RoundNumber ",
+                        Args.byVarItems(
+                                tmp,
+                                this.convertCodeTree(round.base())
+                        )
+                ).storeTagInSlot(26, "Round Mode", "Floor"));
+                yield tmp;
+            }
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }

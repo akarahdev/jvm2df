@@ -113,6 +113,18 @@ public class CodeTreeConverter {
             case TypeCheckInstruction _ -> {
                 // TODO: typecheck :3
             }
+            case ConvertInstruction convertInstruction -> {
+                var baseValue = this.stack.removeLast();
+                stack.add(switch (convertInstruction.toType()) {
+                    case BOOLEAN, VOID, REFERENCE -> throw new RuntimeException("how");
+                    case BYTE -> new CodeTree.Round(new CodeTree.Wrap(baseValue, Byte.MIN_VALUE, Byte.MAX_VALUE));
+                    case CHAR, SHORT ->
+                            new CodeTree.Round(new CodeTree.Wrap(baseValue, Short.MIN_VALUE, Short.MAX_VALUE));
+                    case INT -> new CodeTree.Round(new CodeTree.Wrap(baseValue, Integer.MIN_VALUE, Integer.MAX_VALUE));
+                    case LONG -> new CodeTree.Round(baseValue);
+                    case FLOAT, DOUBLE -> baseValue;
+                });
+            }
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
