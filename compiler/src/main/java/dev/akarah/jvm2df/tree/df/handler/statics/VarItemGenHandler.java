@@ -104,6 +104,18 @@ public class VarItemGenHandler implements InvokeHandler {
                     new ParticleItem.Data()
             ));
         }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("classOf")) {
+            return Optional.of(transformer -> {
+                var tmp = VarPattern.temporary("classOfBuiltIn");
+                transformer.builder().appendCodeBlock(ActionBlock.callFunction(
+                        VarPattern.classOfFunc(),
+                        List.of(tmp, transformer.convertCodeTree(invoke.args().getFirst()))
+                ));
+                return tmp;
+            });
+        }
         return Optional.empty();
     }
 }

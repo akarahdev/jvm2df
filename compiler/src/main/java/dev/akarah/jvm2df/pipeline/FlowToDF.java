@@ -560,7 +560,7 @@ public class FlowToDF {
                     searchIdx = 0;
                 }
                 this.builder.globals().invokeVirtual(
-                        params.getFirst(),
+                        params.get(searchIdx),
                         outline,
                         this.builder.locals().functionCallParams(params),
                         false

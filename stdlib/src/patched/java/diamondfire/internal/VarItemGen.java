@@ -17,6 +17,8 @@ public class VarItemGen {
 
     public static native Object readField(Object allocation, Object field);
 
+    public static native String classOf(Object allocation);
+
     public static native void runGc();
 
     public static native long gcAllocationCount();

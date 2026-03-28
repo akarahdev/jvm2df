@@ -144,7 +144,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
             List<VarItem<?>> parameters,
             boolean process
     ) {
-        var classValue = VarPattern.temporary("classOf");
+        var classValue = VarPattern.temporary("classOfInvokeVirtual");
         this.transformer.appendCodeBlock(ActionBlock.callFunction(
                 VarPattern.classOfFunc(),
                 List.of(classValue, callerItem)

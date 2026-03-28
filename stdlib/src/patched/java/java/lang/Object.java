@@ -8,10 +8,10 @@ public class Object {
     }
 
     public String toString() {
-        return (String) VarItemGen.readField(this, "class");
+        return VarItemGen.classOf(this);
     }
 
     public Class<?> getClass() {
-        return Class.forName((String) VarItemGen.readField(this, "class"));
+        return new Class((String) VarItemGen.classOf(this));
     }
 }
