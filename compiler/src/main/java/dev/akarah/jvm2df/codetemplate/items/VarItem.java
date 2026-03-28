@@ -16,7 +16,8 @@ public interface VarItem<T extends VarItem<T>> {
             Map.entry("g_val", GameValueItem.CODEC),
             Map.entry("item", VanillaItem.CODEC),
             Map.entry("snd", SoundItem.CODEC),
-            Map.entry("part", ParticleItem.CODEC)
+            Map.entry("part", ParticleItem.CODEC),
+            Map.entry("bucket_var", BucketVariableItem.CODEC)
     );
 
     @SuppressWarnings("unchecked")

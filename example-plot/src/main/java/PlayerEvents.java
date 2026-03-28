@@ -1,19 +1,14 @@
+import diamondfire.Control;
 import diamondfire.event.PlayerEventHandler;
-import diamondfire.value.PlayerSelection;
-import diamondfire.value.Text;
+import diamondfire.value.bucket.BucketHandle;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
-        var selection = PlayerSelection.defaultTarget();
-        var text = Text.of(Something.generateString());
-        selection.sendMessage(text);
-        selection.sendMessage(Text.of(Something.generateString().getClass().toString()));
-
-        selection.sendMessage(Text.of((int) Something.generateInt()));
-    }
-
-    @Override
-    public void Sneak() {
+        var bucket = BucketHandle.primary("hai");
+        Control.debug(bucket.load());
+        bucket.store(Keys.MY_KEY, "hey");
+        Control.debug(bucket.read(Keys.MY_KEY));
+        Control.debug(bucket.saveAndUnload());
     }
 }

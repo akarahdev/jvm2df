@@ -33,7 +33,9 @@ Roadmap:
     - [ ] `diamondfire.value.Sound`
     - [ ] `diamondfire.value.Particle`
     - [ ] `diamondfire.value.Potion`
-    - [ ] `diamondfire.value.Bucket`
+- [x] `diamondfire.value.bucket.*`
+    - [x] `diamondfire.value.bucket.BucketHandle`
+    - [x] `diamondfire.value.bucket.BucketVariableKey`
 - [ ] `diamondfire.value.selection.*` APIs
     - [ ] `diamondfire.value.selection.AbstractSelection`
     - [ ] `diamondfire.value.selection.PlayerSelection`

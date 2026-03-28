@@ -22,4 +22,6 @@ public class VarItemGen {
     public static native void runGc();
 
     public static native long gcAllocationCount();
+
+    public static native Object bucketVar(String namespace, String bucket, String name);
 }

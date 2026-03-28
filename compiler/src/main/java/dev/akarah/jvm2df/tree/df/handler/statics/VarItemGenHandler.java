@@ -116,6 +116,26 @@ public class VarItemGenHandler implements InvokeHandler {
                 return tmp;
             });
         }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("bucketVar")) {
+            return Optional.of(transformer -> {
+                var namespace = (LiteralItem) transformer.convertCodeTree(invoke.args().getFirst());
+                var bucket = transformer.convertCodeTree(invoke.args().get(1));
+                var bucketName = switch (bucket) {
+                    case LiteralItem literalItem -> literalItem.value();
+                    case VariableItem variableItem -> "%var(" + variableItem.name() + ")";
+                    default -> throw new RuntimeException("whar");
+                };
+                var name = transformer.convertCodeTree(invoke.args().get(2));
+                var varName = switch (name) {
+                    case LiteralItem literalItem -> literalItem.value();
+                    case VariableItem variableItem -> "%var(" + variableItem.name() + ")";
+                    default -> throw new RuntimeException("whar");
+                };
+                return new BucketVariableItem(varName, bucketName, namespace.value());
+            });
+        }
         return Optional.empty();
     }
 }
