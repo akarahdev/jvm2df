@@ -7,7 +7,7 @@ public final class Particle {
     Object inner;
 
     public Particle(String id) {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "SetParticleType",
                 VarItemGen.lineVar(),
                 VarItemGen.emptyParticle(),
@@ -16,7 +16,7 @@ public final class Particle {
     }
 
     public Particle setType(String id) {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "SetParticleType",
                 VarItemGen.lineVar(),
                 VarItemGen.emptyParticle(),
@@ -26,7 +26,7 @@ public final class Particle {
     }
 
     public Particle setAmount(int value) {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "SetParticleAmount",
                 VarItemGen.lineVar(),
                 value
@@ -35,7 +35,7 @@ public final class Particle {
     }
 
     public Particle setSpread(double horizontal, double vertical) {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "SetParticleSpread",
                 VarItemGen.lineVar(),
                 horizontal,

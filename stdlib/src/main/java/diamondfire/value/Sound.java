@@ -7,7 +7,7 @@ public final class Sound {
     Object inner;
 
     public Sound(String id) {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "SetCustomSound",
                 VarItemGen.lineVar(),
                 VarItemGen.emptySound(),

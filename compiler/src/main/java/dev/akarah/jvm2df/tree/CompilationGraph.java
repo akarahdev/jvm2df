@@ -48,6 +48,20 @@ public class CompilationGraph {
         return list;
     }
 
+    public Set<ClassEntry> allSuperClassesFor(ClassModel model) {
+        var list = new HashSet<ClassEntry>();
+        var entry = model.thisClass();
+        do {
+            list.add(entry);
+            System.out.println("trying " + entry);
+            if (this.classByEntry(entry) == null) {
+                throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
+            }
+            entry = this.classByEntry(entry).superclass().orElse(null);
+        } while (entry != null);
+        return list;
+    }
+
     public ClassModel classByEntry(ClassEntry name) {
         if (!this.classDescs.containsKey(name.asSymbol().descriptorString())) {
             throw new NullPointerException("Please compile with missing class " + name);

@@ -5,7 +5,7 @@ import diamondfire.internal.VarItemGen;
 
 public class Float {
     public static String toString(float i) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "String",
                 VarItemGen.lineVar(),
                 i,

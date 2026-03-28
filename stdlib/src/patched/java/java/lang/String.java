@@ -7,7 +7,7 @@ import diamondfire.internal.annotation.NativeValue;
 @NativeValue
 public class String {
     public String concat(String other) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "+",
                 VarItemGen.lineVar(),
                 this,
@@ -16,7 +16,7 @@ public class String {
     }
 
     public int length() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "StringLength",
                 VarItemGen.lineVar(),
                 this
@@ -24,7 +24,7 @@ public class String {
     }
 
     public char charAt(int index) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarC(
                 "TrimString",
                 VarItemGen.lineVar(),
                 this,

@@ -5,7 +5,7 @@ import diamondfire.internal.VarItemGen;
 
 public class Integer {
     public static String toString(int i) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "String",
                 VarItemGen.lineVar(),
                 i,

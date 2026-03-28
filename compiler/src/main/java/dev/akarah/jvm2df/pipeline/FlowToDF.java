@@ -328,6 +328,65 @@ public class FlowToDF {
                 ).storeTagInSlot(26, "Round Mode", "Floor"));
                 yield tmp;
             }
+            case CodeTree.IsInstanceOf isInstanceOf -> {
+                var base = this.convertCodeTree(isInstanceOf.value());
+                var clazz = this.builder().globals().readClass(base);
+                var out = VarPattern.temporary("isinstanceof");
+                var params = buildSuperClassParams(isInstanceOf.descriptor(), clazz);
+                this.builder.appendCodeBlock(ActionBlock.ifVar(
+                        "=",
+                        Args.byVarItems(params)
+                ));
+                this.builder.appendCodeBlock(Bracket.openNormal());
+                this.builder.appendCodeBlock(ActionBlock.setVar(
+                        "=",
+                        Args.byVarItems(
+                                out,
+                                LiteralItem.number("1")
+                        )
+                ));
+                this.builder.appendCodeBlock(Bracket.closeNormal());
+                this.builder.appendCodeBlock(ActionBlock.else_());
+                this.builder.appendCodeBlock(Bracket.openNormal());
+                this.builder.appendCodeBlock(ActionBlock.setVar(
+                        "=",
+                        Args.byVarItems(
+                                out,
+                                LiteralItem.number("0")
+                        )
+                ));
+                this.builder.appendCodeBlock(Bracket.closeNormal());
+                yield out;
+            }
+            case CodeTree.CastValueTo castValueTo -> {
+                var base = this.convertCodeTree(castValueTo.base());
+                var clazz = (VariableItem) this.builder().globals().readClass(base);
+                var params = buildSuperClassParams(castValueTo.descriptor(), clazz);
+                this.builder.appendCodeBlock(ActionBlock.ifVar(
+                        "!=",
+                        Args.byVarItems(params)
+                ));
+                this.builder.appendCodeBlock(Bracket.openNormal());
+                this.builder.appendCodeBlock(ActionBlock.control(
+                                "PrintDebug",
+                                Args.byVarItems(
+                                        LiteralItem.text("Failed to cast object of type %var("
+                                                + clazz.name()
+                                                + ") to class "
+                                                + castValueTo.descriptor().asSymbol().descriptorString())
+                                )
+                        ).storeTagInSlot(26, "Message Style", "Error")
+                        .storeTagInSlot(25, "Sound", "Error")
+                        .storeTagInSlot(24, "Highlighting", "Error")
+                        .storeTagInSlot(23, "Text Value Merging", "No Spaces")
+                        .storeTagInSlot(22, "Permission", "Developer"));
+                this.builder.appendCodeBlock(ActionBlock.control(
+                        "End",
+                        Args.byVarItems()
+                ));
+                this.builder.appendCodeBlock(Bracket.closeNormal());
+                yield base;
+            }
             default -> throw new RuntimeException("unknown code tree " + codeTree);
         };
     }
@@ -605,5 +664,13 @@ public class FlowToDF {
             }
         }
         throw new RuntimeException("I don't understand this invokedynamic " + invoke);
+    }
+
+    // TODO: refactor to support classes downcasting
+    private ArrayList<VarItem<?>> buildSuperClassParams(ClassEntry descriptor, VarItem<?> clazz) {
+        var params = new ArrayList<VarItem<?>>();
+        params.add(clazz);
+        params.add(LiteralItem.string(descriptor.asSymbol().descriptorString()));
+        return params;
     }
 }

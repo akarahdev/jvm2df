@@ -10,7 +10,7 @@ public class List<T> implements Iterable<T> {
     Object inner;
 
     private List() {
-        this.inner = CodeBlocks.setVar(
+        this.inner = CodeBlocks.setVarR(
                 "CreateList",
                 VarItemGen.lineVar()
         );
@@ -38,43 +38,43 @@ public class List<T> implements Iterable<T> {
     }
 
     public void add(T obj) {
-        this.inner = CodeBlocks.setVar("AppendValue", this.inner, obj);
+        this.inner = CodeBlocks.setVarR("AppendValue", this.inner, obj);
     }
 
     public void extend(List<T> obj) {
-        this.inner = CodeBlocks.setVar("AppendList", this.inner, obj);
+        this.inner = CodeBlocks.setVarR("AppendList", this.inner, obj);
     }
 
     public int length() {
-        return CodeBlocks.setVar("ListLength", VarItemGen.lineVar(), this.inner);
+        return CodeBlocks.setVarR("ListLength", VarItemGen.lineVar(), this.inner);
     }
 
     public T get(int idx) {
         checkIndex(idx);
-        return CodeBlocks.setVar("GetListValue", VarItemGen.lineVar(), this.inner, idx + 1);
+        return CodeBlocks.setVarR("GetListValue", VarItemGen.lineVar(), this.inner, idx + 1);
     }
 
     public void set(T value, int idx) {
         checkIndex(idx);
-        this.inner = CodeBlocks.setVar("SetListValue", this.inner, idx + 1, value);
+        this.inner = CodeBlocks.setVarR("SetListValue", this.inner, idx + 1, value);
     }
 
     public void insert(T value, int idx) {
         checkIndex(idx);
-        this.inner = CodeBlocks.setVar("InsertListValue", this.inner, idx + 1, value);
+        this.inner = CodeBlocks.setVarR("InsertListValue", this.inner, idx + 1, value);
     }
 
     public void removeAtIndex(int idx) {
         checkIndex(idx);
-        this.inner = CodeBlocks.setVar("RemoveListIndex", this.inner, idx + 1);
+        this.inner = CodeBlocks.setVarR("RemoveListIndex", this.inner, idx + 1);
     }
 
     public T removeValue(T value) {
-        return CodeBlocks.setVar("RemoveListValue", this.inner, value);
+        return CodeBlocks.setVarR("RemoveListValue", this.inner, value);
     }
 
     public int indexOf(T value) {
-        return (int) CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "GetValueIndex",
                 VarItemGen.lineVar(),
                 this.inner,
@@ -84,21 +84,21 @@ public class List<T> implements Iterable<T> {
     }
 
     public void dedup() {
-        this.inner = CodeBlocks.setVar("DedupList", this.inner);
+        this.inner = CodeBlocks.setVarR("DedupList", this.inner);
     }
 
     public void reverse() {
-        this.inner = CodeBlocks.setVar("ReverseList", this.inner);
+        this.inner = CodeBlocks.setVarR("ReverseList", this.inner);
     }
 
     public void randomize() {
-        this.inner = CodeBlocks.setVar("RandomizeList", this.inner);
+        this.inner = CodeBlocks.setVarR("RandomizeList", this.inner);
     }
 
     public void trim(int start, int end) {
         checkIndex(start);
         checkIndex(end);
-        this.inner = CodeBlocks.setVar("DedupList", this.inner, start, end);
+        this.inner = CodeBlocks.setVarR("DedupList", this.inner, start, end);
     }
 
     public void checkIndex(int idx) {

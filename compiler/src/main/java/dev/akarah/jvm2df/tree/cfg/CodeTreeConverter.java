@@ -110,8 +110,17 @@ public class CodeTreeConverter {
             case OperatorInstruction instruction -> this.operator(instruction, offset);
             case NewObjectInstruction instruction -> this.newObj(instruction);
             case FieldInstruction instruction -> this.field(instruction);
-            case TypeCheckInstruction _ -> {
+            case TypeCheckInstruction instruction -> {
                 // TODO: typecheck :3
+                var valueToCheck = this.stack.removeLast();
+                switch (instruction.opcode()) {
+                    case INSTANCEOF -> {
+                        this.stack.add(new CodeTree.IsInstanceOf(valueToCheck, instruction.type()));
+                    }
+                    case CHECKCAST -> {
+                        this.stack.add(new CodeTree.CastValueTo(valueToCheck, instruction.type()));
+                    }
+                }
             }
             case ConvertInstruction convertInstruction -> {
                 var baseValue = this.stack.removeLast();

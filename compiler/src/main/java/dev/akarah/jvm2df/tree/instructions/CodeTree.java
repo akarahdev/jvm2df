@@ -95,6 +95,12 @@ public interface CodeTree {
     record Round(CodeTree base) implements CodeTree {
     }
 
+    record CastValueTo(CodeTree base, ClassEntry descriptor) implements CodeTree {
+    }
+
+    record IsInstanceOf(CodeTree value, ClassEntry descriptor) implements CodeTree {
+    }
+
     record Unknown(CodeElement codeElement) implements CodeTree {
     }
 }

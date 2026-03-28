@@ -6,7 +6,8 @@ import java.util.List;
 public interface ResourceGenerator {
     List<ResourceGenerator> GENERATORS = List.of(
             ParticleGenerator.INSTANCE,
-            SoundGenerator.INSTANCE
+            SoundGenerator.INSTANCE,
+            CodeBlocksAPIGenerator.INSTANCE
     );
 
     void generate() throws IOException;

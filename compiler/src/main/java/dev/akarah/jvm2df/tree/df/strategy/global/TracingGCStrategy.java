@@ -71,6 +71,11 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
+    public VarItem<?> readClass(VarItem<?> allocation) {
+        return this.inner.readClass(allocation);
+    }
+
+    @Override
     public void invokeVirtual(
             VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,

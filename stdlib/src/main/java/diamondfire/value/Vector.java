@@ -7,7 +7,7 @@ import diamondfire.internal.annotation.NativeValue;
 @NativeValue
 public final class Vector {
     public static Vector of(double x, double y, double z) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "Vector",
                 VarItemGen.lineVar(),
                 x,
@@ -17,7 +17,7 @@ public final class Vector {
     }
 
     public double x() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "GetVectorComp",
                 VarItemGen.lineVar(),
                 this,
@@ -26,7 +26,7 @@ public final class Vector {
     }
 
     public double y() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "GetVectorComp",
                 VarItemGen.lineVar(),
                 this,
@@ -35,7 +35,7 @@ public final class Vector {
     }
 
     public double z() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "GetVectorComp",
                 VarItemGen.lineVar(),
                 this,

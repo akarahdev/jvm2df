@@ -7,7 +7,7 @@ import diamondfire.internal.annotation.NativeValue;
 @NativeValue
 public final class Text {
     public static Text of(Object s) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "StyledText",
                 VarItemGen.lineVar(),
                 s,
@@ -17,7 +17,7 @@ public final class Text {
     }
 
     public static Text of(String s) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "ParseMiniMessage",
                 VarItemGen.lineVar(),
                 s,
@@ -27,7 +27,7 @@ public final class Text {
     }
 
     public static Text parseDynamic(String s) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "ParseMiniMessage",
                 VarItemGen.lineVar(),
                 s,
@@ -37,7 +37,7 @@ public final class Text {
     }
 
     public static Text parseFull(String s) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "ParseMiniMessage",
                 VarItemGen.lineVar(),
                 s,

@@ -5,7 +5,7 @@ import diamondfire.internal.VarItemGen;
 
 public class Long {
     public static String toString(long i) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "String",
                 VarItemGen.lineVar(),
                 i,
@@ -14,5 +14,6 @@ public class Long {
     }
 
     public static native Long valueOf(long i);
+
     public native long longValue();
 }

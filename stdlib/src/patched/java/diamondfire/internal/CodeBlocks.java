@@ -1,123 +1,135 @@
 package diamondfire.internal;
 
-public class CodeBlocks {
-    public static native void control(
-            String action
-    );
-
-    public static native void control(
-            String action,
-            Object a,
-            Object b
-    );
-
-    public static native void control(
-            String action,
-            Object a,
-            Object b,
-            Object c,
-            Object d,
-            Object e,
-            Object f
-    );
-
-    public static native void playerAction(
-            String action,
-            Object a
-    );
-
-    public static native void playerAction(
-            String action,
-            Object a,
-            Object b
-    );
-
-    public static native void playerAction(
-            String action,
-            Object a,
-            Object b,
-            Object c,
-            Object d
-    );
-
-    public static native void ifPlayer(
-            String action,
-            Object a,
-            Object b
-    );
-
-    public static native void ifVar(
-            String action,
-            Object a,
-            Object b
-    );
-
-    public static native void ifVar(
-            String action,
-            Object a,
-            Object b,
-            Object c
-    );
-
-    public static native <T> T setVar(
-            String action
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a,
-            Object b
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a,
-            Object b,
-            Object c
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a,
-            Object b,
-            Object c,
-            Object d
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a,
-            Object b,
-            Object c,
-            Object d,
-            Object e
-    );
-
-    public static native <T> T setVar(
-            String action,
-            Object a,
-            Object b,
-            Object c,
-            Object d,
-            Object e,
-            Object f,
-            Object g
-    );
-
-    public static native void selectObject(
-            String action
-    );
-
-    public static native void selectObject(
-            String action,
-            Object a
-    );
-
+public class CodeBlocks {    public static native void control();
+    public static native void control(Object arg0);
+    public static native void control(Object arg0,Object arg1);
+    public static native void control(Object arg0,Object arg1,Object arg2);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void control(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native void playerAction();
+    public static native void playerAction(Object arg0);
+    public static native void playerAction(Object arg0,Object arg1);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void playerAction(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native void ifPlayer();
+    public static native void ifPlayer(Object arg0);
+    public static native void ifPlayer(Object arg0,Object arg1);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void ifPlayer(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native void ifVar();
+    public static native void ifVar(Object arg0);
+    public static native void ifVar(Object arg0,Object arg1);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void ifVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native void setVar();
+    public static native boolean setVarZ();
+    public static native long setVarL();
+    public static native int setVarI();
+    public static native float setVarF();
+    public static native <T> T setVarR();
+    public static native double setVarD();
+    public static native char setVarC();
+    public static native void setVar(Object arg0);
+    public static native boolean setVarZ(Object arg0);
+    public static native long setVarL(Object arg0);
+    public static native int setVarI(Object arg0);
+    public static native float setVarF(Object arg0);
+    public static native <T> T setVarR(Object arg0);
+    public static native double setVarD(Object arg0);
+    public static native char setVarC(Object arg0);
+    public static native void setVar(Object arg0,Object arg1);
+    public static native boolean setVarZ(Object arg0,Object arg1);
+    public static native long setVarL(Object arg0,Object arg1);
+    public static native int setVarI(Object arg0,Object arg1);
+    public static native float setVarF(Object arg0,Object arg1);
+    public static native <T> T setVarR(Object arg0,Object arg1);
+    public static native double setVarD(Object arg0,Object arg1);
+    public static native char setVarC(Object arg0,Object arg1);
+    public static native void setVar(Object arg0,Object arg1,Object arg2);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void setVar(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native boolean setVarZ(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native long setVarL(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native int setVarI(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native float setVarF(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native <T> T setVarR(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native double setVarD(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native char setVarC(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
+    public static native void selectObject();
+    public static native void selectObject(Object arg0);
+    public static native void selectObject(Object arg0,Object arg1);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7);
+    public static native void selectObject(Object arg0,Object arg1,Object arg2,Object arg3,Object arg4,Object arg5,Object arg6,Object arg7,Object arg8);
     public static native void openNormal();
 
     public static native void closeNormal();

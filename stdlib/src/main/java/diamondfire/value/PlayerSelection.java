@@ -12,7 +12,7 @@ public class PlayerSelection {
 
     public static PlayerSelection defaultTarget() {
         var s = new PlayerSelection();
-        s.inner = CodeBlocks.setVar(
+        s.inner = CodeBlocks.setVarR(
                 "CreateList",
                 VarItemGen.lineVar(),
                 VarItemGen.gameValue("UUID", "Default")
@@ -70,7 +70,7 @@ public class PlayerSelection {
 
     public Location location() {
         CodeBlocks.selectObject("PlayerName", this.inner);
-        var out = (Location) CodeBlocks.setVar(
+        var out = (Location) CodeBlocks.setVarR(
                 "=",
                 VarItemGen.lineVar(),
                 VarItemGen.gameValue("Location", "Selection")

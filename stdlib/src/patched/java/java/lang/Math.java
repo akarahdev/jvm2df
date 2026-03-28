@@ -8,7 +8,7 @@ public class Math {
     public static final float PI = 3.14159265358979323846f;
 
     public static double sin(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Sine",
                 VarItemGen.lineVar(),
                 a,
@@ -18,7 +18,7 @@ public class Math {
     }
 
     public static double cos(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Cosine",
                 VarItemGen.lineVar(),
                 a,
@@ -28,7 +28,7 @@ public class Math {
     }
 
     public static double tan(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Tangent",
                 VarItemGen.lineVar(),
                 a,
@@ -38,7 +38,7 @@ public class Math {
     }
 
     public static double asin(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Sine",
                 VarItemGen.lineVar(),
                 a,
@@ -48,7 +48,7 @@ public class Math {
     }
 
     public static double acos(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Cosine",
                 VarItemGen.lineVar(),
                 a,
@@ -58,7 +58,7 @@ public class Math {
     }
 
     public static double atan(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Tangent",
                 VarItemGen.lineVar(),
                 a,
@@ -68,7 +68,7 @@ public class Math {
     }
 
     public static double exp(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Exponent",
                 VarItemGen.lineVar(),
                 a,
@@ -77,7 +77,7 @@ public class Math {
     }
 
     public static double log(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Logarithm",
                 VarItemGen.lineVar(),
                 a,
@@ -86,7 +86,7 @@ public class Math {
     }
 
     public static double sqrt(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "Root",
                 VarItemGen.lineVar(),
                 a,
@@ -95,7 +95,7 @@ public class Math {
     }
 
     public static double ceil(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "RoundNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -104,7 +104,7 @@ public class Math {
     }
 
     public static double floor(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "RoundNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -113,7 +113,7 @@ public class Math {
     }
 
     public static int round(float a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "RoundNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -122,7 +122,7 @@ public class Math {
     }
 
     public static long round(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarL(
                 "RoundNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -131,7 +131,7 @@ public class Math {
     }
 
     public static double atan2(double a, double b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "ArcTangent2",
                 VarItemGen.lineVar(),
                 a,
@@ -141,7 +141,7 @@ public class Math {
     }
 
     public static double random() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "RandomNumber",
                 VarItemGen.lineVar(),
                 0,
@@ -151,7 +151,7 @@ public class Math {
     }
 
     public static int abs(int a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "AbsoluteValue",
                 VarItemGen.lineVar(),
                 a
@@ -159,7 +159,7 @@ public class Math {
     }
 
     public static long abs(long a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarL(
                 "AbsoluteValue",
                 VarItemGen.lineVar(),
                 a
@@ -167,7 +167,7 @@ public class Math {
     }
 
     public static float abs(float a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarF(
                 "AbsoluteValue",
                 VarItemGen.lineVar(),
                 a
@@ -175,7 +175,7 @@ public class Math {
     }
 
     public static double abs(double a) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "AbsoluteValue",
                 VarItemGen.lineVar(),
                 a
@@ -183,7 +183,7 @@ public class Math {
     }
 
     public static int max(int a, int b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "MaxNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -192,7 +192,7 @@ public class Math {
     }
 
     public static long max(long a, long b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarL(
                 "MaxNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -201,7 +201,7 @@ public class Math {
     }
 
     public static float max(float a, float b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarF(
                 "MaxNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -210,7 +210,7 @@ public class Math {
     }
 
     public static double max(double a, double b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "MaxNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -219,7 +219,7 @@ public class Math {
     }
 
     public static int min(int a, int b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarI(
                 "MinNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -228,7 +228,7 @@ public class Math {
     }
 
     public static long min(long a, long b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarL(
                 "MinNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -237,7 +237,7 @@ public class Math {
     }
 
     public static float min(float a, float b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarF(
                 "MinNumber",
                 VarItemGen.lineVar(),
                 a,
@@ -246,7 +246,7 @@ public class Math {
     }
 
     public static double min(double a, double b) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarD(
                 "MinNumber",
                 VarItemGen.lineVar(),
                 a,

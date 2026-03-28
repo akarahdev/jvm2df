@@ -19,7 +19,7 @@ public record DFCodeBlocksHandler(String functionName, String codeBlock,
     @Override
     public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
-                && invoke.outline().name().equals(functionName)) {
+                && invoke.outline().name().startsWith(functionName)) {
             var codeArguments = new ArrayList<>(invoke.args());
             var action = codeArguments.removeFirst();
             if (!(action instanceof CodeTree.Constant(var constantDesc))) {

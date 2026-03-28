@@ -138,17 +138,23 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
+    public VarItem<?> readClass(VarItem<?> allocation) {
+        var classValue = VarPattern.temporary("classOfInvokeVirtual");
+        this.transformer.appendCodeBlock(ActionBlock.callFunction(
+                VarPattern.classOfFunc(),
+                List.of(classValue, allocation)
+        ));
+        return classValue;
+    }
+
+    @Override
     public void invokeVirtual(
             VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,
             List<VarItem<?>> parameters,
             boolean process
     ) {
-        var classValue = VarPattern.temporary("classOfInvokeVirtual");
-        this.transformer.appendCodeBlock(ActionBlock.callFunction(
-                VarPattern.classOfFunc(),
-                List.of(classValue, callerItem)
-        ));
+        var classValue = (VariableItem) readClass(callerItem);
         var classVariable1 = VarPattern.classInfo("%var(" + classValue.name() + ")").name();
         var methodEntry = VarPattern.methodInfo(methodOutline);
         if (process) {

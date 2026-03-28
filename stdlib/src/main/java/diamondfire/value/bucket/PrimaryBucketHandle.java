@@ -24,7 +24,7 @@ public class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public String load() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "LoadBucket",
                 VarItemGen.lineVar(),
                 NAMESPACE,
@@ -34,7 +34,7 @@ public class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public String save() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "SaveBucket",
                 VarItemGen.lineVar(),
                 NAMESPACE,
@@ -44,7 +44,7 @@ public class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public String saveAndUnload() {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "SaveUnloadBucket",
                 VarItemGen.lineVar(),
                 NAMESPACE,
@@ -54,7 +54,7 @@ public class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public <T> void store(BucketVariableKey<T> variable, T value) {
-        var out = CodeBlocks.setVar(
+        CodeBlocks.setVar(
                 "=",
                 VarItemGen.bucketVar(NAMESPACE, this.name, variable.key()),
                 value
@@ -63,7 +63,7 @@ public class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public <T> T read(BucketVariableKey<T> key) {
-        return CodeBlocks.setVar(
+        return CodeBlocks.setVarR(
                 "=",
                 VarItemGen.lineVar(),
                 VarItemGen.bucketVar(NAMESPACE, this.name, key.key())

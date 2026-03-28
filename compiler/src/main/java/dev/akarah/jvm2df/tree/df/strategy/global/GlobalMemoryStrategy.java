@@ -26,6 +26,8 @@ public interface GlobalMemoryStrategy {
 
     VarItem<?> readStaticField(String clazz, String field);
 
+    VarItem<?> readClass(VarItem<?> allocation);
+
     void invokeVirtual(
             VarItem<?> callerItem,
             CompilationGraph.MethodOutline methodOutline,
