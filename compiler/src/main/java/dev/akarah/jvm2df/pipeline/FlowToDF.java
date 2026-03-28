@@ -334,8 +334,9 @@ public class FlowToDF {
                 var out = VarPattern.temporary("isinstanceof");
                 var params = buildSuperClassParams(isInstanceOf.descriptor(), (VariableItem) clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
-                        "=",
-                        Args.byVarItems(params)
+                        "Contains",
+                        Args.byVarItems(params),
+                        "NOT"
                 ));
                 this.builder.appendCodeBlock(Bracket.openNormal());
                 this.builder.appendCodeBlock(ActionBlock.setVar(
