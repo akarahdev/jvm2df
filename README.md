@@ -20,8 +20,23 @@ Roadmap:
     - [x] `extends` clauses and virtual dispatch
     - [ ] `abstract class`
     - [x] `interface` and `invokeinterface`
-- [ ] `java.lang.MethodHandle` and related APIs
 - [ ] `invokedynamic`
+    - [ ] `java.lang.MethodHandle` and related APIs
+    - [ ] String concat
+    - [ ] Lambdas
+    - [ ] Enum switch
+    - [ ] Pattern matching
 - [ ] `diamondfire.value.*` APIs
+    - [ ] `diamondfire.value.Location`
+    - [ ] `diamondfire.value.Text`
+    - [ ] `diamondfire.value.Vector`
+    - [ ] `diamondfire.value.Sound`
+    - [ ] `diamondfire.value.Particle`
+    - [ ] `diamondfire.value.Potion`
+    - [ ] `diamondfire.value.Bucket`
+- [ ] `diamondfire.value.selection.*` APIs
+    - [ ] `diamondfire.value.selection.AbstractSelection`
+    - [ ] `diamondfire.value.selection.PlayerSelection`
+    - [ ] `diamondfire.value.selection.EntitySelection`
 - [x] Enhanced `for` loop
 - [x] `java.lang.Thread`
