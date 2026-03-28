@@ -62,6 +62,16 @@ public class CompilationGraph {
         return list;
     }
 
+    public Set<ClassEntry> allClassesExtending(ClassEntry classEntry) {
+        var set = new HashSet<ClassEntry>();
+        for (var classEntries : this.classDescs.entrySet()) {
+            if (allSuperClassesFor(classEntries.getValue()).contains(classEntry)) {
+                set.add(classEntries.getValue().thisClass());
+            }
+        }
+        return set;
+    }
+
     public ClassModel classByEntry(ClassEntry name) {
         if (!this.classDescs.containsKey(name.asSymbol().descriptorString())) {
             throw new NullPointerException("Please compile with missing class " + name);

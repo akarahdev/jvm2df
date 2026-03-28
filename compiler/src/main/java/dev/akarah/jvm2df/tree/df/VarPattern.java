@@ -52,6 +52,10 @@ public class VarPattern {
         return "globals::gc";
     }
 
+    public static String classesExtendingThisClass() {
+        return "<classes-extending-this-class>";
+    }
+
     public static String classOfFunc() {
         return "globals::classOf";
     }

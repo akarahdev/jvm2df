@@ -332,7 +332,7 @@ public class FlowToDF {
                 var base = this.convertCodeTree(isInstanceOf.value());
                 var clazz = this.builder().globals().readClass(base);
                 var out = VarPattern.temporary("isinstanceof");
-                var params = buildSuperClassParams(isInstanceOf.descriptor(), clazz);
+                var params = buildSuperClassParams(isInstanceOf.descriptor(), (VariableItem) clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
                         "=",
                         Args.byVarItems(params)
@@ -363,7 +363,7 @@ public class FlowToDF {
                 var clazz = (VariableItem) this.builder().globals().readClass(base);
                 var params = buildSuperClassParams(castValueTo.descriptor(), clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
-                        "!=",
+                        "Contains",
                         Args.byVarItems(params)
                 ));
                 this.builder.appendCodeBlock(Bracket.openNormal());
@@ -667,10 +667,12 @@ public class FlowToDF {
     }
 
     // TODO: refactor to support classes downcasting
-    private ArrayList<VarItem<?>> buildSuperClassParams(ClassEntry descriptor, VarItem<?> clazz) {
+    private ArrayList<VarItem<?>> buildSuperClassParams(ClassEntry descriptor, VariableItem clazz) {
         var params = new ArrayList<VarItem<?>>();
+        var classVar = VarPattern.classInfo("%var(" + clazz.name() + ")");
+        var type = LiteralItem.string("%entry(" + classVar.name() + "," + VarPattern.classesExtendingThisClass() + ")");
+        params.add(type);
         params.add(clazz);
-        params.add(LiteralItem.string(descriptor.asSymbol().descriptorString()));
         return params;
     }
 }

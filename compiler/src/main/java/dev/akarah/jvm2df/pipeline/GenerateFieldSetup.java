@@ -10,6 +10,7 @@ import dev.akarah.jvm2df.tree.df.VarPattern;
 import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GenerateFieldSetup implements PipelineComponent {
     @Override
@@ -57,6 +58,12 @@ public class GenerateFieldSetup implements PipelineComponent {
                         outline
                 )));
             }
+            methodKeys.add(LiteralItem.string(VarPattern.classesExtendingThisClass()));
+            methodValues.add(LiteralItem.string(
+                    pipeline.graph().allClassesExtending(classElements.thisClass())
+                            .stream().map(x -> x.asSymbol().descriptorString())
+                            .collect(Collectors.joining())
+            ));
 
             var av = pipeline.codeLineBuilder().createListQuickly(methodKeys);
             var bv = pipeline.codeLineBuilder().createListQuickly(methodValues);
