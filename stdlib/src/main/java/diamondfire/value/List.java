@@ -6,7 +6,7 @@ import diamondfire.internal.VarItemGen;
 
 import java.util.Iterator;
 
-public class List<T> implements Iterable<T> {
+public final class List<T> implements Iterable<T> {
     Object inner;
 
     private List() {

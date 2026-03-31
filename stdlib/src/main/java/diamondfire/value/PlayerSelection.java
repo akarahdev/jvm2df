@@ -3,7 +3,7 @@ package diamondfire.value;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
-public class PlayerSelection {
+public final class PlayerSelection {
     Object inner;
 
     private PlayerSelection() {

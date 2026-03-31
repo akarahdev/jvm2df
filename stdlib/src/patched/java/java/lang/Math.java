@@ -3,7 +3,7 @@ package java.lang;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
-public class Math {
+public final class Math {
     public static final float E = 2.7182818284590452354f;
     public static final float PI = 3.14159265358979323846f;
 

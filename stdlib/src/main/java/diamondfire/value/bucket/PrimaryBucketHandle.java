@@ -3,7 +3,7 @@ package diamondfire.value.bucket;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
-public class PrimaryBucketHandle implements BucketHandle {
+public final class PrimaryBucketHandle implements BucketHandle {
     static final String NAMESPACE = "primary";
 
     String name;
@@ -18,7 +18,7 @@ public class PrimaryBucketHandle implements BucketHandle {
         return this.name;
     }
 
-    protected PrimaryBucketHandle(String name) {
+    PrimaryBucketHandle(String name) {
         this.name = name;
     }
 

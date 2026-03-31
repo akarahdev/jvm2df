@@ -33,7 +33,7 @@ public class VarPattern {
     }
 
     public static VariableItem classInfo(String internalName) {
-        return new VariableItem("class::" + internalName, "unsaved");
+        return new VariableItem("class::" + internalName, "saved");
     }
 
     public static String methodInfo(CompilationGraph.MethodOutline outline) {

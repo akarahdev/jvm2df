@@ -1,6 +1,6 @@
 package java.lang;
 
-public class Class<T> {
+public final class Class<T> {
     String descriptor;
 
     public Class(String descriptor) {

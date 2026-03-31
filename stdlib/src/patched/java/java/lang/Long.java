@@ -3,7 +3,7 @@ package java.lang;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 
-public class Long {
+public final class Long {
     public static String toString(long i) {
         return CodeBlocks.setVarR(
                 "String",

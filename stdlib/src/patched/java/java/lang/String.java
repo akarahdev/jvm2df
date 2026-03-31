@@ -5,7 +5,7 @@ import diamondfire.internal.VarItemGen;
 import diamondfire.internal.annotation.NativeValue;
 
 @NativeValue
-public class String {
+public final class String {
     public String concat(String other) {
         return CodeBlocks.setVarR(
                 "+",

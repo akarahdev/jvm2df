@@ -1,10 +1,11 @@
 import diamondfire.event.PlayerEventHandler;
+import diamondfire.value.PlayerSelection;
+import diamondfire.value.Text;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
-        var obj = ClassThree.generate(); //always ClassThree
-        var cast1 = (ClassOne) obj; // must succeed
-        var cast2 = (ClassTwo) obj; // will always fail
+        var sel = PlayerSelection.defaultTarget();
+        sel.sendMessage(Text.of("<gray>Hello <blue>%default<gray>!"));
     }
 }

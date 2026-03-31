@@ -9,6 +9,7 @@ import java.lang.classfile.Label;
 import java.lang.classfile.Opcode;
 import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.*;
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -279,7 +280,12 @@ public class CodeTreeConverter {
                 switch (instruction.opcode()) {
                     case INVOKESTATIC -> InvokeStyle.STATIC;
                     case INVOKESPECIAL -> InvokeStyle.VIRTUAL_EXACT;
-                    case INVOKEVIRTUAL, INVOKEINTERFACE -> InvokeStyle.VIRTUAL_OVERRIDABLE;
+                    case INVOKEVIRTUAL, INVOKEINTERFACE -> {
+                        if (this.graph.classByEntry(instruction.method().owner()).flags().has(AccessFlag.FINAL)) {
+                            yield InvokeStyle.VIRTUAL_EXACT;
+                        }
+                        yield InvokeStyle.VIRTUAL_OVERRIDABLE;
+                    }
                     default -> InvokeStyle.DYNAMIC_CALL_SITE;
                 }
         );

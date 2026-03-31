@@ -1,4 +1,4 @@
 package java.lang;
 
-public class Error {
+public final class Error {
 }

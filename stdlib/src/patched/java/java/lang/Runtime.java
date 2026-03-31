@@ -2,7 +2,7 @@ package java.lang;
 
 import diamondfire.internal.VarItemGen;
 
-public class Runtime {
+public final class Runtime {
     private Runtime() {
     }
 

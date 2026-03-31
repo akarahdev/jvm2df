@@ -5,6 +5,7 @@ import dev.akarah.jvm2df.codetemplate.blocks.Bracket;
 import dev.akarah.jvm2df.codetemplate.blocks.CodeLine;
 import dev.akarah.jvm2df.codetemplate.items.Args;
 import dev.akarah.jvm2df.codetemplate.items.LiteralItem;
+import dev.akarah.jvm2df.codetemplate.items.VariableItem;
 import dev.akarah.jvm2df.tree.df.VarPattern;
 
 import java.lang.reflect.AccessFlag;
@@ -76,6 +77,22 @@ public class GenerateFieldSetup implements PipelineComponent {
 
         pipeline.codeLineBuilder().init(null);
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.gameEvent("PlotStartup"));
+
+        var hashVar = new VariableItem("globals::comptimehash::" + new Object().hashCode(), "saved");
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.ifVar(
+                "!=",
+                Args.byVarItems(hashVar, LiteralItem.number("0"))
+        ));
+        pipeline.codeLineBuilder().appendCodeBlock(Bracket.openNormal());
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.control(
+                "End",
+                Args.byVarItems()
+        ));
+        pipeline.codeLineBuilder().appendCodeBlock(Bracket.closeNormal());
+        pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.setVar(
+                "=",
+                Args.byVarItems(hashVar, LiteralItem.number("1"))
+        ));
 
         var funcsToCall = new ArrayList<>(
                 pipeline.classes().stream()
