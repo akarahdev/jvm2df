@@ -14,4 +14,8 @@ public final class Sound {
                 id
         );
     }
+
+    public Object raw() {
+        return this.inner;
+    }
 }

@@ -15,6 +15,10 @@ public final class Particle {
         );
     }
 
+    public Object raw() {
+        return this.inner;
+    }
+
     public Particle setType(String id) {
         this.inner = CodeBlocks.setVarR(
                 "SetParticleType",

@@ -6,12 +6,18 @@ import diamondfire.internal.annotation.NativeValue;
 
 @NativeValue
 public final class ItemStack {
-    public static ItemStack of(String material) {
-        return CodeBlocks.setVarR(
+    Object inner;
+
+    public ItemStack(String material) {
+        this.inner = CodeBlocks.setVarR(
                 "SetItemType",
                 VarItemGen.lineVar(),
                 VarItemGen.vanillaItem("{DF_NBT:4671,count:1,id:'minecraft:dirt'}"),
                 material
         );
+    }
+
+    public Object raw() {
+        return this.inner;
     }
 }

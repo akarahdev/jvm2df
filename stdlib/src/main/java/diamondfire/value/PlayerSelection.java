@@ -52,7 +52,7 @@ public final class PlayerSelection {
         CodeBlocks.selectObject("PlayerName", this.inner);
         CodeBlocks.playerAction(
                 "PlaySound",
-                sound.inner,
+                sound.raw(),
                 VarItemGen.tag("Sound Source", "Master")
         );
         CodeBlocks.selectObject("Reset");
@@ -62,7 +62,7 @@ public final class PlayerSelection {
         CodeBlocks.selectObject("PlayerName", this.inner);
         CodeBlocks.playerAction(
                 "Particle",
-                particle.inner,
+                particle.raw(),
                 location
         );
         CodeBlocks.selectObject("Reset");
