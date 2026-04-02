@@ -63,11 +63,10 @@ public final class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public <T> T read(BucketVariableKey<T> key) {
-//        return CodeBlocks.setVarR(
-//                "=",
-//                VarItemGen.lineVar(),
-//                VarItemGen.bucketVar(NAMESPACE, this.name, key.key())
-//        );
-        return null;
+        return CodeBlocks.setVarR(
+                "=",
+                VarItemGen.lineVar(),
+                0
+        );
     }
 }

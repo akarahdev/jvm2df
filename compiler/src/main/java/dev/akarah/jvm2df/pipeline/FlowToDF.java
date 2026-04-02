@@ -171,7 +171,7 @@ public class FlowToDF {
                     yield alloc;
                 }
                 default -> {
-                    throw new RuntimeException("I can't handle this right now :(");
+                    throw new RuntimeException("I can't handle this right now :(" + constant.constantDesc());
                 }
             };
             case CodeTree.StoreLocal(int idx, CodeTree value, CodeTree.Kind kind) -> {

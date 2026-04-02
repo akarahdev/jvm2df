@@ -135,18 +135,20 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
                 Args.byVarItems(allocation, LiteralItem.string("heap::"))
         ).storeTagInSlot(26, "Ignore Case", "False"));
         this.transformer().appendCodeBlock(Bracket.openNormal());
-        var out = VarPattern.temporary("root_count");
-        this.transformer().appendCodeBlock(ActionBlock.setVar(
-                "GetDictValue",
-                Args.byVarItems(out, VarPattern.gcRoots(), allocation)
-        ));
-        this.transformer().appendCodeBlock(ActionBlock.setVar(
-                "+=",
-                Args.byVarItems(out, LiteralItem.number("1"))
-        ));
         this.transformer().appendCodeBlock(ActionBlock.setVar(
                 "SetDictValue",
-                Args.byVarItems(VarPattern.gcRoots(), allocation, out)
+                Args.byVarItems(
+                        VarPattern.gcRoots(),
+                        allocation,
+                        LiteralItem.number(
+                                "%math("
+                                        + "%entry(" + VarPattern.gcRoots().name() + ","
+                                        + "%var(" + allocation.name() + ")"
+                                        + ")"
+                                        + "+1"
+                                        + ")"
+                        )
+                )
         ));
         this.transformer().appendCodeBlock(Bracket.closeNormal());
         return this.transformer().built();
@@ -172,12 +174,18 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
 
         var out = VarPattern.temporary("root_count");
         this.transformer().appendCodeBlock(ActionBlock.setVar(
-                "GetDictValue",
-                Args.byVarItems(out, VarPattern.gcRoots(), allocation)
-        ));
-        this.transformer().appendCodeBlock(ActionBlock.setVar(
-                "-=",
-                Args.byVarItems(out, LiteralItem.number("1"))
+                "=",
+                Args.byVarItems(
+                        out,
+                        LiteralItem.number(
+                                "%math("
+                                        + "%entry(" + VarPattern.gcRoots().name() + ","
+                                        + "%var(" + allocation.name() + ")"
+                                        + ")"
+                                        + "-1"
+                                        + ")"
+                        )
+                )
         ));
 
         this.transformer().appendCodeBlock(ActionBlock.ifVar(
