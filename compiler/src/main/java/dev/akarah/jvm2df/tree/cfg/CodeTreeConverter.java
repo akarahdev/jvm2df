@@ -270,25 +270,34 @@ public class CodeTreeConverter {
             params.add(this.stack.removeLast());
         }
         params = params.reversed();
-        var invoke = new CodeTree.Invoke(
-                instruction.method().owner(),
-                new CompilationGraph.MethodOutline(
-                        instruction.method().name().stringValue(),
-                        instruction.typeSymbol()
-                ),
-                params,
-                switch (instruction.opcode()) {
-                    case INVOKESTATIC -> InvokeStyle.STATIC;
-                    case INVOKESPECIAL -> InvokeStyle.VIRTUAL_EXACT;
-                    case INVOKEVIRTUAL, INVOKEINTERFACE -> {
-                        if (this.graph.classByEntry(instruction.method().owner()).flags().has(AccessFlag.FINAL)) {
-                            yield InvokeStyle.VIRTUAL_EXACT;
-                        }
-                        yield InvokeStyle.VIRTUAL_OVERRIDABLE;
+        CodeTree.Invoke invoke;
+        if (instruction.opcode().equals(Opcode.INVOKEVIRTUAL)
+                && this.graph.classByEntry(instruction.method().owner()).flags().has(AccessFlag.FINAL)) {
+            invoke = new CodeTree.Invoke(
+                    instruction.method().owner(),
+                    new CompilationGraph.MethodOutline(
+                            instruction.method().name().stringValue(),
+                            instruction.typeSymbol()
+                    ),
+                    params,
+                    InvokeStyle.STATIC
+            );
+        } else {
+            invoke = new CodeTree.Invoke(
+                    instruction.method().owner(),
+                    new CompilationGraph.MethodOutline(
+                            instruction.method().name().stringValue(),
+                            instruction.typeSymbol()
+                    ),
+                    params,
+                    switch (instruction.opcode()) {
+                        case INVOKESTATIC -> InvokeStyle.STATIC;
+                        case INVOKESPECIAL -> InvokeStyle.VIRTUAL_EXACT;
+                        case INVOKEINTERFACE -> InvokeStyle.VIRTUAL_OVERRIDABLE;
+                        default -> InvokeStyle.DYNAMIC_CALL_SITE;
                     }
-                    default -> InvokeStyle.DYNAMIC_CALL_SITE;
-                }
-        );
+            );
+        }
         if (TypeKind.from(instruction.typeSymbol().returnType()) == TypeKind.VOID) {
             this.statements.add(invoke);
         } else {

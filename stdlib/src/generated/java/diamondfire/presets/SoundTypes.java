@@ -1,6 +1,6 @@
 package diamondfire.presets;
 
-public final class SoundTypes {
+public class SoundTypes {
     public static final String AMBIENT_BASALT_DELTAS_ADDITIONS = "ambient.basalt_deltas.additions";
     public static final String AMBIENT_BASALT_DELTAS_LOOP = "ambient.basalt_deltas.loop";
     public static final String AMBIENT_BASALT_DELTAS_MOOD = "ambient.basalt_deltas.mood";

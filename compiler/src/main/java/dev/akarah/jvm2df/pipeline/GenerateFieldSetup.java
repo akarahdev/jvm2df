@@ -39,6 +39,7 @@ public class GenerateFieldSetup implements PipelineComponent {
             ));
 
             for (var outline : pipeline.graph().allSuperMethodsFor(pipeline.graph().classByEntry(classElements.thisClass()))) {
+                System.out.println(classElements.thisClass());
                 var methodModel = pipeline.graph().lookupMethodInSuper(
                         classElements.thisClass(),
                         outline.name(),

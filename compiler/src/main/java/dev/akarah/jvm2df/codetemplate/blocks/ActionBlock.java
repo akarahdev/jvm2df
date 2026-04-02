@@ -143,9 +143,33 @@ public record ActionBlock(
         );
     }
 
+    public static ActionBlock entityAction(String action, Args args) {
+        return new ActionBlock(
+                "entity_action",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(args)
+        );
+    }
+
     public static ActionBlock ifPlayer(String action, Args args) {
         return new ActionBlock(
                 "if_player",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(args)
+        );
+    }
+
+    public static ActionBlock ifEntity(String action, Args args) {
+        return new ActionBlock(
+                "if_entity",
                 Optional.empty(),
                 Optional.of(action),
                 Optional.empty(),

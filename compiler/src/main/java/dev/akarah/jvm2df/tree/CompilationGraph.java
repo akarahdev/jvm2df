@@ -6,6 +6,7 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.*;
 
 public class CompilationGraph {
@@ -28,28 +29,31 @@ public class CompilationGraph {
         );
     }
 
-    public Set<MethodOutline> allSuperMethodsFor(ClassModel model) {
+    public Set<MethodOutline> allSuperMethodsFor(ClassModel inpm) {
         var list = new HashSet<MethodOutline>();
-        var entry = model.thisClass();
-        do {
-            model = this.classByEntry(entry);
+        for (var entry : this.allSuperClassesFor(inpm)) {
+            if (this.classByEntry(entry) == null) {
+                throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
+            }
+            var model = this.classByEntry(entry);
             System.out.println("trying " + entry);
             for (var method : model.methods()) {
+                if (method.flags().has(AccessFlag.STATIC)) {
+                    continue;
+                }
                 list.add(new MethodOutline(
                         method.methodName().stringValue(),
                         method.methodTypeSymbol()
                 ));
             }
-            if (this.classByEntry(entry) == null) {
-                throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
-            }
-            entry = this.classByEntry(entry).superclass().orElse(null);
-        } while (entry != null);
+        }
         return list;
     }
 
     public Set<ClassEntry> allSuperClassesFor(ClassModel model) {
         var list = new HashSet<ClassEntry>();
+
+        // get super classes
         var entry = model.thisClass();
         do {
             list.add(entry);
@@ -59,6 +63,24 @@ public class CompilationGraph {
             }
             entry = this.classByEntry(entry).superclass().orElse(null);
         } while (entry != null);
+
+        // get super interfaces
+        var workList = new ArrayList<ClassEntry>();
+        workList.add(model.thisClass());
+        while (!workList.isEmpty()) {
+            var currentEntry = workList.removeLast();
+            if (this.classByEntry(currentEntry) == null) {
+                throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
+            }
+            var superClassesOfItf = this.classByEntry(currentEntry).interfaces();
+            for (var sc : superClassesOfItf) {
+                if (!list.contains(sc) && !workList.contains(sc)) {
+                    workList.add(sc);
+                    list.add(sc);
+                }
+            }
+        }
+
         return list;
     }
 
@@ -73,6 +95,10 @@ public class CompilationGraph {
     }
 
     public ClassModel classByEntry(ClassEntry name) {
+        if (name == null) {
+
+            throw new NullPointerException("why null :c");
+        }
         if (!this.classDescs.containsKey(name.asSymbol().descriptorString())) {
             throw new NullPointerException("Please compile with missing class " + name);
         }
@@ -90,9 +116,15 @@ public class CompilationGraph {
     public MethodModel lookupMethodInSuper(ClassEntry baseClass, String methodName, MethodTypeDesc typeDesc) {
         MethodModel m;
         m = lookupMethodExact(baseClass, methodName, typeDesc);
-        while (m == null && baseClass != null) {
-            baseClass = classByEntry(baseClass).superclass().orElse(null);
-            m = lookupMethodExact(baseClass, methodName, typeDesc);
+        for (var superClass : allSuperClassesFor(classByEntry(baseClass))) {
+            if (m != null) {
+                break;
+            }
+            System.out.println("looking in " + superClass);
+            m = lookupMethodExact(superClass, methodName, typeDesc);
+        }
+        if (m == null) {
+            throw new RuntimeException("Could not find method " + methodName + typeDesc.descriptorString() + " in " + baseClass);
         }
         return m;
     }

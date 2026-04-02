@@ -1,6 +1,6 @@
 package diamondfire.presets;
 
-public final class ParticleTypes {
+public class ParticleTypes {
     public static final String RAIN = "Rain";
     public static final String UNDERWATER = "Underwater";
     public static final String ASH = "Ash";

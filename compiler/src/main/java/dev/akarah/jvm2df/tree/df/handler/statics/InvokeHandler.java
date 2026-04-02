@@ -17,6 +17,8 @@ public interface InvokeHandler {
             new DFCodeBlocksHandler("ifVar", "if_var", ActionBlock::ifVar),
             new DFCodeBlocksHandler("selectObject", "select_obj", ActionBlock::selectObject),
             new DFCodeBlocksHandler("ifPlayer", "if_player", ActionBlock::ifPlayer),
+            new DFCodeBlocksHandler("entityAction", "entity_action", ActionBlock::entityAction),
+            new DFCodeBlocksHandler("ifEntity", "if_entity", ActionBlock::ifEntity),
             new VarItemGenHandler(),
             new BoxedPrimitiveHandler(),
             new BracketHandler(),

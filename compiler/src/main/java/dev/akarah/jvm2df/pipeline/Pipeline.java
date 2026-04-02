@@ -84,7 +84,7 @@ public class Pipeline {
 
         this.classes = JarToClasses.convert(this.jarPath);
 
-        final var codeLines = new ArrayList<CodeLine>();
+        var codeLines = new ArrayList<CodeLine>();
 
         this.graph = new CompilationGraph();
         this.classes.forEach(graph::register);
@@ -95,6 +95,12 @@ public class Pipeline {
         for (var component : this.components) {
             codeLines.addAll(component.generate(this));
         }
+
+        codeLines = new ArrayList<>(
+                codeLines.stream()
+                        .filter(x -> !x.codeBlocks().isEmpty())
+                        .toList()
+        );
 
         return codeLines;
     }
