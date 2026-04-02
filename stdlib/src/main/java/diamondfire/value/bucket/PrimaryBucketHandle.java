@@ -54,19 +54,20 @@ public final class PrimaryBucketHandle implements BucketHandle {
 
     @Override
     public <T> void store(BucketVariableKey<T> variable, T value) {
-        CodeBlocks.setVar(
-                "=",
-                VarItemGen.bucketVar(NAMESPACE, this.name, variable.key()),
-                value
-        );
+//        CodeBlocks.setVar(
+//                "=",
+//                VarItemGen.bucketVar(NAMESPACE, this.name, variable.key()),
+//                value
+//        );
     }
 
     @Override
     public <T> T read(BucketVariableKey<T> key) {
-        return CodeBlocks.setVarR(
-                "=",
-                VarItemGen.lineVar(),
-                VarItemGen.bucketVar(NAMESPACE, this.name, key.key())
-        );
+//        return CodeBlocks.setVarR(
+//                "=",
+//                VarItemGen.lineVar(),
+//                VarItemGen.bucketVar(NAMESPACE, this.name, key.key())
+//        );
+        return null;
     }
 }
