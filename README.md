@@ -10,6 +10,8 @@ Supported features:
 - Objects
 - Garbage collection
 
+Note that compilation currently only works on Node Beta due to bucket variables being a dependency of JVM2DF.
+
 Roadmap:
 
 - [x] `java.lang.String` APIs
