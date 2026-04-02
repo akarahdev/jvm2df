@@ -273,8 +273,13 @@ public class CodeTreeConverter {
         CodeTree.Invoke invoke;
         if (instruction.opcode().equals(Opcode.INVOKEVIRTUAL)
                 && this.graph.classByEntry(instruction.method().owner()).flags().has(AccessFlag.FINAL)) {
-            invoke = new CodeTree.Invoke(
+            var method = this.graph.lookupMethodInSuper(
                     instruction.method().owner(),
+                    instruction.method().name().stringValue(),
+                    instruction.typeSymbol()
+            );
+            invoke = new CodeTree.Invoke(
+                    method.parent().orElseThrow().thisClass(),
                     new CompilationGraph.MethodOutline(
                             instruction.method().name().stringValue(),
                             instruction.typeSymbol()
