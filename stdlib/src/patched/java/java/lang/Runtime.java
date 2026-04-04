@@ -1,6 +1,6 @@
 package java.lang;
 
-import diamondfire.internal.VarItemGen;
+import df.internal.VarItemGen;
 
 public final class Runtime {
     private Runtime() {

@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class VarItemGenHandler implements InvokeHandler {
     @Override
     public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("tag")) {
             switch (invoke.args().size()) {
                 case 2 -> {
@@ -36,14 +36,14 @@ public class VarItemGenHandler implements InvokeHandler {
 
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("lineVar")) {
             return Optional.of(transformer -> {
                 return VarPattern.temporary("std");
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("gameValue")) {
             return Optional.of(transformer -> {
                 var value = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
@@ -52,7 +52,7 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("vanillaItem")) {
             return Optional.of(transformer -> {
                 var value = ((CodeTree.Constant) invoke.args().getFirst()).constantDesc().toString();
@@ -60,7 +60,7 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("readField")) {
             return Optional.of(transformer -> {
                 var value = transformer.convertCodeTree(invoke.args().getFirst());
@@ -69,7 +69,7 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("readStaticField")) {
             return Optional.of(transformer -> {
                 var value = transformer.convertCodeTree(invoke.args().getFirst());
@@ -79,7 +79,7 @@ public class VarItemGenHandler implements InvokeHandler {
         }
 
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("classHandle")) {
             return Optional.of(transformer -> {
                 var value = transformer.convertCodeTree(invoke.args().getFirst());
@@ -91,7 +91,7 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("runGc")) {
             return Optional.of(transformer -> {
                 transformer.builder().appendCodeBlock(ActionBlock.callFunction(
@@ -103,7 +103,7 @@ public class VarItemGenHandler implements InvokeHandler {
         }
 
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("gcAllocationCount")) {
             return Optional.of(transformer -> {
                 var variable = new VariableItem("len", "line");
@@ -115,12 +115,12 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("emptySound")) {
             return Optional.of(transformer -> new SoundItem(1, 2, "Pling"));
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("emptyParticle")) {
             return Optional.of(transformer -> new ParticleItem(
                     "Rain",
@@ -129,7 +129,7 @@ public class VarItemGenHandler implements InvokeHandler {
             ));
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("classOf")) {
             return Optional.of(transformer -> {
                 var tmp = VarPattern.temporary("classOfBuiltIn");
@@ -141,7 +141,7 @@ public class VarItemGenHandler implements InvokeHandler {
             });
         }
 
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("bucketVar")) {
             return Optional.of(transformer -> {
                 var namespace = (LiteralItem) transformer.convertCodeTree(invoke.args().getFirst());

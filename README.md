@@ -28,19 +28,19 @@ Roadmap:
     - [ ] Lambdas
     - [ ] Enum switch
     - [ ] Pattern matching
-- [ ] `diamondfire.value.*` APIs
-    - [ ] `diamondfire.value.Location`
-    - [ ] `diamondfire.value.Text`
-    - [ ] `diamondfire.value.Vector`
-    - [ ] `diamondfire.value.Sound`
-    - [ ] `diamondfire.value.Particle`
-    - [ ] `diamondfire.value.Potion`
-- [x] `diamondfire.value.bucket.*`
-    - [x] `diamondfire.value.bucket.BucketHandle`
-    - [x] `diamondfire.value.bucket.BucketVariableKey`
-- [ ] `diamondfire.value.selection.*` APIs
-    - [ ] `diamondfire.value.selection.AbstractSelection`
-    - [ ] `diamondfire.value.selection.PlayerSelection`
-    - [ ] `diamondfire.value.selection.EntitySelection`
+- [ ] `df.value.*` APIs
+    - [ ] `df.value.Location`
+    - [ ] `df.value.Text`
+    - [ ] `df.value.Vector`
+    - [ ] `df.value.Sound`
+    - [ ] `df.value.Particle`
+    - [ ] `df.value.Potion`
+- [x] `df.value.bucket.*`
+    - [x] `df.value.bucket.BucketHandle`
+    - [x] `df.value.bucket.BucketVariableKey`
+- [ ] `df.value.selection.*` APIs
+    - [ ] `df.value.selection.AbstractSelection`
+    - [ ] `df.value.selection.PlayerSelection`
+    - [ ] `df.value.selection.EntitySelection`
 - [x] Enhanced `for` loop
 - [x] `java.lang.Thread`

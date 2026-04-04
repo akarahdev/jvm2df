@@ -1,7 +1,7 @@
 package java.lang;
 
-import diamondfire.internal.CodeBlocks;
-import diamondfire.internal.VarItemGen;
+import df.internal.CodeBlocks;
+import df.internal.VarItemGen;
 
 public final class Math {
     public static final float E = 2.7182818284590452354f;

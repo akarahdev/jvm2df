@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class VarItemOptimizationHandler implements InvokeHandler {
     @Override
     public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.classEntry().asInternalName().equals("diamondfire/value/Text")
+        if (invoke.classEntry().asInternalName().equals("df/value/Text")
                 && invoke.outline().name().equals("of")
                 && invoke.args().size() == 1
                 && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {
@@ -21,7 +21,7 @@ public class VarItemOptimizationHandler implements InvokeHandler {
                 return LiteralItem.text(constantDesc.toString());
             });
         }
-        if (invoke.classEntry().asInternalName().equals("diamondfire/value/ItemStack")
+        if (invoke.classEntry().asInternalName().equals("df/value/ItemStack")
                 && invoke.outline().name().equals("of")
                 && invoke.args().size() == 1
                 && invoke.args().getFirst() instanceof CodeTree.Constant(ConstantDesc constantDesc)) {

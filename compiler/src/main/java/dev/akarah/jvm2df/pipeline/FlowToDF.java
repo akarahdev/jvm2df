@@ -91,19 +91,19 @@ public class FlowToDF {
                 .orElse("java/lang/Object");
 
         switch (parentalName) {
-            case "diamondfire/event/PlayerEventHandler" -> {
+            case "df/event/PlayerEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     return this.builder.built();
                 }
                 this.builder.appendCodeBlock(ActionBlock.playerEvent(methodModel.methodName().stringValue()));
             }
-            case "diamondfire/event/EntityEventHandler" -> {
+            case "df/event/EntityEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     return this.builder.built();
                 }
                 this.builder.appendCodeBlock(ActionBlock.entityEvent(methodModel.methodName().stringValue()));
             }
-            case "diamondfire/event/GameEventHandler" -> {
+            case "df/event/GameEventHandler" -> {
                 if (methodModel.methodName().equalsString("<init>") || methodModel.methodName().equalsString("<clinit>")) {
                     return this.builder.built();
                 }

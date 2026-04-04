@@ -1,8 +1,8 @@
 package java.lang;
 
-import diamondfire.internal.CodeBlocks;
-import diamondfire.internal.VarItemGen;
-import diamondfire.internal.annotation.NativeValue;
+import df.internal.CodeBlocks;
+import df.internal.VarItemGen;
+import df.internal.annotation.NativeValue;
 
 @NativeValue
 public final class String {

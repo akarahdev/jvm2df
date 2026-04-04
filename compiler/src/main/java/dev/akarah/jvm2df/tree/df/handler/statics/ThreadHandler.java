@@ -20,7 +20,7 @@ public class ThreadHandler implements InvokeHandler {
                 && invoke.outline().name().equals("start0")) {
             return Optional.of(transformer -> {
                 transformer.builder().globals().invokeVirtual(
-                        (VariableItem) transformer.convertCodeTree(invoke.args().getFirst()),
+                        transformer.convertCodeTree(invoke.args().getFirst()),
                         new CompilationGraph.MethodOutline(
                                 "run",
                                 MethodTypeDesc.of(ClassDesc.ofDescriptor("V"))
@@ -33,7 +33,7 @@ public class ThreadHandler implements InvokeHandler {
                 return null;
             });
         }
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
+        if (invoke.classEntry().asInternalName().equals("df/internal/CodeBlocks")
                 && invoke.outline().name().equals("closeNormal")) {
             return Optional.of(transformer -> {
                 transformer.builder().appendCodeBlock(Bracket.closeNormal());

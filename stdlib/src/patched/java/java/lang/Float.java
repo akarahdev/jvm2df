@@ -1,7 +1,7 @@
 package java.lang;
 
-import diamondfire.internal.CodeBlocks;
-import diamondfire.internal.VarItemGen;
+import df.internal.CodeBlocks;
+import df.internal.VarItemGen;
 
 public final class Float {
     public static String toString(float i) {

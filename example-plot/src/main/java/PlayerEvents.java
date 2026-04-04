@@ -1,8 +1,8 @@
-import diamondfire.event.PlayerEventHandler;
-import diamondfire.value.Text;
-import diamondfire.value.selection.PlayerSelection;
-import diamondfire.value.tags.BossBarColor;
-import diamondfire.value.tags.BossBarSkyEffect;
+import df.event.PlayerEventHandler;
+import df.value.Text;
+import df.value.selection.PlayerSelection;
+import df.value.tags.BossBarColor;
+import df.value.tags.BossBarSkyEffect;
 
 public class PlayerEvents extends PlayerEventHandler {
     @Override

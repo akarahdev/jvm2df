@@ -1,6 +1,6 @@
 package java.lang;
 
-import diamondfire.internal.VarItemGen;
+import df.internal.VarItemGen;
 
 public class Object {
     public boolean equals(Object other) {

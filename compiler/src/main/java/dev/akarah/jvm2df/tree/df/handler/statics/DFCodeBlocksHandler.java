@@ -18,7 +18,7 @@ public record DFCodeBlocksHandler(String functionName, String codeBlock,
                                   BiFunction<String, Args, CodeBlock<?>> mapper) implements InvokeHandler {
     @Override
     public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
-        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/CodeBlocks")
+        if (invoke.classEntry().asInternalName().equals("df/internal/CodeBlocks")
                 && invoke.outline().name().startsWith(functionName)) {
             var codeArguments = new ArrayList<>(invoke.args());
             var action = codeArguments.removeFirst();

@@ -1,6 +1,6 @@
 package java.lang;
 
-import diamondfire.internal.VarItemGen;
+import df.internal.VarItemGen;
 
 public abstract class Enum<E extends Enum<E>> {
     protected Enum(String name, int ordinal) {
