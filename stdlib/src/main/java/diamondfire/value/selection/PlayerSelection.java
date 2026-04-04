@@ -3,11 +3,12 @@ package diamondfire.value.selection;
 import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 import diamondfire.value.selection.playerimpl.AppearancePlayerImpl;
+import diamondfire.value.selection.playerimpl.CommunicationPlayerImpl;
 import diamondfire.value.selection.playerimpl.MovementPlayerImpl;
 import diamondfire.value.selection.playerimpl.StatisticsPlayerImpl;
 
 public final class PlayerSelection implements
-        AppearancePlayerImpl, MovementPlayerImpl, StatisticsPlayerImpl {
+        AppearancePlayerImpl, MovementPlayerImpl, StatisticsPlayerImpl, CommunicationPlayerImpl {
     Object inner;
 
     public static PlayerSelection defaultTarget() {

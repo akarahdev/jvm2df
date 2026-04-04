@@ -294,7 +294,8 @@ public record ActionBlock(
                             option,
                             tag,
                             this.action().orElse("dynamic"),
-                            this.block()
+                            this.block(),
+                            null
                     ),
                     slot
             ));

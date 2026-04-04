@@ -35,7 +35,8 @@ public record DFCodeBlocksHandler(String functionName, String codeBlock,
                                 blockTagItem.option(),
                                 blockTagItem.tag(),
                                 constantDesc.toString(),
-                                codeBlock
+                                codeBlock,
+                                blockTagItem.variable()
                         ));
                     } else {
                         norms.add(compiledArg);

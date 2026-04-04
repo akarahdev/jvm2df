@@ -15,11 +15,25 @@ public class VarItemGenHandler implements InvokeHandler {
     public Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke) {
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
                 && invoke.outline().name().equals("tag")) {
-            return Optional.of(transformer -> {
-                var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
-                var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
-                return new BlockTagItem(option, tag, "?", "?");
-            });
+            switch (invoke.args().size()) {
+                case 2 -> {
+                    return Optional.of(transformer -> {
+                        var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
+                        var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
+                        return new BlockTagItem(option, tag, "?", "?", null);
+                    });
+                }
+                case 3 -> {
+                    return Optional.of(transformer -> {
+                        var value = transformer.convertCodeTree(invoke.args().get(2));
+                        var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
+                        var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
+                        return new BlockTagItem(option, tag, "?", "?", (VariableItem) value);
+                    });
+                }
+                default -> throw new RuntimeException("2 or 3 args!!");
+            }
+
         }
 
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")

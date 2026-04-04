@@ -3,12 +3,14 @@ package dev.akarah.jvm2df.codetemplate.items;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public record BlockTagItem(String option, String tag, String action, String block) implements VarItem<BlockTagItem> {
+public record BlockTagItem(String option, String tag, String action, String block,
+                           VarItem<?> variable) implements VarItem<BlockTagItem> {
     public static Codec<BlockTagItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("option").forGetter(BlockTagItem::option),
             Codec.STRING.fieldOf("tag").forGetter(BlockTagItem::tag),
             Codec.STRING.fieldOf("action").forGetter(BlockTagItem::action),
-            Codec.STRING.fieldOf("block").forGetter(BlockTagItem::block)
+            Codec.STRING.fieldOf("block").forGetter(BlockTagItem::block),
+            VarItem.GENERIC_CODEC.optionalFieldOf("variable", null).forGetter(BlockTagItem::variable)
     ).apply(instance, BlockTagItem::new));
 
     @Override

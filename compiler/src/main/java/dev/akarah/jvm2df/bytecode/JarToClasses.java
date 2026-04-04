@@ -1,7 +1,5 @@
 package dev.akarah.jvm2df.bytecode;
 
-import dev.akarah.jvm2df.codetemplate.items.VarItem;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.classfile.ClassFile;
@@ -12,10 +10,7 @@ import java.util.List;
 import java.util.jar.JarInputStream;
 
 public class JarToClasses {
-    static {
-        System.out.println(VarItem.VAR_ITEMS);
-    }
-    
+
     public static List<ClassModel> convert(Path jarFile) {
         var classFiles = new ArrayList<ClassModel>();
         try (var jarStream = new JarInputStream(new FileInputStream(jarFile.toFile()))) {
