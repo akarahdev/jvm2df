@@ -75,6 +75,19 @@ public record ActionBlock(
         );
     }
 
+
+    public static ActionBlock gameAction(String action, Args args) {
+        return new ActionBlock(
+                "game_action",
+                Optional.empty(),
+                Optional.of(action),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(args)
+        );
+    }
+
     public static ActionBlock function(String data, List<VarItem<?>> params) {
         return new ActionBlock(
                 "func",

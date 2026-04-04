@@ -17,7 +17,8 @@ public class CodeBlocksAPIGenerator implements ResourceGenerator {
             "setVar",
             "selectObject",
             "entityAction",
-            "ifEntity"
+            "ifEntity",
+            "gameAction"
     );
 
     List<String> variableYieldingCodeBlocks = List.of(

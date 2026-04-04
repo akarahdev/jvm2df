@@ -5,7 +5,7 @@ public class VarItemGen {
 
     public static native Object tag(String tag, String option, Object defaultValue);
 
-    public static native Object gameValue(String value, String target);
+    public static native <T> T gameValue(String value, String target);
 
     public static native Object lineVar();
 

@@ -78,7 +78,8 @@ public class CodeTreeConverter {
                 var value2Var = 1000000 - 1 + new Random().nextInt(Integer.MAX_VALUE - 1000000);
                 switch (instruction.opcode()) {
                     case POP -> {
-                        this.stack.removeLast();
+                        var poppedValue = this.stack.removeLast();
+                        this.statements.add(poppedValue);
                     }
                     case POP2 -> {
                         this.stack.removeLast();
