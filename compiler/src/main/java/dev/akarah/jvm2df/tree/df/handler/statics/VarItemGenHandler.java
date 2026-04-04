@@ -28,7 +28,7 @@ public class VarItemGenHandler implements InvokeHandler {
                         var value = transformer.convertCodeTree(invoke.args().get(2));
                         var tag = ((CodeTree.Constant) invoke.args().get(0)).constantDesc().toString();
                         var option = ((CodeTree.Constant) invoke.args().get(1)).constantDesc().toString();
-                        return new BlockTagItem(option, tag, "?", "?", (VariableItem) value);
+                        return new BlockTagItem(option, tag, "?", "?", value);
                     });
                 }
                 default -> throw new RuntimeException("2 or 3 args!!");
@@ -68,6 +68,16 @@ public class VarItemGenHandler implements InvokeHandler {
                 return transformer.builder().globals().readField(value, field);
             });
         }
+
+        if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
+                && invoke.outline().name().equals("readStaticField")) {
+            return Optional.of(transformer -> {
+                var value = transformer.convertCodeTree(invoke.args().getFirst());
+                var field = transformer.convertCodeTree(invoke.args().get(1));
+                return transformer.builder().globals().readStaticFieldOfDynClass(value, field);
+            });
+        }
+
 
         if (invoke.classEntry().asInternalName().equals("diamondfire/internal/VarItemGen")
                 && invoke.outline().name().equals("classHandle")) {

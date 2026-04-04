@@ -4,6 +4,8 @@ import diamondfire.internal.CodeBlocks;
 import diamondfire.internal.VarItemGen;
 import diamondfire.value.Text;
 import diamondfire.value.selection.Selection;
+import diamondfire.value.tags.BossBarColor;
+import diamondfire.value.tags.BossBarSkyEffect;
 
 public interface CommunicationPlayerImpl extends Selection {
     default void sendMessage(Text text) {
@@ -35,7 +37,7 @@ public interface CommunicationPlayerImpl extends Selection {
         CodeBlocks.selectObject("Reset");
     }
 
-    default void sendBossBar(Text text, double health, String skyEffect, String barColor) {
+    default void sendBossBar(Text text, double health, BossBarSkyEffect skyEffect, BossBarColor barColor) {
         CodeBlocks.selectObject("PlayerName", VarItemGen.readField(this, "inner"));
         CodeBlocks.playerAction(
                 " SetBossBar ",
@@ -43,9 +45,9 @@ public interface CommunicationPlayerImpl extends Selection {
                 health * 1000,
                 1000,
                 1,
-                VarItemGen.tag("Sky Effect", "None", skyEffect),
+                VarItemGen.tag("Sky Effect", "None", skyEffect.toString()),
                 VarItemGen.tag("Bar Style", "Solid"),
-                VarItemGen.tag("Bar Color", "Purple", barColor)
+                VarItemGen.tag("Bar Color", "Purple", barColor.toString())
         );
         CodeBlocks.selectObject("Reset");
     }

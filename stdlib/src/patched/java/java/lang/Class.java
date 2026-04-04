@@ -13,6 +13,6 @@ public final class Class<T> {
 
     @Override
     public String toString() {
-        return "Class{".concat(this.descriptor).concat("}");
+        return this.descriptor;
     }
 }

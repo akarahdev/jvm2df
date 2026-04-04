@@ -32,8 +32,9 @@ public class CodeClientAPI extends WebSocketClient {
             case "auth" -> {
                 this.send("mode code");
                 this.send("clear");
+                this.send("spawn");
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(3000);
                 } catch (Exception _) {
                     // ignored bruh
                 }

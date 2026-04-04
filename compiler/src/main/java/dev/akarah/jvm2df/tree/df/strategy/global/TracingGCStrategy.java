@@ -71,6 +71,11 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
+    public VarItem<?> readStaticFieldOfDynClass(VarItem<?> clazz, VarItem<?> field) {
+        return this.inner.readStaticFieldOfDynClass(clazz, field);
+    }
+
+    @Override
     public VarItem<?> readClass(VarItem<?> allocation) {
         return this.inner.readClass(allocation);
     }

@@ -138,6 +138,20 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
+    public VarItem<?> readStaticFieldOfDynClass(VarItem<?> clazz, VarItem<?> field) {
+        var readVar = VarPattern.temporary("read");
+        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                "GetDictValue",
+                Args.byVarItems(
+                        readVar,
+                        new VariableItem("statics", "unsaved"),
+                        LiteralItem.string(clazz.percentCodeSafe() + "." + field.percentCodeSafe())
+                )
+        ));
+        return readVar;
+    }
+
+    @Override
     public VarItem<?> readClass(VarItem<?> allocation) {
         var classValue = VarPattern.temporary("classOfInvokeVirtual");
         this.transformer.appendCodeBlock(ActionBlock.callFunction(
@@ -210,24 +224,6 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         var classVar = new VariableItem("class", "line");
         var objVar = new VariableItem("obj", "line");
 
-        // reference types
-        this.transformer.appendCodeBlock(ActionBlock.ifVar(
-                "StartsWith",
-                Args.byVarItems(objVar, LiteralItem.string("heap::"))
-        ));
-        this.transformer.appendCodeBlock(Bracket.openNormal());
-        {
-            this.transformer.appendCodeBlock(ActionBlock.setVar(
-                    "GetDictValue",
-                    Args.byVarItems(
-                            classVar,
-                            new VariableItem("%var(" + objVar.name() + ")", "unsaved"),
-                            LiteralItem.string("class")
-                    )
-            ));
-            this.transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
-        }
-        this.transformer.appendCodeBlock(Bracket.closeNormal());
 
         // primitive types
         var map = Map.ofEntries(
@@ -252,6 +248,26 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
             ).storeTagInSlot(26, "Variable Type", entry.getKey()));
             this.transformer.appendCodeBlock(Bracket.openNormal());
             {
+                if (entry.getKey().equals("String")) {
+                    // reference types
+                    this.transformer.appendCodeBlock(ActionBlock.ifVar(
+                            "StartsWith",
+                            Args.byVarItems(objVar, LiteralItem.string("heap::"))
+                    ));
+                    this.transformer.appendCodeBlock(Bracket.openNormal());
+                    {
+                        this.transformer.appendCodeBlock(ActionBlock.setVar(
+                                "GetDictValue",
+                                Args.byVarItems(
+                                        classVar,
+                                        new VariableItem("%var(" + objVar.name() + ")", "unsaved"),
+                                        LiteralItem.string("class")
+                                )
+                        ));
+                        this.transformer.appendCodeBlock(ActionBlock.control("Return", Args.byVarItems()));
+                    }
+                    this.transformer.appendCodeBlock(Bracket.closeNormal());
+                }
                 this.transformer.appendCodeBlock(ActionBlock.setVar(
                         "=",
                         Args.byVarItems(classVar, LiteralItem.string(entry.getValue()))

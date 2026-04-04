@@ -24,6 +24,8 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
+import java.lang.constant.DynamicConstantDesc;
+import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -169,6 +171,17 @@ public class FlowToDF {
                             LiteralItem.string(classDesc.descriptorString())
                     );
                     yield alloc;
+                }
+                case DynamicConstantDesc<?> dynamicConstantDesc -> {
+                    try {
+                        var resolved = dynamicConstantDesc.resolveConstantDesc(MethodHandles.lookup());
+                        if (resolved == null) {
+                            yield LiteralItem.string("heap::0");
+                        }
+                        throw new RuntimeException("I don't know how to handle this :( " + dynamicConstantDesc);
+                    } catch (ReflectiveOperationException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 default -> {
                     throw new RuntimeException("I can't handle this right now :(" + constant.constantDesc());
