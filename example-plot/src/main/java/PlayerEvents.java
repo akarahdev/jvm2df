@@ -6,6 +6,6 @@ public class PlayerEvents extends PlayerEventHandler {
     @Override
     public void Join() {
         var sel = PlayerSelection.defaultTarget();
-        sel.teleport(Location.of(10, 55, 10));
+        sel.teleport(Location.of(Datas.x() + Datas.y(), 50, 10));
     }
 }

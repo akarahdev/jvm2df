@@ -30,4 +30,13 @@ public interface VarItem<T extends VarItem<T>> {
     Codec<T> dataCodec();
 
     String id();
+
+    default String percentCodeSafe() {
+        return switch (this) {
+            case VariableItem(String name, String scope) -> "%var(" + name + ")";
+            case LiteralItem(String id, String value) -> value;
+            default -> throw new RuntimeException("Can not convert " + this + " into % code.");
+        };
+    }
 }
+

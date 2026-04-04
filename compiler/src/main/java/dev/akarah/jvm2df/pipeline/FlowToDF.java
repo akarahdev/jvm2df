@@ -548,24 +548,8 @@ public class FlowToDF {
         };
         switch (op) {
             case "CompareNumbers" -> {
-                var lhsVarItem = this.convertCodeTree(add.lhs());
-                var rhsVarItem = this.convertCodeTree(add.rhs());
-
-                var lhsVarString = "";
-                if (lhsVarItem instanceof LiteralItem literalItem) {
-                    lhsVarString = literalItem.value();
-                }
-                if (lhsVarItem instanceof VariableItem variableItem) {
-                    lhsVarString = "%var(" + variableItem.name() + ")";
-                }
-
-                var rhsVarString = "";
-                if (rhsVarItem instanceof LiteralItem literalItem) {
-                    rhsVarString = literalItem.value();
-                }
-                if (rhsVarItem instanceof VariableItem variableItem) {
-                    rhsVarString = "%var(" + variableItem.name() + ")";
-                }
+                var lhsVarString = this.convertCodeTree(add.lhs()).percentCodeSafe();
+                var rhsVarString = this.convertCodeTree(add.rhs()).percentCodeSafe();
                 this.builder.appendCodeBlock(ActionBlock.setVar(
                         "ClampNumber",
                         Args.byVarItems(
@@ -599,14 +583,9 @@ public class FlowToDF {
                 );
             }
             default -> {
-                this.builder.appendCodeBlock(ActionBlock.setVar(
-                        op,
-                        Args.byVarItems(
-                                variable,
-                                this.convertCodeTree(add.lhs()),
-                                this.convertCodeTree(add.rhs())
-                        )
-                ));
+                var lhs = this.convertCodeTree(add.lhs()).percentCodeSafe();
+                var rhs = this.convertCodeTree(add.rhs()).percentCodeSafe();
+                return LiteralItem.number("%math(" + lhs + "+" + rhs + ")");
             }
         }
 
