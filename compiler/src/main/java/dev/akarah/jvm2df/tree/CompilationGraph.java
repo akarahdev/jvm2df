@@ -36,7 +36,6 @@ public class CompilationGraph {
                 throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
             }
             var model = this.classByEntry(entry);
-            System.out.println("trying " + entry);
             for (var method : model.methods()) {
                 if (method.flags().has(AccessFlag.STATIC)) {
                     continue;
@@ -57,7 +56,6 @@ public class CompilationGraph {
         var entry = model.thisClass();
         do {
             list.add(entry);
-            System.out.println("trying " + entry);
             if (this.classByEntry(entry) == null) {
                 throw new NullPointerException("Entry class " + entry + " is not present in the JAR");
             }
@@ -96,13 +94,19 @@ public class CompilationGraph {
 
     public ClassModel classByEntry(ClassEntry name) {
         if (name == null) {
-
             throw new NullPointerException("why null :c");
         }
         if (!this.classDescs.containsKey(name.asSymbol().descriptorString())) {
             throw new NullPointerException("Please compile with missing class " + name);
         }
         return this.classDescs.get(name.asSymbol().descriptorString());
+    }
+
+    public ClassEntry entryByDescriptor(String name) {
+        if (!this.classDescs.containsKey(name)) {
+            throw new RuntimeException("Unknown descriptor " + name);
+        }
+        return this.classDescs.get(name).thisClass();
     }
 
     public MethodModel lookupMethodExact(ClassEntry className, String methodName, MethodTypeDesc typeDesc) {

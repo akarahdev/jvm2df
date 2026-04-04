@@ -25,7 +25,8 @@ public interface InvokeHandler {
             new BracketHandler(),
             new VarItemOptimizationHandler(),
             new ForceReturnHandler(),
-            new ThreadHandler()
+            new ThreadHandler(),
+            new ArrayCloneHandler()
     );
 
     Optional<Function<FlowToDF, VarItem<?>>> tryRewrite(CodeTree.Invoke invoke);

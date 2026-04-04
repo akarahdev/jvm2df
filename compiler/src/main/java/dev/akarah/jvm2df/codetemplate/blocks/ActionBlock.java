@@ -97,7 +97,7 @@ public record ActionBlock(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(
-                        Args.byVarItems(params)
+                        Args.byVarItemsList(params)
                 )
         );
     }
@@ -111,12 +111,12 @@ public record ActionBlock(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(
-                        Args.byVarItems(params)
+                        Args.byVarItemsList(params)
                 )
         );
     }
 
-    public static ActionBlock callFunction(String data, List<VarItem<?>> params) {
+    public static ActionBlock callFunction(String data, List<? extends VarItem<?>> params) {
         return new ActionBlock(
                 "call_func",
                 Optional.of(data),
@@ -125,7 +125,7 @@ public record ActionBlock(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(
-                        Args.byVarItems(params)
+                        Args.byVarItemsList(params)
                 )
         );
     }
@@ -139,7 +139,7 @@ public record ActionBlock(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(
-                        Args.byVarItems(params)
+                        Args.byVarItemsList(params)
                 )
         );
     }

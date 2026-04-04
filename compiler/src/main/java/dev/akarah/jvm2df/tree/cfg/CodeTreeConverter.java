@@ -59,8 +59,27 @@ public class CodeTreeConverter {
             case LoadInstruction instruction -> {
                 this.stack.add(new CodeTree.LoadLocal(instruction.slot()));
             }
-            case NewPrimitiveArrayInstruction _, NewReferenceArrayInstruction _ -> {
-                this.stack.add(new CodeTree.ArrayNew(this.stack.removeLast()));
+            case NewPrimitiveArrayInstruction instruction -> {
+                this.stack.add(new CodeTree.ArrayNew(
+                        this.stack.removeLast(),
+                        "[" + primitiveTypeDescriptor(instruction.typeKind())
+                ));
+            }
+            case NewReferenceArrayInstruction instruction -> {
+                this.stack.add(new CodeTree.ArrayNew(
+                        this.stack.removeLast(),
+                        "[" + instruction.componentType().asSymbol().descriptorString()
+                ));
+            }
+            case NewMultiArrayInstruction instruction -> {
+                CodeTree outermostSize = null;
+                for (int i = 0; i < instruction.dimensions(); i++) {
+                    outermostSize = this.stack.removeLast();
+                }
+                this.stack.add(new CodeTree.ArrayNew(
+                        outermostSize,
+                        instruction.arrayType().asSymbol().descriptorString()
+                ));
             }
             case ArrayStoreInstruction _ -> {
                 var value = this.stack.removeLast();
@@ -272,7 +291,9 @@ public class CodeTreeConverter {
         }
         params = params.reversed();
         CodeTree.Invoke invoke;
+        var ownerDescriptor = instruction.method().owner().asSymbol().descriptorString();
         if (instruction.opcode().equals(Opcode.INVOKEVIRTUAL)
+                && !ownerDescriptor.startsWith("[")
                 && this.graph.classByEntry(instruction.method().owner()).flags().has(AccessFlag.FINAL)) {
             var method = this.graph.lookupMethodInSuper(
                     instruction.method().owner(),
@@ -365,6 +386,20 @@ public class CodeTreeConverter {
 
     private int labelToOffset(Label label) {
         return this.labelConverter.apply(label);
+    }
+
+    private String primitiveTypeDescriptor(TypeKind kind) {
+        return switch (kind) {
+            case BOOLEAN -> "Z";
+            case BYTE -> "B";
+            case CHAR -> "C";
+            case SHORT -> "S";
+            case INT -> "I";
+            case LONG -> "J";
+            case FLOAT -> "F";
+            case DOUBLE -> "D";
+            default -> throw new IllegalArgumentException("Unsupported primitive array element kind: " + kind);
+        };
     }
 
 

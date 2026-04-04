@@ -58,14 +58,14 @@ public class CodeLineBuilder {
                 if (codeblocks == 0) {
                     this.appendCodeBlock(ActionBlock.setVar(
                             "CreateList",
-                            Args.byVarItems(currentSet)
+                            Args.byVarItemsList(currentSet)
                     ));
                     currentSet.clear();
                     currentSet.add(variable);
                 } else {
                     this.appendCodeBlock(ActionBlock.setVar(
                             "AppendValue",
-                            Args.byVarItems(currentSet)
+                            Args.byVarItemsList(currentSet)
                     ));
                     currentSet.clear();
                     currentSet.add(variable);
@@ -76,7 +76,7 @@ public class CodeLineBuilder {
         if (currentSet.size() > 1) {
             this.appendCodeBlock(ActionBlock.setVar(
                     "AppendValue",
-                    Args.byVarItems(currentSet)
+                    Args.byVarItemsList(currentSet)
             ));
         }
         return variable;

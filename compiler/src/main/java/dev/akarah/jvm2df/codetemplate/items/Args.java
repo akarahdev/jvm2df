@@ -15,7 +15,7 @@ public record Args(List<Argument> arguments) {
         ).apply(instance, Argument::new));
     }
 
-    public static Args byVarItems(List<VarItem<?>> varItems) {
+    public static Args byVarItemsList(List<? extends VarItem<?>> varItems) {
         var list = new ArrayList<Argument>();
         int idx = 0;
         for (var item : varItems) {
@@ -29,7 +29,7 @@ public record Args(List<Argument> arguments) {
     }
 
     public static Args byVarItems(VarItem<?>... varItems) {
-        return byVarItems(Arrays.asList(varItems));
+        return byVarItemsList(Arrays.asList(varItems));
     }
 
     public static Codec<Args> CODEC = Argument.CODEC.listOf().xmap(Args::new, Args::arguments).fieldOf("items").codec();

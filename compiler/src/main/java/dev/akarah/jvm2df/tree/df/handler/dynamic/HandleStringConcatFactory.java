@@ -50,7 +50,7 @@ public class HandleStringConcatFactory implements InvokeDynamicHandler {
                 params.addFirst(returnVariable);
                 transformer.builder().appendCodeBlock(ActionBlock.setVar(
                         "String",
-                        Args.byVarItems(params)
+                        Args.byVarItemsList(params)
                 ).storeTagInSlot(26, "Text Value Merging", "No spaces"));
                 return returnVariable;
             });

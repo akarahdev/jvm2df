@@ -87,7 +87,9 @@ public class Pipeline {
         var codeLines = new ArrayList<CodeLine>();
 
         this.graph = new CompilationGraph();
-        this.classes.forEach(graph::register);
+        this.classes.forEach(classElements -> {
+            graph.register(classElements);
+        });
 
         this.bytecodeTranslator = new BytecodeTranslator();
         this.codeLineBuilder = new CodeLineBuilder(this.localMemoryStrategy, this.globalMemoryStrategy, graph);

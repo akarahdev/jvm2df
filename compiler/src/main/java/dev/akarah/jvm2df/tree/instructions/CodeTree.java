@@ -56,7 +56,7 @@ public interface CodeTree {
     record Negate(CodeTree lhs) implements CodeTree {
     }
 
-    record ArrayNew(CodeTree size) implements CodeTree {
+    record ArrayNew(CodeTree size, String descriptor) implements CodeTree {
     }
 
     record ArrayIndex(CodeTree list, CodeTree index) implements CodeTree {

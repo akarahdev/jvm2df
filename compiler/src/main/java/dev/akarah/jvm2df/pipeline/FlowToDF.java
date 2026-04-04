@@ -234,6 +234,11 @@ public class FlowToDF {
                 var alloc = this.builder.globals().allocate();
                 this.builder.globals().setField(
                         alloc,
+                        LiteralItem.string("class"),
+                        LiteralItem.string(arrayNew.descriptor())
+                );
+                this.builder.globals().setField(
+                        alloc,
                         LiteralItem.string("length"),
                         this.convertCodeTree(arrayNew.size())
                 );
@@ -335,7 +340,7 @@ public class FlowToDF {
                 var params = buildSuperClassParams(isInstanceOf.descriptor(), (VariableItem) clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
                         "Contains",
-                        Args.byVarItems(params),
+                        Args.byVarItemsList(params),
                         "NOT"
                 ));
                 this.builder.appendCodeBlock(Bracket.openNormal());
@@ -365,7 +370,7 @@ public class FlowToDF {
                 var params = buildSuperClassParams(castValueTo.descriptor(), clazz);
                 this.builder.appendCodeBlock(ActionBlock.ifVar(
                         "Contains",
-                        Args.byVarItems(params),
+                        Args.byVarItemsList(params),
                         "NOT"
                 ));
                 this.builder.appendCodeBlock(Bracket.openNormal());
@@ -609,7 +614,6 @@ public class FlowToDF {
             params.addFirst(returnVariable);
         }
         var outline = invoke.outline();
-        var ownedClass = this.builder.graph().classByEntry(invoke.classEntry());
         switch (invoke.style()) {
             case STATIC, VIRTUAL_EXACT, DYNAMIC_CALL_SITE -> {
                 this.builder.appendCodeBlock(ActionBlock.callFunction(
