@@ -130,6 +130,15 @@ public class VarItemGenHandler implements InvokeHandler {
         }
 
         if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
+                && invoke.outline().name().equals("emptyPotion")) {
+            return Optional.of(transformer -> new PotionItem(
+                    "Speed",
+                    1,
+                    0
+            ));
+        }
+
+        if (invoke.classEntry().asInternalName().equals("df/internal/VarItemGen")
                 && invoke.outline().name().equals("classOf")) {
             return Optional.of(transformer -> {
                 var tmp = VarPattern.temporary("classOfBuiltIn");

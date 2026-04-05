@@ -13,6 +13,8 @@ public class VarItemGen {
 
     public static native Object emptyParticle();
 
+    public static native Object emptyPotion();
+
     public static native Object vanillaItem(String nbt);
 
     public static native Object classHandle(Object className);

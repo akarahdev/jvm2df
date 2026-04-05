@@ -20,11 +20,11 @@ Roadmap:
     - [ ] Relooper
 - [ ] Polymorphism
     - [x] `extends` clauses and virtual dispatch
-    - [ ] `abstract class`
+    - [x] `abstract class`
     - [x] `interface` and `invokeinterface`
 - [ ] `invokedynamic`
     - [ ] `java.lang.MethodHandle` and related APIs
-    - [ ] String concat
+    - [x] String concat
     - [ ] Lambdas
     - [ ] Enum switch
     - [ ] Pattern matching
@@ -39,7 +39,7 @@ Roadmap:
     - [x] `df.value.bucket.BucketHandle`
     - [x] `df.value.bucket.BucketVariableKey`
 - [ ] `df.value.selection.*` APIs
-    - [ ] `df.value.selection.AbstractSelection`
+    - [x] `df.value.selection.Selection`
     - [ ] `df.value.selection.PlayerSelection`
     - [ ] `df.value.selection.EntitySelection`
 - [x] Enhanced `for` loop

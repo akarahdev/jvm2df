@@ -19,6 +19,7 @@ public interface VarItem<T extends VarItem<T>> {
             Map.entry("item", () -> VanillaItem.CODEC),
             Map.entry("snd", () -> SoundItem.CODEC),
             Map.entry("part", () -> ParticleItem.CODEC),
+            Map.entry("pot", () -> PotionItem.CODEC),
             Map.entry("bucket_var", () -> BucketVariableItem.CODEC)
     );
 
