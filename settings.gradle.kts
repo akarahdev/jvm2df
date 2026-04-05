@@ -4,3 +4,11 @@ include("stdlib")
 include("compiler")
 include("compiler-frontend")
 include("generator")
+
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}

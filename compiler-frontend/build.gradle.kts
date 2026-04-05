@@ -13,11 +13,11 @@ application {
 }
 
 tasks.run {
-    dependsOn(":example-plot:shadowJar")
+    dependsOn(":example-plot:proguardJar")
 }
 
 tasks.run {
-    args(project.rootDir.toString() + "/example-plot/build/libs/example-plot-1.0-SNAPSHOT-all.jar")
+    args(project.rootDir.toString() + "/example-plot/build/libs/example-plot-1.0-SNAPSHOT-proguarded.jar")
 }
 
 repositories {

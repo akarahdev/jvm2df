@@ -229,15 +229,15 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
         var map = Map.ofEntries(
                 Map.entry("String", "Ljava/lang/String;"),
                 Map.entry("Number", "Ljava/lang/Double;"),
-                Map.entry("Styled Text", "Ldiamondfire/value/Text;"),
-                Map.entry("Location", "Ldiamondfire/value/Location;"),
-                Map.entry("Item", "Ldiamondfire/value/Item;"),
-                Map.entry("List", "Ldiamondfire/value/List;"),
-                Map.entry("Potion effect", "Ldiamondfire/value/PotionEffect;"),
-                Map.entry("Sound", "Ldiamondfire/value/Sound;"),
-                Map.entry("Particle", "Ldiamondfire/value/Particle;"),
-                Map.entry("Vector", "Ldiamondfire/value/Vector;"),
-                Map.entry("Dictionary", "Ldiamondfire/value/Dictionary;")
+                Map.entry("Styled Text", "Ldf/value/Text;"),
+                Map.entry("Location", "Ldf/value/Location;"),
+                Map.entry("Item", "Ldf/value/Item;"),
+                Map.entry("List", "Ldf/value/List;"),
+                Map.entry("Potion effect", "Ldf/value/PotionEffect;"),
+                Map.entry("Sound", "Ldf/value/Sound;"),
+                Map.entry("Particle", "Ldf/value/Particle;"),
+                Map.entry("Vector", "Ldf/value/Vector;"),
+                Map.entry("Dictionary", "Ldf/value/Dictionary;")
         );
 
         // other types
