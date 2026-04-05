@@ -155,6 +155,8 @@ public class CodeTreeConverter {
                     case FLOAT, DOUBLE -> baseValue;
                 });
             }
+            case TableSwitchInstruction tableSwitchInstruction -> tableSwitch(tableSwitchInstruction, offset);
+            case LookupSwitchInstruction lookupSwitchInstruction -> lookupSwitch(lookupSwitchInstruction, offset);
             default -> {
                 this.stack.add(new CodeTree.Unknown(codeElement));
             }
@@ -378,6 +380,50 @@ public class CodeTreeConverter {
                     new Terminator.BranchIf(
                             stack.removeLast(),
                             this.labelToOffset(instruction.target()),
+                            offset + instruction.sizeInBytes()
+                    )
+            );
+        }
+    }
+
+    private void tableSwitch(TableSwitchInstruction instruction, int offset) {
+        var local = Integer.MAX_VALUE - 2;
+        this.statements.add(new CodeTree.StoreLocal(
+                local,
+                this.stack.removeLast(),
+                CodeTree.Kind.PRIMITIVE
+        ));
+        for (var switchCase : instruction.cases()) {
+            this.statements.add(
+                    new Terminator.BranchIf(
+                            new CodeTree.Compare(
+                                    ComparisonType.EQUAL,
+                                    new CodeTree.LoadLocal(local),
+                                    new CodeTree.Constant(switchCase.caseValue())
+                            ),
+                            this.labelToOffset(switchCase.target()),
+                            offset + instruction.sizeInBytes()
+                    )
+            );
+        }
+    }
+
+    private void lookupSwitch(LookupSwitchInstruction instruction, int offset) {
+        var local = Integer.MAX_VALUE - 2;
+        this.statements.add(new CodeTree.StoreLocal(
+                local,
+                this.stack.removeLast(),
+                CodeTree.Kind.PRIMITIVE
+        ));
+        for (var switchCase : instruction.cases()) {
+            this.statements.add(
+                    new Terminator.BranchIf(
+                            new CodeTree.Compare(
+                                    ComparisonType.EQUAL,
+                                    new CodeTree.LoadLocal(local),
+                                    new CodeTree.Constant(switchCase.caseValue())
+                            ),
+                            this.labelToOffset(switchCase.target()),
                             offset + instruction.sizeInBytes()
                     )
             );

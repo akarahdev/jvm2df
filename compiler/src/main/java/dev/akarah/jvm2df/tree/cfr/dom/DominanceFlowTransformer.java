@@ -9,6 +9,7 @@ import dev.akarah.jvm2df.tree.instructions.ComparisonType;
 import dev.akarah.jvm2df.tree.instructions.Terminator;
 
 import java.util.*;
+import java.util.function.Function;
 
 /*
 READER DISCLAIMER:
@@ -30,6 +31,9 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
     private final Map<BasicBlock, List<BasicBlock>> dominanceTree = new HashMap<>();
     private final Set<BasicBlock> visitedBlocks = new HashSet<>();
     private final Set<BasicBlock> loopHeaders = new HashSet<>();
+
+    private record BranchChain(int startIndex, List<Terminator.BranchIf> branches) {
+    }
 
     private void buildCfg() {
         for (var block : basicBlocks) {
@@ -234,7 +238,7 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
             List<CodeTree> statements = new ArrayList<>();
             statements.add(new CodeTree.ExecuteFlow(new ReconstructedFlow.LoopForever(body)));
 
-            if (exit != null && exit != stopAt) {
+            if (exit != null) {
                 statements.addAll(reconstruct(exit, stopAt).statements());
             }
             return new FlowBlock(statements);
@@ -244,6 +248,24 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         List<CodeTree> statements = new ArrayList<>();
 
         var blockStatements = block.statements();
+
+        var branchChain = trailingBranchChain(blockStatements);
+        if (branchChain != null) {
+            for (int i = 0; i < branchChain.startIndex(); i++) {
+                statements.add(blockStatements.get(i));
+            }
+
+            BasicBlock merge = findMergePoint(block);
+            Function<BasicBlock, FlowBlock> targetResolver = target -> reconstructTarget(target, merge);
+
+            statements.addAll(reconstructConditionalChain(branchChain.branches(), 0, targetResolver).statements());
+
+            if (merge != null) {
+                statements.addAll(reconstruct(merge, stopAt).statements());
+            }
+            return new FlowBlock(statements);
+        }
+
         for (int i = 0; i < blockStatements.size() - 1; i++) {
             statements.add(blockStatements.get(i));
         }
@@ -266,7 +288,7 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
                     Optional.of(reconstruct(ifFalse, merge))
             )));
 
-            if (merge != null && merge != stopAt) {
+            if (merge != null) {
                 statements.addAll(reconstruct(merge, stopAt).statements());
             }
         } else if (term instanceof Terminator.ReturnValue || term instanceof Terminator.ReturnVoid || term instanceof Terminator.Unreachable) {
@@ -276,10 +298,81 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
         return new FlowBlock(statements);
     }
 
+    private FlowBlock reconstructTarget(BasicBlock target, BasicBlock stopAt) {
+        if (target == null || target == stopAt) {
+            return new FlowBlock(new ArrayList<>());
+        }
+        return reconstruct(target, stopAt);
+    }
+
+    private BranchChain trailingBranchChain(List<CodeTree> statements) {
+        int startIndex = statements.size();
+        while (startIndex > 0 && statements.get(startIndex - 1) instanceof Terminator.BranchIf) {
+            startIndex--;
+        }
+
+        if (startIndex == statements.size()) {
+            return null;
+        }
+
+        List<Terminator.BranchIf> branches = new ArrayList<>();
+        for (int i = startIndex; i < statements.size(); i++) {
+            branches.add((Terminator.BranchIf) statements.get(i));
+        }
+        return new BranchChain(startIndex, branches);
+    }
+
+    private FlowBlock reconstructConditionalChain(
+            List<Terminator.BranchIf> branches,
+            int index,
+            Function<BasicBlock, FlowBlock> targetResolver
+    ) {
+        var branch = branches.get(index);
+        var ifTrue = targetResolver.apply(blocksByOffset.get(branch.ifTrue()));
+        FlowBlock ifFalse = (index + 1 < branches.size())
+                ? reconstructConditionalChain(branches, index + 1, targetResolver)
+                : targetResolver.apply(blocksByOffset.get(branch.ifFalse()));
+
+        return new FlowBlock(List.of(new CodeTree.ExecuteFlow(new ReconstructedFlow.If(
+                branch.operand(),
+                ifTrue,
+                Optional.of(ifFalse)
+        ))));
+    }
+
     private FlowBlock reconstructLoopBody(BasicBlock header, BasicBlock exit) {
         // Special reconstruction for loop body that allows entering the header
         List<CodeTree> statements = new ArrayList<>();
         var blockStatements = header.statements();
+
+        var branchChain = trailingBranchChain(blockStatements);
+        if (branchChain != null) {
+            for (int i = 0; i < branchChain.startIndex(); i++) {
+                statements.add(blockStatements.get(i));
+            }
+
+            BasicBlock merge = findMergePoint(header);
+            if (merge == exit) merge = null;
+
+            BasicBlock branchStop = merge == null ? exit : merge;
+            Function<BasicBlock, FlowBlock> targetResolver = target -> {
+                if (target == header) {
+                    return new FlowBlock(List.of(new Terminator.Continue()));
+                }
+                if (target == exit) {
+                    return new FlowBlock(List.of(new Terminator.Break()));
+                }
+                return reconstructTarget(target, branchStop);
+            };
+
+            statements.addAll(reconstructConditionalChain(branchChain.branches(), 0, targetResolver).statements());
+
+            if (merge != null) {
+                statements.addAll(reconstruct(merge, exit).statements());
+            }
+            return new FlowBlock(statements);
+        }
+
         for (int i = 0; i < blockStatements.size() - 1; i++) {
             statements.add(blockStatements.get(i));
         }
@@ -307,7 +400,7 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
                     Optional.of((ifFalse == header) ? new FlowBlock(List.of(new Terminator.Continue())) : (ifFalse == exit ? new FlowBlock(List.of(new Terminator.Break())) : reconstruct(ifFalse, merge == null ? exit : merge)))
             )));
 
-            if (merge != null && merge != exit) {
+            if (merge != null) {
                 statements.addAll(reconstruct(merge, exit).statements());
             }
         } else if (term instanceof Terminator.ReturnValue || term instanceof Terminator.ReturnVoid || term instanceof Terminator.Unreachable) {
@@ -323,7 +416,7 @@ public class DominanceFlowTransformer implements ControlFlowTransformer {
     private boolean dominates(BasicBlock a, BasicBlock b) {
         if (a == null || b == null) return false;
         var curr = b;
-        while (curr != null) {
+        while (true) {
             if (curr == a) return true;
             var next = idom.get(curr);
             if (next == curr || next == null) break;

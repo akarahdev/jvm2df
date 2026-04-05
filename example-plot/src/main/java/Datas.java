@@ -12,4 +12,8 @@ public enum Datas {
     public String toString() {
         return this.name;
     }
+
+    public static int bruh() {
+        return 2;
+    }
 }
