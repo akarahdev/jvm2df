@@ -36,9 +36,15 @@ public class TracingGCStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
-    public VarItem<?> allocate() {
-        var value = this.inner.allocate();
-        this.setField(value, LiteralItem.string("dhs::marked"), LiteralItem.number("0"));
+    public VarItem<?> allocate(
+            List<VarItem<?>> fields,
+            List<VarItem<?>> values
+    ) {
+        var fieldsV2 = new ArrayList<>(fields);
+        fieldsV2.add(LiteralItem.string("dhs::marked"));
+        var valuesV2 = new ArrayList<>(values);
+        valuesV2.add(LiteralItem.number("0"));
+        var value = this.inner.allocate(fieldsV2, valuesV2);
         this.transformer().appendCodeBlock(ActionBlock.setVar(
                 "SetDictValue",
                 Args.byVarItems(

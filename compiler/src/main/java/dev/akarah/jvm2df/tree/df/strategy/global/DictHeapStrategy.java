@@ -34,7 +34,7 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
     }
 
     @Override
-    public VarItem<?> allocate() {
+    public VarItem<?> allocate(List<VarItem<?>> fields, List<VarItem<?>> values) {
         var allocationNameVar = VarPattern.temporary("allocation");
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "=",
@@ -43,10 +43,14 @@ public class DictHeapStrategy implements GlobalMemoryStrategy {
                         VarPattern.newMemoryAddress()
                 )
         ));
+        var fieldList = this.transformer().createListQuickly(fields);
+        var valueList = this.transformer().createListQuickly(values);
         this.transformer.appendCodeBlock(ActionBlock.setVar(
                 "CreateDict",
                 Args.byVarItems(
-                        new VariableItem("%var(" + allocationNameVar.name() + ")", "unsaved")
+                        new VariableItem("%var(" + allocationNameVar.name() + ")", "unsaved"),
+                        fieldList,
+                        valueList
                 )
         ));
         return allocationNameVar;

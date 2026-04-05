@@ -164,12 +164,7 @@ public class CodeTreeConverter {
     }
 
     private void newObj(NewObjectInstruction instruction) {
-        this.statements.add(new CodeTree.StoreLocal(
-                Integer.MAX_VALUE - 1,
-                new CodeTree.ObjectNew("L" + instruction.className().asInternalName() + ";"),
-                CodeTree.Kind.REFERENCE
-        ));
-        this.stack.add(new CodeTree.LoadLocal(Integer.MAX_VALUE - 1));
+        this.stack.add(new CodeTree.ObjectNew("L" + instruction.className().asInternalName() + ";"));
     }
 
     private void field(FieldInstruction instruction) {

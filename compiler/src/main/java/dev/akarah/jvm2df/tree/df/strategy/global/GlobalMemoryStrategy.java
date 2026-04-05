@@ -16,7 +16,10 @@ public interface GlobalMemoryStrategy {
 
     void setup(CodeLineBuilder transformer, LocalMemoryStrategy locals);
 
-    VarItem<?> allocate();
+    VarItem<?> allocate(
+            List<VarItem<?>> fields,
+            List<VarItem<?>> vals
+    );
 
     void setField(VarItem<?> allocation, VarItem<?> field, VarItem<?> value);
 

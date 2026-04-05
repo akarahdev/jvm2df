@@ -266,7 +266,7 @@ public class GenerateFieldSetup implements PipelineComponent {
         var arrayVar = new VariableItem("array", "line");
         var keyVar = new VariableItem("key", "line");
         var valueVar = new VariableItem("value", "line");
-        var out = pipeline.codeLineBuilder().globals().allocate();
+        var out = pipeline.codeLineBuilder().globals().allocate(List.of(), List.of());
 
         pipeline.codeLineBuilder().appendCodeBlock(ActionBlock.repeat(
                 "ForEachEntry",

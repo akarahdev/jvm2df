@@ -159,18 +159,16 @@ public class FlowToDF {
                 case Double i -> LiteralItem.number(i.toString());
                 case String string -> LiteralItem.string(string);
                 case ClassDesc classDesc -> {
-                    var alloc = this.builder().globals().allocate();
-                    this.builder().globals().setField(
-                            alloc,
-                            LiteralItem.string("class"),
-                            LiteralItem.string("Ljava/lang/Class;")
+                    yield this.builder().globals().allocate(
+                            List.of(
+                                    LiteralItem.string("class"),
+                                    LiteralItem.string("descriptor")
+                            ),
+                            List.of(
+                                    LiteralItem.string("Ljava/lang/Class;"),
+                                    LiteralItem.string(classDesc.descriptorString())
+                            )
                     );
-                    this.builder().globals().setField(
-                            alloc,
-                            LiteralItem.string("descriptor"),
-                            LiteralItem.string(classDesc.descriptorString())
-                    );
-                    yield alloc;
                 }
                 case DynamicConstantDesc<?> dynamicConstantDesc -> {
                     try {
@@ -244,18 +242,16 @@ public class FlowToDF {
                 yield this.builder.locals().referenceLocal(inc.idx());
             }
             case CodeTree.ArrayNew arrayNew -> {
-                var alloc = this.builder.globals().allocate();
-                this.builder.globals().setField(
-                        alloc,
-                        LiteralItem.string("class"),
-                        LiteralItem.string(arrayNew.descriptor())
+                yield this.builder.globals().allocate(
+                        List.of(
+                                LiteralItem.string("class"),
+                                LiteralItem.string("length")
+                        ),
+                        List.of(
+                                LiteralItem.string(arrayNew.descriptor()),
+                                this.convertCodeTree(arrayNew.size())
+                        )
                 );
-                this.builder.globals().setField(
-                        alloc,
-                        LiteralItem.string("length"),
-                        this.convertCodeTree(arrayNew.size())
-                );
-                yield alloc;
             }
             case CodeTree.ArrayStore arrayStore -> {
                 var array = this.convertCodeTree(arrayStore.list());
@@ -275,13 +271,14 @@ public class FlowToDF {
                     LiteralItem.string("length")
             );
             case CodeTree.ObjectNew objectNew -> {
-                var alloc = this.builder.globals().allocate();
-                this.builder.globals().setField(
-                        alloc,
-                        LiteralItem.string("class"),
-                        LiteralItem.string(objectNew.clazz())
+                yield this.builder.globals().allocate(
+                        List.of(
+                                LiteralItem.string("class")
+                        ),
+                        List.of(
+                                LiteralItem.string(objectNew.clazz())
+                        )
                 );
-                yield alloc;
             }
             case CodeTree.ObjectSetStatic(String clazz, String field, CodeTree value, CodeTree.Kind kind) -> {
                 if (kind.equals(CodeTree.Kind.REFERENCE)) {
